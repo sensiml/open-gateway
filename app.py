@@ -45,8 +45,8 @@ INT16_BYTE_SIZE = 2
 
 _config = {
     "sample_rate": 119,
-    "serial_port": "/dev/ttyACM0",
-    "samples_per_packet": 10,
+    "serial_port": app.config["SERIAL_PORT"],
+    "samples_per_packet": app.config["CONFIG_SAMPLES_PER_PACKET"],
     "column_location": {
         "AccelerometerY": 1,
         "AccelerometerX": 0,
