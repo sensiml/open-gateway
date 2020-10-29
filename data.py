@@ -66,6 +66,12 @@ def read_buffer(port, buffer_size):
         return ser.read(SHORT * buffer_size)
 
 
+def flush_buffer(port):
+    with serial.Serial(port, BAUD_RATE, timeout=1) as ser:
+        return ser.reset_input_buffer()
+
+    
+
 def check_for_config(port, default_config):
     try:
         config = json.loads(read_line(port))

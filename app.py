@@ -25,6 +25,7 @@ from data import (
     _get_serial_data,
     send_connect,
     _generate_samples,
+    flush_buffer,
 )
 
 app = Flask(__name__)
@@ -38,7 +39,7 @@ app.config["CONFIG_COLUMNS"] = [
     "GyroscopeZ",
 ]
 app.config["CONFIG_SAMPLE_RATE"] = 100
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 100
+app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
 app.config["TEST"] = True
 app.config["SERIAL_PORT"] = "/dev/ttyACM0"
 INT16_BYTE_SIZE = 2
@@ -125,6 +126,7 @@ def stream():
                 time.sleep(delay)
 
         else:
+            flush_buffer(app.config["SERIAL_PORT"])
             while True:
                 yield _get_serial_data(
                     app.config["SERIAL_PORT"],
