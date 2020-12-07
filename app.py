@@ -4,6 +4,7 @@ It contains the definition of routes and views for the application.
 """
 
 from flask import (
+    render_template,
     Flask,
     Response,
     stream_with_context,
@@ -40,7 +41,7 @@ app.config["CONFIG_COLUMNS"] = [
 ]
 app.config["CONFIG_SAMPLE_RATE"] = 100
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
-app.config["TEST"] = True
+app.config["TEST"] = False
 app.config["SERIAL_PORT"] = "/dev/ttyACM0"
 INT16_BYTE_SIZE = 2
 
@@ -65,7 +66,7 @@ wsgi_app = app.wsgi_app
 @app.route("/")
 def main():
     """Renders a sample page."""
-    return "Welcome to the SensiML IoT Streaming Server!"
+    return render_template('index.html')
 
 
 @app.route("/config")
