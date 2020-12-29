@@ -13,9 +13,8 @@ class TestReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
     def __init__(self, config, **kwargs):
-        self.samples_per_packet = config['CONFIG_SAMPLES_PER_PACKET']
-        self.sample_rate = config["CONFIG_SAMPLE_RATE"]
-        self.config_columns = config.get("CONFIG_COLUMNS")
+        
+        super(TestReader, self).__init__(config, **kwargs)
 
     @property
     def delay(self):
@@ -75,15 +74,7 @@ class TestReader(BaseReader):
 
     def set_config(self, config):
 
-        config["CONFIG_COLUMNS"] = [
-            "AccelerometerX",
-            "AccelerometerY",
-            "AccelerometerZ",
-            "GyroscopeX",
-            "GyroscopeY",
-            "GyroscopeZ",
-        ]
-
+        config["CONFIG_COLUMNS"] = {"0": "AccelerometerX", "1": "AccelerometerY", "2": "AccelerometerZ", "3": "GyroscopeX", "4": "GyroscopeY", "5": "GyroscopeZ"}
         config["CONFIG_SAMPLE_RATE"] = 100
         config["DATA_SOURCE"] = "TEST"
 
@@ -97,7 +88,8 @@ class TestReader(BaseReader):
     def read_data(self):
         index = 0
         data = self._generate_samples(len(self.config_columns), self.sample_rate)
-        while True:
+        self.streaming = True
+        while self.streaming:
             sample_data, index = self._pack_data(
                 data, self.byteSize, self.samples_per_packet, index
             )

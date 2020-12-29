@@ -3,6 +3,7 @@ This script runs the application using a development server.
 It contains the definition of routes and views for the application.
 """
 
+
 from flask import (
     render_template,
     Flask,
@@ -19,7 +20,8 @@ import random, struct
 import math
 from forms import SerialPortForm, BLEDeviceListForm
 from sources import get_source
-
+import sys
+import json
 
 app = Flask(__name__)
 
@@ -28,11 +30,21 @@ app.config["CONFIG_SAMPLE_RATE"] = 100
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
 app.config['DATA_SOURCE'] = None
 app.config["CONFIG_COLUMNS"] = None
+app.config["SERIAL_PORT"] = None
+app.config["BLE_DEVICE_ID"] = None
 
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
 
+def cache_config(config):
+    tmp = {"CONFIG_SAMPLE_RATE": app.config['CONFIG_SAMPLE_RATE'],
+            "DATA_SOURCE":app.config['DATA_SOURCE'],
+            "CONFIG_COLUMNS":app.config["CONFIG_COLUMNS"],
+            "BLE_DEVICE_ID":app.config["BLE_DEVICE_ID"],
+            "SERIAL_PORT":app.config['SERIAL_PORT'],            
+           }
+    json.dump(tmp, open('config.cache','w'))
 
 @app.route("/")
 def main():
@@ -41,7 +53,7 @@ def main():
 
 
 @app.route("/config")
-def config():
+def get_config():
 
     ret = {}
     ret["sample_rate"] = app.config["CONFIG_SAMPLE_RATE"]
@@ -51,7 +63,10 @@ def config():
 
     if app.config['CONFIG_COLUMNS']:
         for y in range(0, len(app.config["CONFIG_COLUMNS"])):
-            ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
+            if app.config["CONFIG_COLUMNS"].get(y, None):
+                ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
+            else:
+                ret["column_location"][app.config["CONFIG_COLUMNS"][str(y)]] = int(y)
     else:
         ret["column_location"] = {}
 
@@ -70,6 +85,8 @@ def config_test():
 
     source.send_connect()
 
+    cache_config(app.config)
+
     return redirect("/config")
 
 
@@ -83,8 +100,11 @@ def config_serial():
     if request.method == "POST":
 
         source._port = form.data["serial_port"]
+
         source.set_config(app.config)
-        source.send_connect()
+        print("STREAMING APP CONFIGURED FOR STREAMING")
+
+        cache_config(app.config)
 
         return redirect("/config")
 
@@ -99,29 +119,56 @@ def config_ble():
     form = BLEDeviceListForm()
 
     app.config['DATA_SOURCE'] = "BLE"
-    source = get_source(app.config)
-
 
     if request.method == "POST":
 
-        source._port = form.data["ble_device_id"]
+        app.config['BLE_DEVICE_ID'] = form.data["ble_device_id"]
+
+        source = get_source(app.config)
+
         source.set_config(app.config)
-        source.send_connect()
+        print("BLE APP CONFIGURED FOR STREAMING")
+
+        source.disconnect()
+        print("DISCONNECT FROM DEVICE")
+
+        cache_config(app.config)
 
         return redirect("/config")
 
+    device_id_list = get_source(app.config, connect=False).list_available_devices()
 
     return render_template(
-        "ble-device-list.html", form=form, ble_device_id_list=source.list_available_devices()
+        "ble-device-list.html", form=form, ble_device_id_list=device_id_list
     )
 
 
 @app.route("/stream")
 def stream():
 
+    if app.config.get("STREAMING_SOURCE", None):
+        print("Source is already Streaming!")
+        return "Source is already Streaming. Call disconnect to stop."
+
     source = get_source(app.config)
 
+    app.config['STREAMING_SOURCE'] = source
+
     return Response(stream_with_context(source.read_data()), mimetype="application/octet-stream")
+
+
+
+@app.route("/disconnect")
+def disconnect():
+
+    source = app.config.get('STREAMING_SOURCE', None)
+
+    if source is not None:
+        source.disconnect()
+
+    del app.config['STREAMING_SOURCE']
+        
+    return redirect("/config")
 
 
 if __name__ == "__main__":
@@ -132,4 +179,8 @@ if __name__ == "__main__":
         PORT = int(os.environ.get("SERVER_PORT", "5555"))
     except ValueError:
         PORT = 5555
+
+    if os.path.exists('config.cache'):
+        app.config.update(json.load(open('config.cache','r')))
+
     app.run(HOST, 5555)

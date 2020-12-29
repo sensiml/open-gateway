@@ -6,7 +6,7 @@ import time
 import random
 from sources.base import BaseReader
 
-SHORT = 2
+
 BAUD_RATE = 921600
 
 class SerialReader(BaseReader):
@@ -14,9 +14,9 @@ class SerialReader(BaseReader):
     def __init__(self, config, **kwargs):
         self._port = config.get('SERIAL_PORT', None)
         self._baud_rate = config.get('BAUD_RATE', BAUD_RATE)
-        self._buffer_size = None
-        self._data_width = len(config.get("CONFIG_COLUMNS", []))
 
+        super(SerialReader, self).__init__(config, **kwargs)
+        
     @property
     def port(self):
         return self._port
@@ -24,10 +24,6 @@ class SerialReader(BaseReader):
     @property
     def baud_rate(self):
         return self.baud_rate
-
-    @property
-    def data_width(self):
-        return self._data_width
 
     def _write(self, command):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
@@ -38,9 +34,9 @@ class SerialReader(BaseReader):
             return ser.readline()
 
 
-    def _read_buffer(self,buffer_size):
+    def _read_buffer(self, buffer_size):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
-            return ser.read(SHORT * buffer_size)
+            return ser.read(buffer_size)
 
 
     def _flush_buffer(self):
@@ -73,12 +69,7 @@ class SerialReader(BaseReader):
         if not source_config:
             raise Exception("Invalid Source Configuration")
 
-        config_columns = {}
-        config_coumns = ["" for x in range(len(source_config["column_location"]))]
-        for key, value in source_config["column_location"].items():
-            config_columns[value] = key
-
-        config["CONFIG_COLUMNS"] = config_columns
+        config["CONFIG_COLUMNS"] = source_config["column_location"]
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "SERIAL"
         config["SERIAL_PORT"] = self.port
@@ -94,15 +85,14 @@ class SerialReader(BaseReader):
         if self.port is None:
             return "Serial Port not configured!"
 
+        self.send_connect()
+        time.sleep(1)
+        
         self._flush_buffer()
 
-        while True:
-            yield self._read_buffer(
-                self.data_width
-                * samples_per_packet,
-            )
-
-
+        self.streaming = True
+        while self.streaming:
+            yield self._read_buffer(self.packet_buffer_size)
 
 if __name__ == "__main__":
     port = "/dev/ttyACM0"
