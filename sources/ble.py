@@ -69,9 +69,10 @@ class BLEReader(BaseReader):
         device_list = []
 
         for dev in devices:
-            s =  "Device %s (%s), RSSI=%d dB" % (dev.addr, dev.addrType, dev.rssi)
+            s =  "Device ID: %s - " % (dev.addr)
             for (adtype, desc, value) in dev.getScanData():
-                s += "  %s = %s" % (desc, value)
+                if desc == 'Complete Local Name':
+                    s += " Name = %s" % (value)
 
             device_list.append(s)
 

@@ -2,14 +2,16 @@
 <div class="formwrapper">
     <h2 class="title">BLE DEVICE ID</h2>
 
+    <form method="POST">
+        <div class="form-field">{{ form.ble_device_id.label }} {{ form.ble_device_id }}</div>
+        {{ form.submit }}
+    </form>
+
     {% for item in ble_device_id_list %}
     <h4> {{ item }} </h4>
     {% endfor %}
 
 
-    <form method="POST">
-        <div class="form-field">{{ form.ble_device_id.label }} {{ form.ble_device_id }}</div>
-        {{ form.submit }}
-    </form>
+
 </div>
 {% endblock %}
