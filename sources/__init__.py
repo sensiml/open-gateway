@@ -1,11 +1,11 @@
 from sources.ble import BLEReader
-from sources.dummy import DummyReader
+from sources.TEST import TestReader
 from sources.serial import SerialReader
 
 
 def get_source(config):
-    if config['DATA_SOURCE'] == 'DUMMY':
-        return DummyReader(config)
+    if config['DATA_SOURCE'] == 'TEST':
+        return TestReader(config)
 
     if config['DATA_SOURCE'] == 'SERIAL':
         return SerialReader(config)

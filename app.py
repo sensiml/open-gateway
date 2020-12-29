@@ -41,7 +41,7 @@ def main():
 
 
 @app.route("/config")
-def return_config():
+def config():
 
     ret = {}
     ret["sample_rate"] = app.config["CONFIG_SAMPLE_RATE"]
@@ -59,10 +59,10 @@ def return_config():
 
 
 
-@app.route("/config-dummy", methods=["GET", "POST"])
-def config_dummy():
+@app.route("/config-test", methods=["GET", "POST"])
+def config_test():
 
-    app.config['DATA_SOURCE'] = "DUMMY"
+    app.config['DATA_SOURCE'] = "TEST"
 
     source = get_source(app.config)
 
@@ -74,7 +74,7 @@ def config_dummy():
 
 
 @app.route("/config-serial", methods=["GET", "POST"])
-def serial_port():
+def config_serial():
     form = SerialPortForm()
 
     app.config['DATA_SOURCE'] = "SERIAL"
@@ -95,7 +95,7 @@ def serial_port():
 
 
 @app.route("/config-ble", methods=["GET", "POST"])
-def ble_config():
+def config_ble():
     form = BLEDeviceListForm()
 
     app.config['DATA_SOURCE'] = "BLE"
@@ -120,8 +120,6 @@ def ble_config():
 def stream():
 
     source = get_source(app.config)
-
-    print(source.read_data())
 
     return Response(stream_with_context(source.read_data()), mimetype="application/octet-stream")
 

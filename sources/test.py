@@ -9,7 +9,7 @@ from sources.base import BaseReader
 SHORT = 2
 INT16_BYTE_SIZE = 2
 
-class DummyReader(BaseReader):
+class TestReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
     def __init__(self, config, **kwargs):
@@ -85,7 +85,7 @@ class DummyReader(BaseReader):
         ]
 
         config["CONFIG_SAMPLE_RATE"] = 100
-        config["DATA_SOURCE"] = "DUMMY"
+        config["DATA_SOURCE"] = "TEST"
 
         self.samples_per_packet = config['CONFIG_SAMPLES_PER_PACKET']
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
