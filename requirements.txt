@@ -1,3 +1,4 @@
 flask
 flask-wtf
 wtforms
+bluepy

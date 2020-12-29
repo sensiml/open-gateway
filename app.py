@@ -17,47 +17,18 @@ import time
 from json import dumps
 import random, struct
 import math
-from forms import SerialPortForm
-from data import (
-    _generate_samples,
-    get_port_info,
-    pack_data,
-    check_for_config,
-    _get_serial_data,
-    send_connect,
-    _generate_samples,
-    flush_buffer,
-)
+from forms import SerialPortForm, BLEDeviceListForm
+from sources import get_source
+
 
 app = Flask(__name__)
+
 app.config["SECRET_KEY"] = "any secret string"
-app.config["CONFIG_COLUMNS"] = [
-    "AccelerometerX",
-    "AccelerometerY",
-    "AccelerometerZ",
-    "GyroscopeX",
-    "GyroscopeY",
-    "GyroscopeZ",
-]
 app.config["CONFIG_SAMPLE_RATE"] = 100
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
-app.config["TEST"] = False
-app.config["SERIAL_PORT"] = "/dev/ttyACM0"
-INT16_BYTE_SIZE = 2
+app.config['DATA_SOURCE'] = None
+app.config["CONFIG_COLUMNS"] = None
 
-_config = {
-    "sample_rate": 119,
-    "serial_port": app.config["SERIAL_PORT"],
-    "samples_per_packet": app.config["CONFIG_SAMPLES_PER_PACKET"],
-    "column_location": {
-        "AccelerometerY": 1,
-        "AccelerometerX": 0,
-        "GyroscopeZ": 5,
-        "GyroscopeY": 4,
-        "GyroscopeX": 3,
-        "AccelerometerZ": 2,
-    },
-}
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
@@ -71,71 +42,88 @@ def main():
 
 @app.route("/config")
 def return_config():
+
     ret = {}
     ret["sample_rate"] = app.config["CONFIG_SAMPLE_RATE"]
     ret["column_location"] = dict()
     ret["samples_per_packet"] = app.config["CONFIG_SAMPLES_PER_PACKET"]
+    ret["source"] = app.config['DATA_SOURCE']
 
-    for y in range(0, len(app.config["CONFIG_COLUMNS"])):
-        ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
+    if app.config['CONFIG_COLUMNS']:
+        for y in range(0, len(app.config["CONFIG_COLUMNS"])):
+            ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
+    else:
+        ret["column_location"] = {}
 
     return Response(dumps(ret), mimetype="application/json")
 
 
-@app.route("/serialport", methods=["GET", "POST"])
+
+@app.route("/config-dummy", methods=["GET", "POST"])
+def config_dummy():
+
+    app.config['DATA_SOURCE'] = "DUMMY"
+
+    source = get_source(app.config)
+
+    source.set_config(app.config)
+
+    source.send_connect()
+
+    return redirect("/config")
+
+
+@app.route("/config-serial", methods=["GET", "POST"])
 def serial_port():
     form = SerialPortForm()
+
+    app.config['DATA_SOURCE'] = "SERIAL"
+    source = get_source(app.config)
+
     if request.method == "POST":
-        app.config["SERIAL_PORT"] = form.data["serial_port"]
-        config = check_for_config(app.config["SERIAL_PORT"], _config)
-        app.config["CONFIG_SAMPLE_RATE"] = config["sample_rate"]
-        app.config["CONFIG_COLUMNS"] = config["CONFIG_COLUMNS"]
-        app.config["TEST"] = False
-        send_connect(app.config["SERIAL_PORT"])
+
+        source._port = form.data["serial_port"]
+        source.set_config(app.config)
+        source.send_connect()
 
         return redirect("/config")
 
+
     return render_template(
-        "serialport.html", form=form, serial_port_list=get_port_info()
+        "serialport.html", form=form, serial_port_list=source.list_available_devices()
+    )
+
+
+@app.route("/config-ble", methods=["GET", "POST"])
+def ble_config():
+    form = BLEDeviceListForm()
+
+    app.config['DATA_SOURCE'] = "BLE"
+    source = get_source(app.config)
+
+
+    if request.method == "POST":
+
+        source._port = form.data["ble_device_id"]
+        source.set_config(app.config)
+        source.send_connect()
+
+        return redirect("/config")
+
+
+    return render_template(
+        "ble-device-list.html", form=form, ble_device_id_list=source.list_available_devices()
     )
 
 
 @app.route("/stream")
 def stream():
 
-    delay = (
-        (1.0 / app.config["CONFIG_SAMPLE_RATE"])
-        * app.config["CONFIG_SAMPLES_PER_PACKET"]
-        / 1.25
-    )
-    byteSize = (
-        len(app.config["CONFIG_COLUMNS"])
-        * app.config["CONFIG_SAMPLES_PER_PACKET"]
-        * INT16_BYTE_SIZE
-    )
-    num_cols = len(app.config["CONFIG_COLUMNS"])
+    source = get_source(app.config)
 
-    def gen():
-        if app.config["TEST"]:
-            index = 0
-            data = _generate_samples(num_cols, app.config["CONFIG_SAMPLE_RATE"])
-            while True:
-                sample_data, index = pack_data(
-                    data, byteSize, app.config["CONFIG_SAMPLES_PER_PACKET"], index
-                )
-                yield sample_data
-                time.sleep(delay)
+    print(source.read_data())
 
-        else:
-            flush_buffer(app.config["SERIAL_PORT"])
-            while True:
-                yield _get_serial_data(
-                    app.config["SERIAL_PORT"],
-                    len(app.config["CONFIG_COLUMNS"])
-                    * app.config["CONFIG_SAMPLES_PER_PACKET"],
-                )
-
-    return Response(stream_with_context(gen()), mimetype="application/octet-stream")
+    return Response(stream_with_context(source.read_data()), mimetype="application/octet-stream")
 
 
 if __name__ == "__main__":
