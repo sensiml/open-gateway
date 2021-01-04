@@ -117,15 +117,18 @@ class BLEReader(BaseReader):
         self.streaming=True
 
         while self.streaming:
-            if self.peripheral.waitForNotifications(.01):
-                continue
-            if self.delegate.new_data:
-                tmp = copy.deepcopy(self.delegate.data)
-                if len(tmp) >= self.packet_buffer_size:
-                    self.delegate.new_data=False
-                    self.delegate.data=self.delegate.data[self.packet_buffer_size:]
-                    
-                    yield tmp[:self.packet_buffer_size]            
+            try:
+                if self.peripheral.waitForNotifications(.01):
+                    continue
+                if self.delegate.new_data:
+                    tmp = copy.deepcopy(self.delegate.data)
+                    if len(tmp) >= self.packet_buffer_size:
+                        self.delegate.new_data=False
+                        self.delegate.data=self.delegate.data[self.packet_buffer_size:]
+                        
+                        yield tmp[:self.packet_buffer_size]            
+            except:
+                self.streaming = False
 
 
 if __name__ == "__main__":

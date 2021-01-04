@@ -32,6 +32,7 @@ app.config['DATA_SOURCE'] = None
 app.config["CONFIG_COLUMNS"] = None
 app.config["SERIAL_PORT"] = None
 app.config["BLE_DEVICE_ID"] = None
+app.config["STREAMING_SOURCE"] = None
 
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
@@ -49,11 +50,10 @@ def cache_config(config):
 @app.route("/")
 def main():
     """Renders a sample page."""
-    return render_template('index.html')
+    return render_template('index.html', source=app.config['DATA_SOURCE'], streaming=True if app.config['STREAMING_SOURCE'] else False, configuration=parse_current_config())
 
 
-@app.route("/config")
-def get_config():
+def parse_current_config():
 
     ret = {}
     ret["sample_rate"] = app.config["CONFIG_SAMPLE_RATE"]
@@ -69,6 +69,13 @@ def get_config():
                 ret["column_location"][app.config["CONFIG_COLUMNS"][str(y)]] = int(y)
     else:
         ret["column_location"] = {}
+
+    return ret
+
+@app.route("/config")
+def get_config():
+
+    ret = parse_current_config()
 
     return Response(dumps(ret), mimetype="application/json")
 
@@ -87,7 +94,7 @@ def config_test():
 
     cache_config(app.config)
 
-    return redirect("/config")
+    return redirect("/")
 
 
 @app.route("/config-serial", methods=["GET", "POST"])
@@ -106,7 +113,7 @@ def config_serial():
 
         cache_config(app.config)
 
-        return redirect("/config")
+        return redirect("/")
 
 
     return render_template(
@@ -134,7 +141,7 @@ def config_ble():
 
         cache_config(app.config)
 
-        return redirect("/config")
+        return redirect("/")
 
     device_id_list = get_source(app.config, connect=False).list_available_devices()
 
@@ -167,8 +174,9 @@ def disconnect():
         source.disconnect()
 
     del app.config['STREAMING_SOURCE']
+    app.config['STREAMING_SOURCE'] = None
         
-    return redirect("/config")
+    return redirect("/")
 
 
 if __name__ == "__main__":

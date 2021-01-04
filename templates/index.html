@@ -1,14 +1,48 @@
-{% block content %}
+{% extends 'layout.html' %}
+
+
+
+{% block body %}
 <h1>Welcome to the SensiML IoT Streaming Server!</h1>
 
+
+<form action="config-serial">
+    <input type="submit" value="Configure Serial Port" />
+</form>
+<br>
+<form action="config-ble">
+    <input type="submit" value="Configure BLE Device" />
+</form>
+<br>
+<form action="config-test">
+    <input type="submit" value="Configure Test Data" />
+</form>
+<br>
+<form action="stream">
+    <input type="submit" value="Stream Data">
+</form>
+<br>
+<form action="disconnect">
+    <input type="submit" value="Disconnect Stream">
+</form>
+<br>
+{% if not streaming %}
+<b>Currently Streaming</b>: <p style="color:red;">No</p>
+{% else %}
+<b>Currently Streaming</b>: <p style="color:green;">YES</p> Source: {{source}}
+{% endif %}
+
 <p>
+
+    <b>Current configuration</b>
+
 <ul>
-    <li>To configure the serial port for the app go to <a href="config-serial"> serialport </a></li>
-    <li>To configure the test data for the app go to <a href="config-test"> test </a></li>
-    <li>To configure the BLE Device for the app go to <a href="config-ble"> BLE </a></li>
-    <li>To see the current configuration go to <a href="config"> config </a></li>
-    <li>To start streaming data from the current configuration go to <a href="stream"> stream </a></li>
-    <li>To start stop streaming data <a href="disconnect"> disconnect </a></li>
+    {% for key, value in configuration.items() %}
+    <li> {{key}}: {{ value }}</li>
+    {% endfor %}
+
+
 </ul>
 </p>
+
 {% endblock %}
