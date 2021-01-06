@@ -1,11 +1,34 @@
-{% block content %}
-<h1>Welcome to the SensiML IoT Streaming Server!</h1>
+{% extends 'layout.html' %}
 
-<p>
+
+
+{% block body %}
+
+<b>Configured Source</b>: {{source}}
+
+<br>
+<br>
+
+
+{% if not streaming %}
+<b>Streaming</b>: <p style="color:red;">No</p>
+{% else %}
+<b>Streaming</b>: <p style="color:green;">YES</p>
+{% endif %}
+
+
+<br>
+
+
+<b>Configuration</b>
+
 <ul>
-    <li>1. To configure the serial port for the app go to <a href="serialport"> serialport </a></li>
-    <li>2. To configure the app with the embedded devices configuration go to <a href="config"> config </a></li>
-    <li>3. To start streaming data go to <a href="stream"> stream </a></li>
+    {% for key, value in configuration.items() %}
+    <li> {{key}}: {{ value }}</li>
+    {% endfor %}
+
+
 </ul>
 </p>
+
 {% endblock %}
