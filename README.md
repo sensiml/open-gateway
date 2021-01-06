@@ -5,7 +5,7 @@ This application works as example application code for developing a gateway for 
 
 To install the app dependencies run
 
-```python
+```bash
 cd fkask_simple_stream
 pip install -r requirements.txt
 ```
