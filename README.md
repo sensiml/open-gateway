@@ -1,13 +1,14 @@
-SensiML Simple Streaming Gateway
+# SensiML Simple Streaming Gateway
 
 This application works as example application code for developing a gateway for emmbedded devices using the  SensiML Simple Streaming service.
 
 
 To install the app dependencies run
 
-    cd fkask_simple_stream
-    pip install -r requirements.txt
-
+```python
+cd fkask_simple_stream
+pip install -r requirements.txt
+```
 
 1. Flash a data collection binary to your target IoT device.
 2. Connect to the device over usb.
@@ -20,6 +21,8 @@ To install the app dependencies run
 
 TO USE BLUETOOTH YOU WILL NEED TO FIND BLUEPY HELPER
 
+```bash
 find ~/ -name bluepy-helper
 cd <PATH>
 sudo setcap 'cap_net_raw,cap_net_admin+eip' bluepy-helper
+```
