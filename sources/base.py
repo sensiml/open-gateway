@@ -1,10 +1,11 @@
 SHORT = 2
 
+
 class BaseReader(object):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
     def __init__(self, config, **kwargs):
-        self.samples_per_packet = config['CONFIG_SAMPLES_PER_PACKET']
+        self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
         self.data_width = len(config.get("CONFIG_COLUMNS", []))
@@ -23,7 +24,7 @@ class BaseReader(object):
     def send_connect(self):
         pass
 
-    def set_config(self):
+    def set_config(self, config):
         pass
 
     def read_data(self):

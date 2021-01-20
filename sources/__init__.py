@@ -1,16 +1,29 @@
-from sources.ble import BLEReader
-from sources.test import TestReader
-from sources.serial import SerialReader
+from sources.ble import BLEReader, BLEResultReader
+from sources.test import TestReader, TestResultReader
+from sources.serial import SerialReader, SerialResultReader
 
 
-def get_source(config, **kwargs):
-    if config['DATA_SOURCE'] == 'TEST':
-        return TestReader(config, **kwargs)
+def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs):
+    if source_type == "STREAMING":
+        if data_source == "TEST":
+            return TestReader(config, **kwargs)
 
-    if config['DATA_SOURCE'] == 'SERIAL':
-        return SerialReader(config, **kwargs)
+        if data_source == "SERIAL":
+            return SerialReader(config, device_id, **kwargs)
 
-    if config['DATA_SOURCE'] == "BLE":
-        return BLEReader(config, **kwargs)
+        if data_source == "BLE":
+            return BLEReader(config, device_id, **kwargs)
 
-    raise Exception("Invalid Data Source {}".format(config['DATA_SOURCE']))
+    if source_type == "RESULTS":
+        if data_source == "BLE":
+            return BLEResultReader(config, device_id, **kwargs)
+
+        if data_source == "SERIAL":
+            return SerialResultReader(config, device_id, **kwargs)
+
+        if data_source == "TEST":
+            return TestResultReader(config, **kwargs)
+
+    print(source_type, data_source)
+    raise Exception("Invalid Data Source {}".format(data_source))
+

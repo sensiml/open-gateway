@@ -3,11 +3,12 @@ from wtforms import StringField, TextField, SubmitField
 from wtforms import validators
 
 
-class SerialPortForm(FlaskForm):
-    serial_port = StringField(u"Serial Port", validators=[validators.input_required()])
+class DeviceConfigureForm(FlaskForm):
+    device_id = StringField(u"Device ID", validators=[validators.input_required()])
+    source = StringField(u"Source", validators=[validators.input_required()])
     submit = SubmitField("Submit")
 
 
-class BLEDeviceListForm(FlaskForm):
-    ble_device_id = StringField(u"BLE Device ID", validators=[validators.input_required()])
+class DeviceScanForm(FlaskForm):
+    source = StringField(u"Source", validators=[validators.input_required()])
     submit = SubmitField("Submit")

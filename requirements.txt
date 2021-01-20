@@ -2,3 +2,4 @@ flask
 flask-wtf
 wtforms
 bluepy
+flask-cors

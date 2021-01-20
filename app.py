@@ -18,39 +18,59 @@ import time
 from json import dumps
 import random, struct
 import math
-from forms import SerialPortForm, BLEDeviceListForm
+from forms import DeviceConfigureForm, DeviceScanForm
 from sources import get_source
 import sys
 import json
+from flask_cors import CORS
+from errors import errors
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
+app.register_blueprint(errors)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 app.config["SECRET_KEY"] = "any secret string"
-app.config["CONFIG_SAMPLE_RATE"] = 100
+app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
-app.config['DATA_SOURCE'] = None
-app.config["CONFIG_COLUMNS"] = None
+app.config["DATA_SOURCE"] = None
+app.config["CONFIG_COLUMNS"] = []
 app.config["SERIAL_PORT"] = None
 app.config["BLE_DEVICE_ID"] = None
 app.config["STREAMING_SOURCE"] = None
+app.config["RESULT_SOURCE"] = None
+app.config["MODE"] = None
+app.config["STREAMING"] = False
 
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
 
+
 def cache_config(config):
-    tmp = {"CONFIG_SAMPLE_RATE": app.config['CONFIG_SAMPLE_RATE'],
-            "DATA_SOURCE":app.config['DATA_SOURCE'],
-            "CONFIG_COLUMNS":app.config["CONFIG_COLUMNS"],
-            "BLE_DEVICE_ID":app.config["BLE_DEVICE_ID"],
-            "SERIAL_PORT":app.config['SERIAL_PORT'],            
-           }
-    json.dump(tmp, open('config.cache','w'))
+    tmp = {
+        "CONFIG_SAMPLE_RATE": app.config["CONFIG_SAMPLE_RATE"],
+        "DATA_SOURCE": app.config["DATA_SOURCE"],
+        "CONFIG_COLUMNS": app.config["CONFIG_COLUMNS"],
+        "BLE_DEVICE_ID": app.config["BLE_DEVICE_ID"],
+        "SERIAL_PORT": app.config["SERIAL_PORT"],
+        "MODE": app.config["MODE"],
+    }
+    json.dump(tmp, open("config.cache", "w"))
+
 
 @app.route("/")
 def main():
-    """Renders a sample page."""
-    return render_template('index.html', source=app.config['DATA_SOURCE'], streaming=True if app.config['STREAMING_SOURCE'] else False, configuration=parse_current_config())
+    return app.send_static_file("index.html")
+
+
+def get_device_id():
+    if app.config["DATA_SOURCE"] == "BLE":
+        return app.config["BLE_DEVICE_ID"]
+    if app.config["DATA_SOURCE"] == "SERIAL":
+        return app.config["SERIAL_PORT"]
+    else:
+        return "TESTER"
 
 
 def parse_current_config():
@@ -59,9 +79,11 @@ def parse_current_config():
     ret["sample_rate"] = app.config["CONFIG_SAMPLE_RATE"]
     ret["column_location"] = dict()
     ret["samples_per_packet"] = app.config["CONFIG_SAMPLES_PER_PACKET"]
-    ret["source"] = app.config['DATA_SOURCE']
+    ret["source"] = app.config["DATA_SOURCE"]
+    ret["device_id"] = get_device_id()
+    ret["streaming"] = app.config["STREAMING"]
 
-    if app.config['CONFIG_COLUMNS']:
+    if app.config["CONFIG_COLUMNS"]:
         for y in range(0, len(app.config["CONFIG_COLUMNS"])):
             if app.config["CONFIG_COLUMNS"].get(y, None):
                 ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
@@ -72,6 +94,7 @@ def parse_current_config():
 
     return ret
 
+
 @app.route("/config")
 def get_config():
 
@@ -80,103 +103,143 @@ def get_config():
     return Response(dumps(ret), mimetype="application/json")
 
 
+@app.route("/scan", methods=["POST"])
+def scan():
+    form = DeviceScanForm()
 
-@app.route("/config-test", methods=["GET", "POST"])
-def config_test():
+    source = get_source(
+        app.config,
+        device_id=None,
+        data_source=form.data["source"].upper(),
+        connect=False,
+    )
 
-    app.config['DATA_SOURCE'] = "TEST"
+    device_id_list = source.list_available_devices()
 
-    source = get_source(app.config)
-
-    source.set_config(app.config)
-
-    source.send_connect()
-
-    cache_config(app.config)
-
-    return redirect("/")
+    return Response(json.dumps(device_id_list), mimetype="application/json")
 
 
-@app.route("/config-serial", methods=["GET", "POST"])
-def config_serial():
-    form = SerialPortForm()
-
-    app.config['DATA_SOURCE'] = "SERIAL"
-    source = get_source(app.config)
+@app.route("/config", methods=["GET", "POST"])
+def config():
+    form = DeviceConfigureForm()
 
     if request.method == "POST":
+        disconnect()
+        app.config["STREAMING"] = False
 
-        source._port = form.data["serial_port"]
+        source = get_source(
+            app.config,
+            data_source=form.data["source"].upper(),
+            source_type="STREAMING",
+            device_id=form.data["device_id"],
+        )
 
         source.set_config(app.config)
-        print("STREAMING APP CONFIGURED FOR STREAMING")
+
+        source.send_connect()
 
         cache_config(app.config)
 
-        return redirect("/")
+    ret = parse_current_config()
+
+    return Response(dumps(ret), mimetype="application/json")
 
 
-    return render_template(
-        "serialport.html", form=form, serial_port_list=source.list_available_devices()
-    )
-
-
-@app.route("/config-ble", methods=["GET", "POST"])
-def config_ble():
-    form = BLEDeviceListForm()
-
-    app.config['DATA_SOURCE'] = "BLE"
+@app.route("/config-results", methods=["GET", "POST"])
+def config_results():
+    form = DeviceListForm()
 
     if request.method == "POST":
-
-        app.config['BLE_DEVICE_ID'] = form.data["ble_device_id"]
-
-        source = get_source(app.config)
+        source = get_source(
+            app.config,
+            data_source=form.data["source"],
+            device_id=form.data["device_id"],
+            source_type="RESULTS",
+        )
 
         source.set_config(app.config)
-        print("BLE APP CONFIGURED FOR STREAMING")
 
-        source.disconnect()
-        print("DISCONNECT FROM DEVICE")
+        source.send_connect()
 
         cache_config(app.config)
 
-        return redirect("/")
+        return get_config()
 
-    device_id_list = get_source(app.config, connect=False).list_available_devices()
+    ret = parse_current_config()
 
-    return render_template(
-        "ble-device-list.html", form=form, ble_device_id_list=device_id_list
-    )
+    return Response(dumps(ret), mimetype="application/json")
 
 
 @app.route("/stream")
 def stream():
 
     if app.config.get("STREAMING_SOURCE", None):
-        print("Source is already Streaming!")
-        return "Source is already Streaming. Call disconnect to stop."
+        print("Source is already Streaming! Call /disconnect to stop!.")
+        return "Source is already Streaming. Call /disconnect to stop."
 
-    source = get_source(app.config)
+    source = get_source(
+        app.config,
+        device_id=get_device_id(),
+        data_source=app.config["DATA_SOURCE"],
+        source_type="STREAMING",
+    )
 
-    app.config['STREAMING_SOURCE'] = source
+    app.config["STREAMING_SOURCE"] = source
 
-    return Response(stream_with_context(source.read_data()), mimetype="application/octet-stream")
+    app.config["STREAMING"] = True
 
+    return Response(
+        stream_with_context(source.read_data()), mimetype="application/octet-stream"
+    )
+
+
+@app.route("/results")
+def results():
+
+    if app.config.get("RESULT_SOURCE", None):
+        print("Result Source is already Streaming! Call /disconnect to stop!.")
+        return "Result Source is already Streaming. Call /disconnect to stop."
+
+    source = get_source(
+        app.config,
+        device_id=get_device_id(),
+        data_source=app.config["DATA_SOURCE"],
+        source_type="RESULTS",
+    )
+
+    app.config["RESULT_SOURCE"] = source
+
+    app.config["STREAMING"] = True
+
+    return Response(
+        stream_with_context(source.read_data()), mimetype="application/octet-stream"
+    )
 
 
 @app.route("/disconnect")
 def disconnect():
 
-    source = app.config.get('STREAMING_SOURCE', None)
+    source = app.config.get("STREAMING_SOURCE", None)
+    source_resutlts = app.config.get("RESULT_SOURCE", None)
+    app.config["STREAMING"] = False
 
     if source is not None:
         source.disconnect()
 
-    del app.config['STREAMING_SOURCE']
-    app.config['STREAMING_SOURCE'] = None
-        
-    return redirect("/")
+        del app.config["STREAMING_SOURCE"]
+        app.config["STREAMING_SOURCE"] = None
+
+        return "Disconnected From Streaming Source"
+
+    if source_resutlts is not None:
+        source_resutlts.disconnect()
+
+        del app.config["RESULT_SOURCE"]
+        app.config["RESULT_SOURCE"] = None
+
+        return "Disconnected From Result Source"
+
+    return "No Sources Currently Connected"
 
 
 if __name__ == "__main__":
@@ -188,7 +251,7 @@ if __name__ == "__main__":
     except ValueError:
         PORT = 5555
 
-    if os.path.exists('config.cache'):
-        app.config.update(json.load(open('config.cache','r')))
+    if os.path.exists("config.cache"):
+        app.config.update(json.load(open("config.cache", "r")))
 
     app.run(HOST, 5555)
