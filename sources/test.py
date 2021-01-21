@@ -73,7 +73,7 @@ class TestReader(BaseReader):
     def set_config(self, config):
 
         config["CONFIG_COLUMNS"] = {
-           "AccelerometerX": 0
+           "AccelerometerX": 0,
             "AccelerometerY":1,
             "AccelerometerZ":2,
             "GyroscopeX":3,
