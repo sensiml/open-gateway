@@ -82,16 +82,11 @@ def parse_current_config():
     ret["source"] = app.config["DATA_SOURCE"]
     ret["device_id"] = get_device_id()
     ret["streaming"] = app.config["STREAMING"]
-    # print (app.config)
-    ret["column_location"] = app.config["CONFIG_COLUMNS"]
-    # if app.config["CONFIG_COLUMNS"]:
-    #     for y in range(0, len(app.config["CONFIG_COLUMNS"])):
-    #         if app.config["CONFIG_COLUMNS"].get(y, None):
-    #             ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
-    #         else:
-    #             ret["column_location"][app.config["CONFIG_COLUMNS"][str(y)]] = int(y)
-    # else:
-    #     ret["column_location"] = {}
+
+    if app.config["CONFIG_COLUMNS"]:
+        ret["column_location"] = app.config["CONFIG_COLUMNS"]
+    else:
+        ret["column_location"] = {}
 
     return ret
 
@@ -148,7 +143,7 @@ def config():
 
 @app.route("/config-results", methods=["GET", "POST"])
 def config_results():
-    form = DeviceListForm()
+    form = DeviceConfigureForm()
 
     if request.method == "POST":
         source = get_source(

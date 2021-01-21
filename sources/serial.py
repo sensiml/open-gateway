@@ -42,10 +42,7 @@ class SerialReader(BaseReader):
             return ser.reset_input_buffer()
 
     def read_config(self):
-        x = self._read_line()
-        # print(x)
-        source_config = json.loads(x)
-        return source_config
+        return json.loads(self._read_line())
 
     def get_port_info(self):
         ports = serial.tools.list_ports.comports()
@@ -79,7 +76,9 @@ class SerialReader(BaseReader):
     def set_config(self, config):
 
         source_config = self.read_config()
-        print(source_config)
+
+        self.data_width = len(source_config["column_location"])
+
         if not source_config:
             raise Exception("No configuration received from edge device.")
 
@@ -87,8 +86,6 @@ class SerialReader(BaseReader):
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "SERIAL"
         config["SERIAL_PORT"] = self.port
-
-        self._data_width = len(config["CONFIG_COLUMNS"])
 
 
 class SerialResultReader(BaseReader):

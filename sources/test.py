@@ -73,12 +73,12 @@ class TestReader(BaseReader):
     def set_config(self, config):
 
         config["CONFIG_COLUMNS"] = {
-            "0": "AccelerometerX",
-            "1": "AccelerometerY",
-            "2": "AccelerometerZ",
-            "3": "GyroscopeX",
-            "4": "GyroscopeY",
-            "5": "GyroscopeZ",
+           "AccelerometerX": 0
+            "AccelerometerY":1,
+            "AccelerometerZ":2,
+            "GyroscopeX":3,
+            "GyroscopeY":4,
+            "GyroscopeZ":5,
         }
         config["CONFIG_SAMPLE_RATE"] = 100
         config["DATA_SOURCE"] = "TEST"
