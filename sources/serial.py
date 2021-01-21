@@ -42,7 +42,9 @@ class SerialReader(BaseReader):
             return ser.reset_input_buffer()
 
     def read_config(self):
-        return json.loads(self._read_line())
+        x = self._read_line().decode('ascii')
+        print(x)
+        return json.loads(x)
 
     def get_port_info(self):
         ports = serial.tools.list_ports.comports()
