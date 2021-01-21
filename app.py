@@ -26,7 +26,7 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-app.register_blueprint(errors)
+# app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -82,15 +82,16 @@ def parse_current_config():
     ret["source"] = app.config["DATA_SOURCE"]
     ret["device_id"] = get_device_id()
     ret["streaming"] = app.config["STREAMING"]
-
-    if app.config["CONFIG_COLUMNS"]:
-        for y in range(0, len(app.config["CONFIG_COLUMNS"])):
-            if app.config["CONFIG_COLUMNS"].get(y, None):
-                ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
-            else:
-                ret["column_location"][app.config["CONFIG_COLUMNS"][str(y)]] = int(y)
-    else:
-        ret["column_location"] = {}
+    # print (app.config)
+    ret["column_location"] = app.config["CONFIG_COLUMNS"]
+    # if app.config["CONFIG_COLUMNS"]:
+    #     for y in range(0, len(app.config["CONFIG_COLUMNS"])):
+    #         if app.config["CONFIG_COLUMNS"].get(y, None):
+    #             ret["column_location"][app.config["CONFIG_COLUMNS"][y]] = y
+    #         else:
+    #             ret["column_location"][app.config["CONFIG_COLUMNS"][str(y)]] = int(y)
+    # else:
+    #     ret["column_location"] = {}
 
     return ret
 
