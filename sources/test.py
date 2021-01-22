@@ -9,28 +9,24 @@ from sources.base import BaseReader
 SHORT = 2
 INT16_BYTE_SIZE = 2
 
+
 class TestReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
-    def __init__(self, config, **kwargs):
-        
+    def __init__(self, config, device_id=None, **kwargs):
+
         super(TestReader, self).__init__(config, **kwargs)
 
     @property
     def delay(self):
-        return (
-            (1.0 / self.sample_rate
-            * self.samples_per_packet
-            / 1.25
-        ))
+        return 1.0 / self.sample_rate * self.samples_per_packet / 1.25
 
     @property
     def byteSize(self):
         if self.config_columns:
-            return self.samples_per_packet  * len(self.config_columns) * INT16_BYTE_SIZE
+            return self.samples_per_packet * len(self.config_columns) * INT16_BYTE_SIZE
 
         return 0
-
 
     def _generate_samples(self, num_columns, sample_rate):
         fs = sample_rate * 10
@@ -40,12 +36,12 @@ class TestReader(BaseReader):
 
         return [
             [
-                1000 * offset + 1000 * math.sin(2 * math.pi * f * (float(xs) / fs))
+                1000 * offset
+                + 1000 * math.sin(2 * math.pi * f * (float(xs * offset * 3.14) / fs))
                 for xs in x
             ]
             for offset in range(num_columns)
         ]
-
 
     def _pack_data(self, data, byteSize, samples_per_packet, start_index):
         sample_data = bytearray(byteSize)
@@ -68,17 +64,26 @@ class TestReader(BaseReader):
 
         return bytes(sample_data), end_index
 
+    def list_available_devices(self):
+        return [{"id": 1, "name": "Test Data", "device_id": "Tester"}]
 
     def get_device_info(self):
         pass
 
     def set_config(self, config):
 
-        config["CONFIG_COLUMNS"] = {"0": "AccelerometerX", "1": "AccelerometerY", "2": "AccelerometerZ", "3": "GyroscopeX", "4": "GyroscopeY", "5": "GyroscopeZ"}
-        config["CONFIG_SAMPLE_RATE"] = 100
+        config["CONFIG_COLUMNS"] = {
+           "AccelerometerX": 0,
+            "AccelerometerY":1,
+            "AccelerometerZ":2,
+            "GyroscopeX":3,
+            "GyroscopeY":4,
+            "GyroscopeZ":5,
+        }
+        config["CONFIG_SAMPLE_RATE"] = 119
         config["DATA_SOURCE"] = "TEST"
 
-        self.samples_per_packet = config['CONFIG_SAMPLES_PER_PACKET']
+        self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
 
@@ -95,3 +100,24 @@ class TestReader(BaseReader):
             )
             yield sample_data
             time.sleep(self.delay)
+
+
+class TestResultReader(BaseReader):
+    def __init__(self, config, device_id=None, connect=True, **kwargs):
+
+        self.streaming = False
+
+    def set_config(self, config):
+        pass
+
+    def read_data(self):
+
+        self.streaming = True
+        counter = 0
+        while self.streaming:
+            time.sleep(1)
+
+            yield json.dumps(
+                {"model": 0, "classification": random.randint(0, 10), "id": counter}
+            ) + "\n"
+            counter += 1
