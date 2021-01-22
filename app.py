@@ -82,6 +82,7 @@ def parse_current_config():
     ret["source"] = app.config["DATA_SOURCE"]
     ret["device_id"] = get_device_id()
     ret["streaming"] = app.config["STREAMING"]
+    ret['baud_rate'] = app.config["BAUD_RATE"]
 
     if app.config["CONFIG_COLUMNS"]:
         ret["column_location"] = app.config["CONFIG_COLUMNS"]
