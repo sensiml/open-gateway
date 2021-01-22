@@ -108,7 +108,9 @@ class BLEReader(BaseReader):
             0
         ].read()
 
-        return json.loads(source_config.decode("ascii").rstrip("\x00"))
+        return self._validate_config(
+            json.loads(source_config.decode("ascii").rstrip("\x00"))
+        )
 
     def read_data(self):
 
@@ -140,13 +142,12 @@ class BLEReader(BaseReader):
         if not source_config:
             raise Exception("Invalid Source Configuration")
 
-        self.data_width = len(source_config['column_location'])
+        self.data_width = len(source_config["column_location"])
 
-        config["CONFIG_COLUMNS"] = source_config['column_location']
+        config["CONFIG_COLUMNS"] = source_config["column_location"]
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "BLE"
         config["BLE_DEVICE_ID"] = self.device_id
-
 
 
 class BLEResultReader(BLEReader):

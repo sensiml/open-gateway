@@ -26,7 +26,7 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-#app.register_blueprint(errors)
+app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -56,7 +56,7 @@ def cache_config(config):
         "SERIAL_PORT": app.config["SERIAL_PORT"],
         "MODE": app.config["MODE"],
     }
-    json.dump(tmp, open("config.cache", "w"))
+    json.dump(tmp, open("./.config.cache", "w"))
 
 
 @app.route("/")
@@ -82,7 +82,8 @@ def parse_current_config():
     ret["source"] = app.config["DATA_SOURCE"]
     ret["device_id"] = get_device_id()
     ret["streaming"] = app.config["STREAMING"]
-    ret['baud_rate'] = app.config["BAUD_RATE"]
+    ret["baud_rate"] = app.config["BAUD_RATE"]
+    ret["mode"] = app.config["MODE"].lower()
 
     if app.config["CONFIG_COLUMNS"]:
         ret["column_location"] = app.config["CONFIG_COLUMNS"]
@@ -135,6 +136,8 @@ def config():
 
         source.send_connect()
 
+        app.config["MODE"] = "STREAMING"
+
         cache_config(app.config)
 
     ret = parse_current_config()
@@ -157,6 +160,8 @@ def config_results():
         source.set_config(app.config)
 
         source.send_connect()
+
+        app.config["MODE"] = "RESULTS"
 
         cache_config(app.config)
 
@@ -248,7 +253,7 @@ if __name__ == "__main__":
     except ValueError:
         PORT = 5555
 
-    if os.path.exists("config.cache"):
-        app.config.update(json.load(open("config.cache", "r")))
+    if os.path.exists("./.config.cache"):
+        app.config.update(json.load(open("./.config.cache", "r")))
 
     app.run(HOST, 5555)

@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ConfigureStream = () => {
+const ConfigureStream = (props) => {
   const classes = useStyles();
   const [source, setSource] = React.useState("Serial");
   const [modeUrl, setModeUrl] = React.useState("config");
@@ -74,8 +74,17 @@ const ConfigureStream = () => {
     setError(false);
   };
 
+  const handleRowSelection = (event) => {
+    console.log(event.data.device_id);
+    setDeviceID(event.data.device_id);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (deviceID === "") {
+      setHelperText("Must Set DeviceID");
+      return;
+    }
     console.log(source);
     console.log(deviceID);
     axios
@@ -85,12 +94,14 @@ const ConfigureStream = () => {
       })
       .then((response) => {
         console.log(response.data);
+        console.log(props);
+        props.setStreamingMode(response.data.mode);
         setHelperText("Configured Device");
       })
       .catch(function (error) {
         if (error.response) {
           // Request made and server responded
-          setHelperText(error.response.data.error.message[0]);
+          setHelperText(error.response.data.error.message.join(", "));
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
@@ -156,7 +167,6 @@ const ConfigureStream = () => {
             <FormLabel component="legend">Device ID:</FormLabel>
             <TextField
               id="outlined-basic"
-              label="DeviceID"
               variant="outlined"
               value={deviceID}
               onChange={handleDeviceIDChange}
@@ -185,7 +195,11 @@ const ConfigureStream = () => {
         >
           Scan
         </Button>
-        <DataGrid rows={deviceRows} columns={deviceColumns} />
+        <DataGrid
+          rows={deviceRows}
+          columns={deviceColumns}
+          onRowSelected={handleRowSelection}
+        />
       </Grid>
     </Grid>
   );
