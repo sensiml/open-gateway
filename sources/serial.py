@@ -41,11 +41,6 @@ class SerialReader(BaseReader):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
             return ser.reset_input_buffer()
 
-    def _validate_config(self, config):
-        assert config.get("column_location", None) is not None
-        assert config.get("sample_rate", None) is not None
-        assert config.get("samples_per_packet", None) is not None
-
     def read_config(self):
         return self._validate_config(json.loads(self._read_line()))
 
