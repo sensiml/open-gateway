@@ -66,7 +66,8 @@ class BLEReader(BaseReader):
         self.streaming = False
         self.subscribed = True
 
-        self.peripheral.disconnect()
+        if self.peripheral:
+            self.peripheral.disconnect()
 
     def list_available_devices(self):
 
@@ -139,16 +140,13 @@ class BLEReader(BaseReader):
         if not source_config:
             raise Exception("Invalid Source Configuration")
 
-        config_columns = {}
-        config_coumns = ["" for x in range(len(source_config["column_location"]))]
-        for key, value in source_config["column_location"].items():
-            config_columns[value] = key
+        self.data_width = len(source_config['column_location'])
 
-        config["CONFIG_COLUMNS"] = config_columns
+        config["CONFIG_COLUMNS"] = source_config['column_location']
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "BLE"
+        config["BLE_DEVICE_ID"] = self.device_id
 
-        self._data_width = len(config_columns)
 
 
 class BLEResultReader(BLEReader):
