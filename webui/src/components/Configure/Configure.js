@@ -3,17 +3,7 @@ import axios from "axios";
 import { Typography } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 
-function mapdata(data) {
-  console.log(data);
-  data.streaming = data.streaming ? "Yes" : "No";
-  data.column_location =
-    "column_location" in data
-      ? Object.keys(data.column_location).sort().join(", ")
-      : [];
-  return data;
-}
-
-const Configure = () => {
+const Configure = (props) => {
   let [config, setConfig] = useState([]);
 
   useEffect(() => {
@@ -22,6 +12,18 @@ const Configure = () => {
       .then((res) => setConfig(mapdata(res.data)));
   }, []);
 
+  function mapdata(data) {
+    console.log(data);
+    if (data.mode) {
+      props.setStreamingMode(data.mode);
+    }
+    data.streaming = data.streaming ? "Yes" : "No";
+    data.column_location =
+      "column_location" in data
+        ? Object.keys(data.column_location).sort().join(", ")
+        : [];
+    return data;
+  }
   return (
     <Grid xs={12}>
       <Grid>

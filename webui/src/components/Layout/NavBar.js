@@ -45,8 +45,6 @@ const InconSelector = (props) => {
       return <SettingsIcon />;
     case 2:
       return <AssessmentIcon />;
-    case 3:
-      return <AssignmentIcon />;
     default:
       return <InboxIcon />;
   }
@@ -70,7 +68,7 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Gateway Status", "Configure Gateway", "View Results"].map(
+          {["Gateway Status", "Configure Gateway", "Stream"].map(
             (text, index) => (
               <ListItem button key={text} onClick={handleMenu(index)}>
                 <ListItemIcon>

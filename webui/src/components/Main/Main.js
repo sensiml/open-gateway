@@ -10,6 +10,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const Main = () => {
   const [activeView, setActiveView] = React.useState(0);
+  const [streamingMode, setStreamingMode] = React.useState(0);
 
   function handleChange(newValue) {
     setActiveView(newValue);
@@ -23,9 +24,19 @@ const Main = () => {
         <Header />
         <NavBar onChange={handleChange} />
         <main className={classes.content}>
-          {activeView === 0 ? <Configure /> : null}
-          {activeView === 1 ? <ConfigureStream /> : null}
-          {activeView === 2 ? <Results /> : null}
+          {activeView === 0 ? (
+            <Configure setStreamingMode={setStreamingMode} />
+          ) : null}
+          {activeView === 1 ? (
+            <ConfigureStream setStreamingMode={setStreamingMode} />
+          ) : null}
+          {activeView === 2 ? (
+            streamingMode == "results" ? (
+              <Results />
+            ) : (
+              <SensorStream />
+            )
+          ) : null}
         </main>
       </Grid>
     </div>

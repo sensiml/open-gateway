@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ConfigureStream = () => {
+const ConfigureStream = (props) => {
   const classes = useStyles();
   const [source, setSource] = React.useState("Serial");
   const [modeUrl, setModeUrl] = React.useState("config");
@@ -94,6 +94,8 @@ const ConfigureStream = () => {
       })
       .then((response) => {
         console.log(response.data);
+        console.log(props);
+        props.setStreamingMode(response.data.mode);
         setHelperText("Configured Device");
       })
       .catch(function (error) {
