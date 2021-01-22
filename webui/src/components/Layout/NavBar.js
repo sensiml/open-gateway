@@ -70,14 +70,16 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Configure Gateway", "Gateway Status"].map((text, index) => (
-            <ListItem button key={text} onClick={handleMenu(index)}>
-              <ListItemIcon>
-                <InconSelector index={index}> </InconSelector>
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+          {["Configure Gateway", "Gateway Status", "View Results"].map(
+            (text, index) => (
+              <ListItem button key={text} onClick={handleMenu(index)}>
+                <ListItemIcon>
+                  <InconSelector index={index}> </InconSelector>
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            )
+          )}
         </List>
       </div>
     </Drawer>

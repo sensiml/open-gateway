@@ -7,6 +7,8 @@ import CardContent from "@material-ui/core/CardContent";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DataGrid } from "@material-ui/data-grid";
 
+var id_counter = 0;
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -42,6 +44,8 @@ function bin2String(array) {
 }
 
 const handleStreamRequest = (event, url, setStreamCallback) => {
+  id_counter = 0;
+  setStreamCallback([]);
   fetch(url, {
     method: "GET",
   }).then((response) => {
@@ -61,10 +65,11 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
             var results = bin2String(value);
             for (var i = 0; i < results.length; i++) {
               console.log(results[i]);
+              results[i].id = id_counter;
+              id_counter += 1;
               setStreamCallback((x) => [...x, results[i]]);
             }
 
-            //setStreamCallback(bin2String(value));
             push();
           });
         }
@@ -81,8 +86,8 @@ const Results = () => {
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [deviceColumns, setDeviceColumns] = React.useState([
     { field: "id", headerName: "ID", width: 70 },
-    { field: "model", headerName: "Model", width: 120 },
-    { field: "classification", headerName: "Classification", width: 120 },
+    { field: "ModelNumber", headerName: "Model ID", width: 240 },
+    { field: "Classification", headerName: "Classification", width: 240 },
   ]);
 
   const classes = useStyles();
@@ -120,8 +125,8 @@ const Results = () => {
           </div>
         </CardContent>
       </div>
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGrid rows={deviceRows} columns={deviceColumns} pageSize={10} />
+      <div style={{ height: 600, width: "100%" }}>
+        <DataGrid rows={deviceRows} columns={deviceColumns} pageSize={15} />
       </div>
     </Card>
   );
