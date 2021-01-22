@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 const ConfigureStream = () => {
   const classes = useStyles();
   const [source, setSource] = React.useState("Serial");
+  const [modeUrl, setModeUrl] = React.useState("config");
   const [deviceID, setDeviceID] = React.useState("");
   const [error, setError] = React.useState(false);
   const [helperText, setHelperText] = React.useState("");
@@ -55,8 +56,16 @@ const ConfigureStream = () => {
 
   const handleRadioChange = (event) => {
     setSource(event.target.value);
-    setHelperText(" ");
-    setError(false);
+  };
+
+  const handleSwitchChange = (event) => {
+    if (event.target.value) {
+      setModeUrl('config-results')
+    }
+    else {
+      setModeUrl('config');
+    }
+
   };
 
   const handleDeviceIDChange = (event) => {
@@ -69,9 +78,8 @@ const ConfigureStream = () => {
     event.preventDefault();
     console.log(source);
     console.log(deviceID);
-
     axios
-      .post(`${process.env.REACT_APP_API_URL}config`, {
+      .post(`${process.env.REACT_APP_API_URL}` + modeUrl, {
         device_id: deviceID,
         source: source.toLowerCase(),
       })
@@ -140,7 +148,7 @@ const ConfigureStream = () => {
               <Grid component="label" container alignItems="center" spacing={1}>
                 <Grid item>Sensor Data</Grid>
                 <Grid item>
-                  <Switch name="checkedC" />
+                  <Switch name="checkedC" onChange={handleSwitchChange} />
                 </Grid>
                 <Grid item>KP Results</Grid>
               </Grid>

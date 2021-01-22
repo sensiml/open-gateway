@@ -90,6 +90,10 @@ class SerialReader(BaseReader):
 
 class SerialResultReader(SerialReader):
 
+    def set_config(self, config):
+        config["DATA_SOURCE"] = "SERIAL"
+        config["SERIAL_PORT"] = self.port
+
     def send_connect(self):
         pass
 
@@ -104,8 +108,14 @@ class SerialResultReader(SerialReader):
         self._flush_buffer()
 
         self.streaming = True
-        while self.streaming:
-            yield self._read_line()
+        while self.streaming:            
+            data = self._read_line()
+            try:
+                json.loads(data)
+            except Exception as e:
+                print(e)
+                continue
+            yield 
 
 
 if __name__ == "__main__":
