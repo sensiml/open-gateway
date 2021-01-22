@@ -108,7 +108,7 @@ class TestResultReader(BaseReader):
         self.streaming = False
 
     def set_config(self, config):
-        pass
+        config["DATA_SOURCE"] = "TEST"
 
     def read_data(self):
 
@@ -118,6 +118,6 @@ class TestResultReader(BaseReader):
             time.sleep(1)
 
             yield json.dumps(
-                {"model": 0, "classification": random.randint(0, 10), "id": counter}
+                {"ModelNumber": 0, "Classification": random.randint(0, 10)}
             ) + "\n"
             counter += 1
