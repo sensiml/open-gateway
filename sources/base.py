@@ -15,6 +15,20 @@ class BaseReader(object):
     def packet_buffer_size(self):
         return self.samples_per_packet * self.data_width * SHORT
 
+    def _validate_config(self, config):
+
+        if not isinstance(config, dict):
+            raise Exception("Invalid Configuration")
+
+        if config.get("column_location", None) is None:
+            raise Exception("Invalid Configuration: no column_location")
+        if config.get("sample_rate", None) is None:
+            raise Exception("Invalid Configuration: no sample_rate")
+        if config.get("samples_per_packet", None) is None:
+            raise Exception("Invalid Configuration: no samples_per_packet")
+
+        return config
+
     def read_config(self):
         pass
 

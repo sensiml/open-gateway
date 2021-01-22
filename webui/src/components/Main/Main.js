@@ -10,9 +10,17 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const Main = () => {
   const [activeView, setActiveView] = React.useState(0);
+  const [streamingMode, setStreamingMode] = React.useState(0);
+  const [streamingSource, setStreamingSource] = React.useState(0);
+  const [streamData, setStreamData] = React.useState([]);
+  const [deviceRows, setDeviceRows] = React.useState([]);
+  const [columns, setColumns] = React.useState([]);
+  const [deviceID, setDeviceID] = React.useState([]);
 
   function handleChange(newValue) {
-    setActiveView(newValue);
+    if (activeView != newValue) {
+      setActiveView(newValue);
+    }
   }
 
   const classes = useStyles();
@@ -23,8 +31,33 @@ const Main = () => {
         <Header />
         <NavBar onChange={handleChange} />
         <main className={classes.content}>
-          {activeView === 0 ? <ConfigureStream /> : null}
-          {activeView === 1 ? <Configure /> : null}
+          {activeView === 0 ? (
+            <Configure
+              setStreamingMode={setStreamingMode}
+              setColumns={setColumns}
+              setStreamingSource={setStreamingSource}
+              setDeviceID={setDeviceID}
+            />
+          ) : null}
+          {activeView === 1 ? (
+            <ConfigureStream
+              setStreamingMode={setStreamingMode}
+              streamingSource={streamingSource}
+              streamingMode={streamingMode}
+              deviceID={deviceID}
+            />
+          ) : null}
+          {activeView === 2 ? (
+            streamingMode == "results" ? (
+              <Results deviceRows={deviceRows} setDeviceRows={setDeviceRows} />
+            ) : (
+              <SensorStream
+                streamData={streamData}
+                setStreamData={setStreamData}
+                columns={columns}
+              />
+            )
+          ) : null}
         </main>
       </Grid>
     </div>

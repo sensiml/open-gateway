@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Typography } from "@material-ui/core";
 import { Button } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DataGrid } from "@material-ui/data-grid";
+
+var id_counter = 0;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,6 +45,8 @@ function bin2String(array) {
 }
 
 const handleStreamRequest = (event, url, setStreamCallback) => {
+  id_counter = 0;
+  setStreamCallback([]);
   fetch(url, {
     method: "GET",
   }).then((response) => {
@@ -61,10 +66,11 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
             var results = bin2String(value);
             for (var i = 0; i < results.length; i++) {
               console.log(results[i]);
+              results[i].id = id_counter;
+              id_counter += 1;
               setStreamCallback((x) => [...x, results[i]]);
             }
 
-            //setStreamCallback(bin2String(value));
             push();
           });
         }
@@ -77,53 +83,55 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
   });
 };
 
-const Results = () => {
-  const [deviceRows, setDeviceRows] = React.useState([]);
+const Results = (props) => {
   const [deviceColumns, setDeviceColumns] = React.useState([
     { field: "id", headerName: "ID", width: 70 },
-    { field: "model", headerName: "Model", width: 120 },
-    { field: "classification", headerName: "Classification", width: 120 },
+    { field: "ModelNumber", headerName: "Model ID", width: 240 },
+    { field: "Classification", headerName: "Classification", width: 240 },
   ]);
 
   const classes = useStyles();
   const theme = useTheme();
 
   return (
-    <Card className={classes.root}>
+    <Grid>
       <div className={classes.details}>
-        <CardContent className={classes.content}>
-          <Typography component="h5" variant="h5">
-            Model Result
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary"></Typography>
-          <div className={classes.controls}>
-            <Button
-              aria-label="disconnect"
-              onClick={() => {
-                handleStreamRequest(
-                  "clicked",
-                  `${process.env.REACT_APP_API_URL}results`,
-                  setDeviceRows
-                );
-              }}
-            >
-              Connect
-            </Button>
-            <Button
-              aria-label="disconnect"
-              onClick={() => {
-                handleDisconnectRequest("clicked");
-              }}
-            >
-              Disconnect
-            </Button>
-          </div>
-        </CardContent>
+        <Typography component="h5" variant="h5">
+          Model Result
+        </Typography>
+        <Typography variant="subtitle1" color="textSecondary"></Typography>
+        <div className={classes.controls}>
+          <Button
+            aria-label="disconnect"
+            onClick={() => {
+              handleStreamRequest(
+                "clicked",
+                `${process.env.REACT_APP_API_URL}results`,
+                props.setDeviceRows
+              );
+            }}
+          >
+            Connect
+          </Button>
+          <Button
+            aria-label="disconnect"
+            onClick={() => {
+              handleDisconnectRequest("clicked");
+            }}
+          >
+            Disconnect
+          </Button>
+        </div>
       </div>
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGrid rows={deviceRows} columns={deviceColumns} pageSize={10} />
+      <div style={{ height: 600, width: "100%" }}>
+        <DataGrid
+          rows={props.deviceRows}
+          columns={deviceColumns}
+          pageSize={15}
+          sortModel={[{ field: "id", sort: "desc" }]}
+        />
       </div>
-    </Card>
+    </Grid>
   );
 };
 

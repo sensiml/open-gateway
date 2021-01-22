@@ -40,11 +40,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ConfigureStream = () => {
+const ConfigureStream = (props) => {
   const classes = useStyles();
-  const [source, setSource] = React.useState("Serial");
-  const [modeUrl, setModeUrl] = React.useState("config");
-  const [deviceID, setDeviceID] = React.useState("");
+  const [source, setSource] = React.useState(props.streamingSource);
+  const [modeUrl, setModeUrl] = React.useState(
+    props.streamingMode === "results" ? "config-results" : "config"
+  );
+  const [deviceID, setDeviceID] = React.useState(props.deviceID);
   const [error, setError] = React.useState(false);
   const [helperText, setHelperText] = React.useState("");
   const [deviceRows, setDeviceRows] = React.useState([]);
@@ -58,14 +60,8 @@ const ConfigureStream = () => {
     setSource(event.target.value);
   };
 
-  const handleSwitchChange = (event) => {
-    console.log("HEREREER");
-    console.log(event.target.checked);
-    if (event.target.checked) {
-      setModeUrl("config-results");
-    } else {
-      setModeUrl("config");
-    }
+  const handleModeChange = (event) => {
+    setModeUrl(event.target.value);
   };
 
   const handleDeviceIDChange = (event) => {
@@ -74,8 +70,17 @@ const ConfigureStream = () => {
     setError(false);
   };
 
+  const handleRowSelection = (event) => {
+    console.log(event.data.device_id);
+    setDeviceID(event.data.device_id);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (deviceID === "") {
+      setHelperText("Must Set DeviceID");
+      return;
+    }
     console.log(source);
     console.log(deviceID);
     axios
@@ -85,12 +90,14 @@ const ConfigureStream = () => {
       })
       .then((response) => {
         console.log(response.data);
+        console.log(props);
+        props.setStreamingMode(response.data.mode);
         setHelperText("Configured Device");
       })
       .catch(function (error) {
         if (error.response) {
           // Request made and server responded
-          setHelperText(error.response.data.error.message[0]);
+          setHelperText(error.response.data.error.message.join(", "));
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
@@ -136,27 +143,34 @@ const ConfigureStream = () => {
               onChange={handleRadioChange}
             >
               <FormControlLabel
-                value="Serial"
+                value="SERIAL"
                 control={<Radio />}
                 label="Serial"
               />
               <FormControlLabel value="BLE" control={<Radio />} label="BLE" />
-              <FormControlLabel value="Test" control={<Radio />} label="Test" />
+              <FormControlLabel value="TEST" control={<Radio />} label="Test" />
             </RadioGroup>
-            <Typography component="div">
-              <FormLabel component="legend">Mode:</FormLabel>
-              <Grid component="label" container alignItems="center" spacing={1}>
-                <Grid item>Sensor Data</Grid>
-                <Grid item>
-                  <Switch name="checkedC" onChange={handleSwitchChange} />
-                </Grid>
-                <Grid item>KP Results</Grid>
-              </Grid>
-            </Typography>
+            <FormLabel component="legend">Mode:</FormLabel>
+            <RadioGroup
+              aria-label="mode"
+              name="Streaming Source"
+              value={modeUrl}
+              onChange={handleModeChange}
+            >
+              <FormControlLabel
+                value="config"
+                control={<Radio />}
+                label="Sensor Stream"
+              />
+              <FormControlLabel
+                value="config-results"
+                control={<Radio />}
+                label="Result Stream"
+              />
+            </RadioGroup>
             <FormLabel component="legend">Device ID:</FormLabel>
             <TextField
               id="outlined-basic"
-              label="DeviceID"
               variant="outlined"
               value={deviceID}
               onChange={handleDeviceIDChange}
@@ -185,7 +199,11 @@ const ConfigureStream = () => {
         >
           Scan
         </Button>
-        <DataGrid rows={deviceRows} columns={deviceColumns} />
+        <DataGrid
+          rows={deviceRows}
+          columns={deviceColumns}
+          onRowSelected={handleRowSelection}
+        />
       </Grid>
     </Grid>
   );

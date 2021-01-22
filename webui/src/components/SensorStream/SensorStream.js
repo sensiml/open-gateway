@@ -32,7 +32,26 @@ const handleDisconnectRequest = (event) => {
   });
 };
 
-const handleStreamRequest = (event, url, setStreamCallback) => {
+function splitArray(data, columns) {
+  var size = data.length / columns.length;
+  var x_array = [...Array(size).keys()];
+  var lines = columns.map((x) => {
+    return {
+      x: x_array,
+      y: [],
+      name: x,
+    };
+  });
+
+  for (var i = 0; i < data.length; i += columns.length) {
+    for (var col = 0; col < columns.length; col++) {
+      lines[col].y.push(data[i + col]);
+    }
+  }
+  return lines;
+}
+
+const handleStreamRequest = (event, url, setStreamCallback, columns) => {
   fetch(url, {
     method: "GET",
   }).then((response) => {
@@ -49,28 +68,8 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
               controller.close();
               return;
             }
-            // Get the data and send it to the browser via the controller
-            //setStreamCallback(value);
-            setStreamCallback([
-              {
-                x: [-3, -2, -1],
-                y: [
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                ],
-                name: "Line 1",
-              },
-              {
-                x: [1, 2, 3],
-                y: [
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                ],
-                name: "Line 2",
-              },
-            ]);
+            var int16Array = new Int16Array(value.buffer);
+            setStreamCallback(splitArray(int16Array, columns));
             push();
           });
         }
@@ -83,46 +82,41 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
   });
 };
 
-const SensorStream = () => {
-  let [streamData, setStreamData] = useState([]);
-
+const SensorStream = (props) => {
   const classes = useStyles();
   const theme = useTheme();
 
   return (
-    <Card className={classes.root}>
-      <div className={classes.details}>
-        <CardContent className={classes.content}>
-          <Typography component="h5" variant="h5">
-            Sensor Data
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary"></Typography>
-          <StreamChart data={streamData} />
-          <div className={classes.controls}>
-            <Button
-              aria-label="disconnect"
-              onClick={() => {
-                handleStreamRequest(
-                  "clicked",
-                  `${process.env.REACT_APP_API_URL}stream`,
-                  setStreamData
-                );
-              }}
-            >
-              Stream
-            </Button>
-            <Button
-              aria-label="disconnect"
-              onClick={() => {
-                handleDisconnectRequest("clicked");
-              }}
-            >
-              Disconnect
-            </Button>
-          </div>
-        </CardContent>
+    <div className={classes.details}>
+      <Typography component="h5" variant="h5">
+        Sensor Data
+      </Typography>
+      <Typography variant="subtitle1" color="textSecondary"></Typography>
+      <StreamChart data={props.streamData} />
+      <div className={classes.controls}>
+        <Button
+          aria-label="disconnect"
+          onClick={() => {
+            handleStreamRequest(
+              "clicked",
+              `${process.env.REACT_APP_API_URL}stream`,
+              props.setStreamData,
+              props.columns
+            );
+          }}
+        >
+          Stream
+        </Button>
+        <Button
+          aria-label="disconnect"
+          onClick={() => {
+            handleDisconnectRequest("clicked");
+          }}
+        >
+          Disconnect
+        </Button>
       </div>
-    </Card>
+    </div>
   );
 };
 

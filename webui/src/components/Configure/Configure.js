@@ -3,17 +3,7 @@ import axios from "axios";
 import { Typography } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 
-function mapdata(data) {
-  console.log(data);
-  data.streaming = data.streaming ? "Yes" : "No";
-  data.column_location =
-    "column_location" in data
-      ? Object.keys(data.column_location).sort().join(", ")
-      : [];
-  return data;
-}
-
-const Configure = () => {
+const Configure = (props) => {
   let [config, setConfig] = useState([]);
 
   useEffect(() => {
@@ -22,16 +12,41 @@ const Configure = () => {
       .then((res) => setConfig(mapdata(res.data)));
   }, []);
 
+  function mapdata(data) {
+    if (data.mode) {
+      props.setStreamingMode(data.mode);
+    }
+    data.streaming = data.streaming ? "Yes" : "No";
+    props.setColumns(Object.keys(data.column_location).sort());
+    props.setStreamingSource(data.source);
+    props.setDeviceID(data.device_id);
+    data.column_location =
+      "column_location" in data
+        ? Object.keys(data.column_location).sort().join(", ")
+        : [];
+
+    return data;
+  }
   return (
     <Grid xs={12}>
-      <Typography color="primary">Streaming: </Typography>
-      <Typography>{config.streaming}</Typography>
-      <Typography color="primary">Sensor: </Typography>
-      <Typography>{config.source}</Typography>
-      <Typography color="primary">Sample Rate: </Typography>
-      <Typography>{config.sample_rate}</Typography>
-      <Typography color="primary">Columns:</Typography>
-      <Typography>{config.column_location}</Typography>
+      <Grid>
+        <Typography color="primary"> Configured Mode: </Typography>
+        <Typography>{config.mode}</Typography>
+        <Typography color="primary">Streaming: </Typography>
+        <Typography>{config.streaming}</Typography>
+        <Typography color="primary">Sensors: </Typography>
+        <Typography>{config.source}</Typography>
+      </Grid>
+      {config.mode === "streaming" ? (
+        <Grid>
+          <Typography color="primary">Sample Rate: </Typography>
+          <Typography>{config.sample_rate}</Typography>
+          <Typography color="primary">Columns:</Typography>
+          <Typography>{config.column_location}</Typography>
+        </Grid>
+      ) : (
+        <></>
+      )}
     </Grid>
   );
 };
