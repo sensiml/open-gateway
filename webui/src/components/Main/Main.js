@@ -13,6 +13,7 @@ const Main = () => {
   const [streamingMode, setStreamingMode] = React.useState(0);
   const [streamData, setStreamData] = React.useState([]);
   const [deviceRows, setDeviceRows] = React.useState([]);
+  const [columns, setColumns] = React.useState([]);
 
   function handleChange(newValue) {
     if (activeView != newValue) {
@@ -29,7 +30,10 @@ const Main = () => {
         <NavBar onChange={handleChange} />
         <main className={classes.content}>
           {activeView === 0 ? (
-            <Configure setStreamingMode={setStreamingMode} />
+            <Configure
+              setStreamingMode={setStreamingMode}
+              setColumns={setColumns}
+            />
           ) : null}
           {activeView === 1 ? (
             <ConfigureStream setStreamingMode={setStreamingMode} />
@@ -41,6 +45,7 @@ const Main = () => {
               <SensorStream
                 streamData={streamData}
                 setStreamData={setStreamData}
+                columns={columns}
               />
             )
           ) : null}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Typography } from "@material-ui/core";
 import { Button } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -93,45 +94,44 @@ const Results = (props) => {
   const theme = useTheme();
 
   return (
-    <Card className={classes.root}>
+    <Grid>
       <div className={classes.details}>
-        <CardContent className={classes.content}>
-          <Typography component="h5" variant="h5">
-            Model Result
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary"></Typography>
-          <div className={classes.controls}>
-            <Button
-              aria-label="disconnect"
-              onClick={() => {
-                handleStreamRequest(
-                  "clicked",
-                  `${process.env.REACT_APP_API_URL}results`,
-                  props.setDeviceRows
-                );
-              }}
-            >
-              Connect
-            </Button>
-            <Button
-              aria-label="disconnect"
-              onClick={() => {
-                handleDisconnectRequest("clicked");
-              }}
-            >
-              Disconnect
-            </Button>
-          </div>
-        </CardContent>
+        <Typography component="h5" variant="h5">
+          Model Result
+        </Typography>
+        <Typography variant="subtitle1" color="textSecondary"></Typography>
+        <div className={classes.controls}>
+          <Button
+            aria-label="disconnect"
+            onClick={() => {
+              handleStreamRequest(
+                "clicked",
+                `${process.env.REACT_APP_API_URL}results`,
+                props.setDeviceRows
+              );
+            }}
+          >
+            Connect
+          </Button>
+          <Button
+            aria-label="disconnect"
+            onClick={() => {
+              handleDisconnectRequest("clicked");
+            }}
+          >
+            Disconnect
+          </Button>
+        </div>
       </div>
       <div style={{ height: 600, width: "100%" }}>
         <DataGrid
           rows={props.deviceRows}
           columns={deviceColumns}
           pageSize={15}
+          sortModel={[{ field: "id", sort: "desc" }]}
         />
       </div>
-    </Card>
+    </Grid>
   );
 };
 

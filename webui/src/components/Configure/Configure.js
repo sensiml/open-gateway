@@ -13,15 +13,16 @@ const Configure = (props) => {
   }, []);
 
   function mapdata(data) {
-    console.log(data);
     if (data.mode) {
       props.setStreamingMode(data.mode);
     }
     data.streaming = data.streaming ? "Yes" : "No";
+    props.setColumns(Object.keys(data.column_location).sort());
     data.column_location =
       "column_location" in data
         ? Object.keys(data.column_location).sort().join(", ")
         : [];
+
     return data;
   }
   return (
