@@ -23,8 +23,8 @@ const Main = () => {
         <Header />
         <NavBar onChange={handleChange} />
         <main className={classes.content}>
-          {activeView === 0 ? <ConfigureStream /> : null}
-          {activeView === 1 ? <Configure /> : null}
+          {activeView === 0 ? <Configure /> : null}
+          {activeView === 1 ? <ConfigureStream /> : null}
           {activeView === 2 ? <Results /> : null}
         </main>
       </Grid>

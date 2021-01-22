@@ -40,9 +40,9 @@ const useStyles = makeStyles((theme) => ({
 const InconSelector = (props) => {
   switch (props.index) {
     case 0:
-      return <SettingsIcon />;
-    case 1:
       return <InfoIcon />;
+    case 1:
+      return <SettingsIcon />;
     case 2:
       return <AssessmentIcon />;
     case 3:
@@ -70,7 +70,7 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Configure Gateway", "Gateway Status", "View Results"].map(
+          {["Gateway Status", "Configure Gateway", "View Results"].map(
             (text, index) => (
               <ListItem button key={text} onClick={handleMenu(index)}>
                 <ListItemIcon>
