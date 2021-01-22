@@ -59,13 +59,13 @@ const ConfigureStream = () => {
   };
 
   const handleSwitchChange = (event) => {
-    if (event.target.value) {
-      setModeUrl('config-results')
+    console.log("HEREREER");
+    console.log(event.target.checked);
+    if (event.target.checked) {
+      setModeUrl("config-results");
+    } else {
+      setModeUrl("config");
     }
-    else {
-      setModeUrl('config');
-    }
-
   };
 
   const handleDeviceIDChange = (event) => {
