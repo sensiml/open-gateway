@@ -80,7 +80,7 @@ class TestReader(BaseReader):
             "GyroscopeY":4,
             "GyroscopeZ":5,
         }
-        config["CONFIG_SAMPLE_RATE"] = 100
+        config["CONFIG_SAMPLE_RATE"] = 119
         config["DATA_SOURCE"] = "TEST"
 
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
