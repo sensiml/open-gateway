@@ -102,7 +102,7 @@ class BLEReader(BaseReader):
     def read_config(self):
 
         if self.peripheral is None:
-            raise Exception("BLE Device Not Configured.")
+            raise Exception("BLE Device ID Not Configured.")
 
         source_config = self.peripheral.getCharacteristics(uuid=uuidOfConfigChar)[
             0

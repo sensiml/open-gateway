@@ -31,7 +31,7 @@ class SerialReader(BaseReader):
 
     def _read_line(self):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
-            return ser.readline()
+            return ser.readline().decode('ascii')
 
     def _read_buffer(self, buffer_size):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
@@ -42,9 +42,7 @@ class SerialReader(BaseReader):
             return ser.reset_input_buffer()
 
     def read_config(self):
-        x = self._read_line().decode('ascii')
-        print(x)
-        return json.loads(x)
+        return json.loads(self._read_line())
 
     def get_port_info(self):
         ports = serial.tools.list_ports.comports()
@@ -64,7 +62,7 @@ class SerialReader(BaseReader):
     def read_data(self):
 
         if self.port is None:
-            return "Serial Port not configured!"
+            raise Exception("Serial Port not configured!")
 
         self.send_connect()
         time.sleep(1)
@@ -90,8 +88,24 @@ class SerialReader(BaseReader):
         config["SERIAL_PORT"] = self.port
 
 
-class SerialResultReader(BaseReader):
-    pass
+class SerialResultReader(SerialReader):
+
+    def send_connect(self):
+        pass
+
+    def read_data(self):
+
+        if self.port is None:
+            raise Exception("Serial Port not configured!")
+
+        self.send_connect()
+        time.sleep(1)
+
+        self._flush_buffer()
+
+        self.streaming = True
+        while self.streaming:
+            yield self._read_line()
 
 
 if __name__ == "__main__":
