@@ -13,7 +13,9 @@ const Main = () => {
   const [streamingMode, setStreamingMode] = React.useState(0);
 
   function handleChange(newValue) {
-    setActiveView(newValue);
+    if (activeView != newValue) {
+      setActiveView(newValue);
+    }
   }
 
   const classes = useStyles();
