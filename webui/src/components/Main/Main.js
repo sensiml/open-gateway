@@ -15,6 +15,7 @@ const Main = () => {
   const [streamData, setStreamData] = React.useState([]);
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
+  const [deviceID, setDeviceID] = React.useState([]);
 
   function handleChange(newValue) {
     if (activeView != newValue) {
@@ -35,6 +36,7 @@ const Main = () => {
               setStreamingMode={setStreamingMode}
               setColumns={setColumns}
               setStreamingSource={setStreamingSource}
+              setDeviceID={setDeviceID}
             />
           ) : null}
           {activeView === 1 ? (
@@ -42,6 +44,7 @@ const Main = () => {
               setStreamingMode={setStreamingMode}
               streamingSource={streamingSource}
               streamingMode={streamingMode}
+              deviceID={deviceID}
             />
           ) : null}
           {activeView === 2 ? (

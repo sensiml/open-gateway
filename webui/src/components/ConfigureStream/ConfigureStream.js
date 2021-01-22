@@ -46,7 +46,7 @@ const ConfigureStream = (props) => {
   const [modeUrl, setModeUrl] = React.useState(
     props.streamingMode === "results" ? "config-results" : "config"
   );
-  const [deviceID, setDeviceID] = React.useState("");
+  const [deviceID, setDeviceID] = React.useState(props.deviceID);
   const [error, setError] = React.useState(false);
   const [helperText, setHelperText] = React.useState("");
   const [deviceRows, setDeviceRows] = React.useState([]);
