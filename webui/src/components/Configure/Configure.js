@@ -24,14 +24,26 @@ const Configure = () => {
 
   return (
     <Grid xs={12}>
-      <Typography color="primary">Streaming: </Typography>
-      <Typography>{config.streaming}</Typography>
-      <Typography color="primary">Sensor: </Typography>
-      <Typography>{config.source}</Typography>
-      <Typography color="primary">Sample Rate: </Typography>
-      <Typography>{config.sample_rate}</Typography>
-      <Typography color="primary">Columns:</Typography>
-      <Typography>{config.column_location}</Typography>
+      {config.mode === "RESULTS"} ?
+      <Grid>
+        <Typography color="primary">Result Mode </Typography>
+        <Typography color="primary">Streaming: </Typography>
+        <Typography>{config.streaming}</Typography>
+        <Typography color="primary">Sensor: </Typography>
+        <Typography>{config.source}</Typography>
+      </Grid>
+      :
+      <Grid>
+        <Typography color="primary">Sensor Data Mode </Typography>
+        <Typography color="primary">Streaming: </Typography>
+        <Typography>{config.streaming}</Typography>
+        <Typography color="primary">Sensor: </Typography>
+        <Typography>{config.source}</Typography>
+        <Typography color="primary">Sample Rate: </Typography>
+        <Typography>{config.sample_rate}</Typography>
+        <Typography color="primary">Columns:</Typography>
+        <Typography>{config.column_location}</Typography>
+      </Grid>
     </Grid>
   );
 };
