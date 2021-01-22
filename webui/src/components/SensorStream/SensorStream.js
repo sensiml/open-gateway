@@ -50,25 +50,12 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
               return;
             }
             // Get the data and send it to the browser via the controller
-            //setStreamCallback(value);
+            var int16Array = new Int16Array(value.buffer);
             setStreamCallback([
               {
-                x: [-3, -2, -1],
-                y: [
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                ],
+                x: [...Array(int16Array.length).keys()],
+                y: int16Array,
                 name: "Line 1",
-              },
-              {
-                x: [1, 2, 3],
-                y: [
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                  parseInt(Math.random() * 10),
-                ],
-                name: "Line 2",
               },
             ]);
             push();
@@ -83,9 +70,7 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
   });
 };
 
-const SensorStream = () => {
-  let [streamData, setStreamData] = useState([]);
-
+const SensorStream = (props) => {
   const classes = useStyles();
   const theme = useTheme();
 
@@ -97,7 +82,7 @@ const SensorStream = () => {
             Sensor Data
           </Typography>
           <Typography variant="subtitle1" color="textSecondary"></Typography>
-          <StreamChart data={streamData} />
+          <StreamChart data={props.streamData} />
           <div className={classes.controls}>
             <Button
               aria-label="disconnect"
@@ -105,7 +90,7 @@ const SensorStream = () => {
                 handleStreamRequest(
                   "clicked",
                   `${process.env.REACT_APP_API_URL}stream`,
-                  setStreamData
+                  props.setStreamData
                 );
               }}
             >

@@ -11,6 +11,8 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 const Main = () => {
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState(0);
+  const [streamData, setStreamData] = React.useState([]);
+  const [deviceRows, setDeviceRows] = React.useState([]);
 
   function handleChange(newValue) {
     if (activeView != newValue) {
@@ -34,9 +36,12 @@ const Main = () => {
           ) : null}
           {activeView === 2 ? (
             streamingMode == "results" ? (
-              <Results />
+              <Results deviceRows={deviceRows} setDeviceRows={setDeviceRows} />
             ) : (
-              <SensorStream />
+              <SensorStream
+                streamData={streamData}
+                setStreamData={setStreamData}
+              />
             )
           ) : null}
         </main>

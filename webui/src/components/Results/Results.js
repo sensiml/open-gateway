@@ -82,8 +82,7 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
   });
 };
 
-const Results = () => {
-  const [deviceRows, setDeviceRows] = React.useState([]);
+const Results = (props) => {
   const [deviceColumns, setDeviceColumns] = React.useState([
     { field: "id", headerName: "ID", width: 70 },
     { field: "ModelNumber", headerName: "Model ID", width: 240 },
@@ -108,7 +107,7 @@ const Results = () => {
                 handleStreamRequest(
                   "clicked",
                   `${process.env.REACT_APP_API_URL}results`,
-                  setDeviceRows
+                  props.setDeviceRows
                 );
               }}
             >
@@ -126,7 +125,11 @@ const Results = () => {
         </CardContent>
       </div>
       <div style={{ height: 600, width: "100%" }}>
-        <DataGrid rows={deviceRows} columns={deviceColumns} pageSize={15} />
+        <DataGrid
+          rows={props.deviceRows}
+          columns={deviceColumns}
+          pageSize={15}
+        />
       </div>
     </Card>
   );
