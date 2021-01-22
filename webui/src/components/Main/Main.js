@@ -11,6 +11,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 const Main = () => {
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState(0);
+  const [streamingSource, setStreamingSource] = React.useState(0);
   const [streamData, setStreamData] = React.useState([]);
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
@@ -33,10 +34,15 @@ const Main = () => {
             <Configure
               setStreamingMode={setStreamingMode}
               setColumns={setColumns}
+              setStreamingSource={setStreamingSource}
             />
           ) : null}
           {activeView === 1 ? (
-            <ConfigureStream setStreamingMode={setStreamingMode} />
+            <ConfigureStream
+              setStreamingMode={setStreamingMode}
+              streamingSource={streamingSource}
+              streamingMode={streamingMode}
+            />
           ) : null}
           {activeView === 2 ? (
             streamingMode == "results" ? (

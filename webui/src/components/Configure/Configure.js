@@ -18,6 +18,7 @@ const Configure = (props) => {
     }
     data.streaming = data.streaming ? "Yes" : "No";
     props.setColumns(Object.keys(data.column_location).sort());
+    props.setStreamingSource(data.source);
     data.column_location =
       "column_location" in data
         ? Object.keys(data.column_location).sort().join(", ")

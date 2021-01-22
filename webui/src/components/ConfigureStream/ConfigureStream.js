@@ -42,8 +42,10 @@ const useStyles = makeStyles((theme) => ({
 
 const ConfigureStream = (props) => {
   const classes = useStyles();
-  const [source, setSource] = React.useState("Serial");
-  const [modeUrl, setModeUrl] = React.useState("config");
+  const [source, setSource] = React.useState(props.streamingSource);
+  const [modeUrl, setModeUrl] = React.useState(
+    props.streamingMode === "results" ? "config-results" : "config"
+  );
   const [deviceID, setDeviceID] = React.useState("");
   const [error, setError] = React.useState(false);
   const [helperText, setHelperText] = React.useState("");
@@ -58,14 +60,8 @@ const ConfigureStream = (props) => {
     setSource(event.target.value);
   };
 
-  const handleSwitchChange = (event) => {
-    console.log("HEREREER");
-    console.log(event.target.checked);
-    if (event.target.checked) {
-      setModeUrl("config-results");
-    } else {
-      setModeUrl("config");
-    }
+  const handleModeChange = (event) => {
+    setModeUrl(event.target.value);
   };
 
   const handleDeviceIDChange = (event) => {
@@ -147,23 +143,31 @@ const ConfigureStream = (props) => {
               onChange={handleRadioChange}
             >
               <FormControlLabel
-                value="Serial"
+                value="SERIAL"
                 control={<Radio />}
                 label="Serial"
               />
               <FormControlLabel value="BLE" control={<Radio />} label="BLE" />
-              <FormControlLabel value="Test" control={<Radio />} label="Test" />
+              <FormControlLabel value="TEST" control={<Radio />} label="Test" />
             </RadioGroup>
-            <Typography component="div">
-              <FormLabel component="legend">Mode:</FormLabel>
-              <Grid component="label" container alignItems="center" spacing={1}>
-                <Grid item>Sensor Data</Grid>
-                <Grid item>
-                  <Switch name="checkedC" onChange={handleSwitchChange} />
-                </Grid>
-                <Grid item>KP Results</Grid>
-              </Grid>
-            </Typography>
+            <FormLabel component="legend">Mode:</FormLabel>
+            <RadioGroup
+              aria-label="mode"
+              name="Streaming Source"
+              value={modeUrl}
+              onChange={handleModeChange}
+            >
+              <FormControlLabel
+                value="config"
+                control={<Radio />}
+                label="Sensor Stream"
+              />
+              <FormControlLabel
+                value="config-results"
+                control={<Radio />}
+                label="Result Stream"
+              />
+            </RadioGroup>
             <FormLabel component="legend">Device ID:</FormLabel>
             <TextField
               id="outlined-basic"
