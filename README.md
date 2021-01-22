@@ -33,7 +33,7 @@ python3 app.py
     3. Enter the the Device ID (which is the port) into the Text Field and Click Configure
     4. The Simple Streaming Gateway is now configured to Stream Data from your Device over WiFi
 
-**NOTE** TO USE BLUETOOTH YOU WILL NEED TO CHANGE BLUEPY HELPER PERMISSIONS
+**NOTE** To use bluethooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
 
 ```bash
 find ~/ -name bluepy-helper
