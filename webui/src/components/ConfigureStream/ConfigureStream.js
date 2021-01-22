@@ -74,6 +74,11 @@ const ConfigureStream = () => {
     setError(false);
   };
 
+  const handleRowSelection = (event) => {
+    console.log(event.data.device_id);
+    setDeviceID(event.data.device_id);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(source);
@@ -156,7 +161,6 @@ const ConfigureStream = () => {
             <FormLabel component="legend">Device ID:</FormLabel>
             <TextField
               id="outlined-basic"
-              label="DeviceID"
               variant="outlined"
               value={deviceID}
               onChange={handleDeviceIDChange}
@@ -185,7 +189,11 @@ const ConfigureStream = () => {
         >
           Scan
         </Button>
-        <DataGrid rows={deviceRows} columns={deviceColumns} />
+        <DataGrid
+          rows={deviceRows}
+          columns={deviceColumns}
+          onRowSelected={handleRowSelection}
+        />
       </Grid>
     </Grid>
   );
