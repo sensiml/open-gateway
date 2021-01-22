@@ -56,7 +56,7 @@ def cache_config(config):
         "SERIAL_PORT": app.config["SERIAL_PORT"],
         "MODE": app.config["MODE"],
     }
-    json.dump(tmp, open("config.cache", "w"))
+    json.dump(tmp, open("./.config.cache", "w"))
 
 
 @app.route("/")
@@ -253,7 +253,7 @@ if __name__ == "__main__":
     except ValueError:
         PORT = 5555
 
-    if os.path.exists("config.cache"):
-        app.config.update(json.load(open("config.cache", "r")))
+    if os.path.exists("./.config.cache"):
+        app.config.update(json.load(open("./.config.cache", "r")))
 
     app.run(HOST, 5555)

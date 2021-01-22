@@ -132,3 +132,5 @@ dmypy.json
 */node_modules/*
 
 .eslintcache
+
+.config.cache
