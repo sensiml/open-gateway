@@ -4,6 +4,9 @@ from sources.serial import SerialReader, SerialResultReader
 
 
 def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs):
+
+    data_source = data_source.upper()
+    
     if source_type == "STREAMING":
         if data_source == "TEST":
             return TestReader(config, **kwargs)
