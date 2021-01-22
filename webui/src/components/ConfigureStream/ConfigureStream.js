@@ -81,6 +81,10 @@ const ConfigureStream = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (deviceID === "") {
+      setHelperText("Must Set DeviceID");
+      return;
+    }
     console.log(source);
     console.log(deviceID);
     axios
