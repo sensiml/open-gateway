@@ -24,6 +24,8 @@ python3 app.py
     3. Enter the the Device ID (which is the port) into the Text Field and Click Configure
     4. The Simple Streaming Gateway is now configured to Stream Data from your Device over WiFi
 
+**NOTE** The BAUD RATE for the serial connection can be changed in the app.py by updating the default BAUD_RATE configuration.
+
 ## Data Collection over BLE
 
     1. Connect edge node to Gateway over USB serial
