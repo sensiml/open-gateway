@@ -88,6 +88,16 @@ class SerialReader(BaseReader):
         config["SERIAL_PORT"] = self.port
 
 
+def validate_results_data(data):
+    try:
+        tmp = json.loads(data)
+        if isinstance(tmp, dict):
+            return True
+    except Exception as e:
+        print(e)
+    
+    return False
+        
 class SerialResultReader(SerialReader):
 
     def set_config(self, config):
@@ -109,15 +119,9 @@ class SerialResultReader(SerialReader):
         self.streaming = True
         while self.streaming:            
             data = self._read_line()
-            try:
-                tmp = json.loads(data)
-                if not isinstance(tmp, dict):
-                    continue
-            except Exception as e:
-                print(e)
-                continue
 
-            yield  data
+            if validate_results_data(data):
+                yield  data
 
 
 if __name__ == "__main__":
