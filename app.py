@@ -93,7 +93,6 @@ def parse_current_config():
     return ret
 
 
-@app.route("/config")
 def get_config():
 
     ret = parse_current_config()
@@ -152,7 +151,7 @@ def config_results():
     if request.method == "POST":
         source = get_source(
             app.config,
-            data_source=form.data["source"],
+            data_source=form.data["source"].upper(),
             device_id=form.data["device_id"],
             source_type="RESULTS",
         )

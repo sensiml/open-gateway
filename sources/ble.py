@@ -169,7 +169,8 @@ class BLEResultReader(BLEReader):
         super(BLEReader, self).__init__(config, **kwargs)
 
     def set_config(self, config):
-        pass
+        config["DATA_SOURCE"] = "BLE"
+        config["BLE_DEVICE_ID"] = self.device_id
 
     def send_connect(self):
 

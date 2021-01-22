@@ -102,6 +102,7 @@ def validate_results_data(data):
 class SerialResultReader(SerialReader):
     def set_config(self, config):
         config["DATA_SOURCE"] = "SERIAL"
+        config["SERIAL_PORT"] = self.port
 
     def send_connect(self):
         pass
