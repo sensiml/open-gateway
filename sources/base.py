@@ -17,6 +17,9 @@ class BaseReader(object):
 
     def _validate_config(self, config):
 
+        if not isinstance(config, dict):
+            raise Exception("Invalid Configuration")
+
         if config.get("column_location", None) is None:
             raise Exception("Invalid Configuration: no column_location")
         if config.get("sample_rate", None) is None:

@@ -95,7 +95,7 @@ const ConfigureStream = () => {
       .catch(function (error) {
         if (error.response) {
           // Request made and server responded
-          setHelperText(error.response.data.error.message[0]);
+          setHelperText(error.response.data.error.message.join(", "));
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
