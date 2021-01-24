@@ -4,17 +4,17 @@ This Simple Streaming Gateway implements the Simple Streaming Service WiFi proto
 
 The Gateway must first be configured to record data from your target sensor. It does that by fetching a configuration file. You can scan for devices connected over serial and configure the Application by fetching the configuration from the connected device.
 
-[Configure Gateway](img/configure.png)
+1[Configure Gateway](img/configure.png)
 
 After fetching the configuration your gateway is ready to stream out data. You can then use the SensiML Data Capture lab to connect and record live sensor data.
 
 You can also use the Gateway to view the live sensor data streams
 
-[View Sensor Data](img/stream.png)
+![View Sensor Data](img/stream.png)
 
 As well as the results stream
 
-[View Results](img/results.png)
+![View Results](img/results.png)
 
 ## Installation
 
