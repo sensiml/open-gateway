@@ -1,6 +1,20 @@
 # SensiML Simple Streaming Gateway
 
-This application works as example application code for developing a gateway for emmbedded devices using the SensiML Simple Streaming service.
+This Simple Streaming Gateway implements the Simple Streaming Service WiFi protocal to enable forwarding data to the SensiML Data Capture Lab. The Simple Streaming Gateway supports connecting to sensors sources over a serial or BLE connection.
+
+The Gateway must first be configured to record data from your target sensor. It does that by fetching a configuration file. You can scan for devices connected over serial and configure the Application by fetching the configuration from the connected device.
+
+[Configure Gateway](img/configure.png)
+
+After fetching the configuration your gateway is ready to stream out data. You can then use the SensiML Data Capture lab to connect and record live sensor data.
+
+You can also use the Gateway to view the live sensor data streams
+
+[View Sensor Data](img/stream.png)
+
+As well as the results stream
+
+[View Results](img/results.png)
 
 ## Installation
 
