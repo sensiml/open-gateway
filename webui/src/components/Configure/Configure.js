@@ -36,6 +36,8 @@ const Configure = (props) => {
         <Typography>{config.streaming}</Typography>
         <Typography color="primary">Sensors: </Typography>
         <Typography>{config.source}</Typography>
+        <Typography color="primary">Device ID: </Typography>
+        <Typography>{config.device_id}</Typography>
       </Grid>
       {config.mode === "streaming" ? (
         <Grid>
