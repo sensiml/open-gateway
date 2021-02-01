@@ -29,6 +29,19 @@ class BaseReader(object):
 
         return config
 
+
+
+    def _validate_results_data(self, data):
+        try:
+            tmp = json.loads(data)
+            if isinstance(tmp, dict):
+                return True
+        except Exception as e:
+            print(e)
+            
+            return False            
+
+
     def read_config(self):
         pass
 

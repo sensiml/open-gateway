@@ -26,7 +26,7 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-app.register_blueprint(errors)
+#app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -36,6 +36,7 @@ app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []
 app.config["SERIAL_PORT"] = None
+app.config["TCPIP"] = None
 app.config["BLE_DEVICE_ID"] = None
 app.config["STREAMING_SOURCE"] = None
 app.config["RESULT_SOURCE"] = None
