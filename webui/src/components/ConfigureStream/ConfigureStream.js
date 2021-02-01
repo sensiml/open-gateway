@@ -148,6 +148,11 @@ const ConfigureStream = (props) => {
                 label="Serial"
               />
               <FormControlLabel value="BLE" control={<Radio />} label="BLE" />
+              <FormControlLabel
+                value="TCPIP"
+                control={<Radio />}
+                label="TCP/IP"
+              />              
               <FormControlLabel value="TEST" control={<Radio />} label="Test" />
             </RadioGroup>
             <FormLabel component="legend">Mode:</FormLabel>
@@ -160,12 +165,12 @@ const ConfigureStream = (props) => {
               <FormControlLabel
                 value="config"
                 control={<Radio />}
-                label="Sensor Stream"
+                label="Data Collection"
               />
               <FormControlLabel
                 value="config-results"
                 control={<Radio />}
-                label="Result Stream"
+                label="Recognition"
               />
             </RadioGroup>
             <FormLabel component="legend">Device ID:</FormLabel>

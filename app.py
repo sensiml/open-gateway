@@ -14,13 +14,9 @@ from flask import (
     redirect,
     request,
 )
-import time
 from json import dumps
-import random, struct
-import math
 from forms import DeviceConfigureForm, DeviceScanForm
 from sources import get_source
-import sys
 import json
 from flask_cors import CORS
 from errors import errors
@@ -36,6 +32,7 @@ app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []
 app.config["SERIAL_PORT"] = None
+app.config["TCPIP"] = None
 app.config["BLE_DEVICE_ID"] = None
 app.config["STREAMING_SOURCE"] = None
 app.config["RESULT_SOURCE"] = None
@@ -55,6 +52,7 @@ def cache_config(config):
         "BLE_DEVICE_ID": app.config["BLE_DEVICE_ID"],
         "SERIAL_PORT": app.config["SERIAL_PORT"],
         "MODE": app.config["MODE"],
+        "TCPIP":app.config["TCPIP"],
     }
     json.dump(tmp, open("./.config.cache", "w"))
 
@@ -69,6 +67,8 @@ def get_device_id():
         return app.config["BLE_DEVICE_ID"]
     if app.config["DATA_SOURCE"] == "SERIAL":
         return app.config["SERIAL_PORT"]
+    if app.config["DATA_SOURCE"] == "TCPIP":
+        return app.config["TCPIP"]
     else:
         return "TESTER"
 

@@ -1,3 +1,5 @@
+import json
+
 SHORT = 2
 
 
@@ -10,6 +12,7 @@ class BaseReader(object):
         self.config_columns = config.get("CONFIG_COLUMNS")
         self.data_width = len(config.get("CONFIG_COLUMNS", []))
         self.streaming = False
+        self._thread = None
 
     @property
     def packet_buffer_size(self):
@@ -28,6 +31,19 @@ class BaseReader(object):
             raise Exception("Invalid Configuration: no samples_per_packet")
 
         return config
+
+
+
+    def _validate_results_data(self, data):
+        try:
+            tmp = json.loads(data)
+            if isinstance(tmp, dict) and tmp:
+                return True
+        except Exception as e:
+            print(e)
+
+        return False
+
 
     def read_config(self):
         pass
