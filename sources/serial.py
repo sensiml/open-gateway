@@ -37,7 +37,7 @@ class SerialReader(BaseReader):
             return None
 
     def _read_buffer(self, buffer_size):
-        with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
+        with serial.Serial(self.port, self.baud_rate, timeout=4) as ser:
             return ser.read(buffer_size)
 
     def _flush_buffer(self):

@@ -5,6 +5,8 @@ import time
 import random
 from base import BaseReader
 import requests
+import threading
+import copy
 
 WIFI_PORT = 80
 
@@ -14,8 +16,8 @@ class TCPReader(BaseReader):
         self.device_id = device_id
         self._address = device_id.split(':')[0]
         self._port = device_id.split(':')[1]
-        self._data_buffer_1 = b""
-        self._data_buffer_2 = b""
+        self._data_buffer_1 = []
+        self._data_buffer_2 = []
         self._data_buff = 1
 
         super(TCPReader, self).__init__(config, **kwargs)
@@ -39,6 +41,29 @@ class TCPReader(BaseReader):
     def list_available_devices(self):
         return self.get_port_info()
 
+
+    def _update_buffer(self, data):
+
+        if self._data_buff == 1:
+            self._data_buffer_1.append(data)
+        if self._data_buff == 2:
+            self._data_buffer_2.append(data)
+
+    def _read_buffer(self):
+
+        if self._data_buff == 1:
+            self._data_buff = 2
+            tmp = copy.deepcopy(self._data_buffer_1)
+            self._data_buffer_1 = []
+            return tmp
+
+        if self._data_buff == 2:
+            self._data_buff = 1
+            tmp = copy.deepcopy(self._data_buffer_2)
+            self._data_buffer_2 = []
+            return tmp
+
+
     def _read_stream(self, path):
 
         url = '{}/{}'.format(self.address, path)
@@ -48,17 +73,38 @@ class TCPReader(BaseReader):
         with s.get(url, headers=None, stream=True) as resp:
             s = b""
             counter = 0
-            for line in resp.iter_content():
-                s+=line
-                counter+=1
+            for line in resp.iter_line():
 
-                if counter%7*10==0:
-                    if self._data_buff==1:
-                        self._data_buffer_1 += s
-                    else
-                        self._data_buffer_2 += s
-                
-                
+
+    def _read_line(self, path):
+
+        url = '{}/{}'.format(self.address, path)
+
+        s = requests.Session()
+
+        with s.get(url, headers=None, stream=True) as resp:
+            if not self.streaming:
+                return
+
+            content = ""
+
+            for cont in resp.iter_content():
+
+                try:
+                    data = cont.decode('ascii')
+                except Exception as e:
+                    print(e)
+                    continue
+
+                if data == '}':
+                    content+=data
+                    self._update_buffer(content)
+                    content = ""
+                elif data=='{':
+                    content = data
+                else:
+                    content+=data
+
     def _read_sensor_data(self):
         return self._read_stream('stream')
 
@@ -73,7 +119,7 @@ class TCPReader(BaseReader):
             if self._data_buff==1:
                 self._data_buffer_2=b""
                 self._data_buff=2
-                yield self._data_buffer_1                
+                yield self._data_buffer_1
             else:
                 self._data_buffer_1=b""
                 self._data_buff=1
@@ -97,7 +143,7 @@ class TCPReader(BaseReader):
 
 
 
-class TCPResultReader(TCPReader):
+class TCPIPResultReader(TCPReader):
 
     def set_config(self, config):
         config["DATA_SOURCE"] = "TCPIP"
@@ -107,20 +153,26 @@ class TCPResultReader(TCPReader):
         pass
 
     def _read_results(self):
-        return self._read_stream('results')
+        return self._read_line('results')
 
     def read_data(self):
 
         if self.device_id is None:
             raise Exception("IP Adress not configured!")
 
-        self.streaming = True
-        while self.streaming:
-            data = self._read_results()
 
-            print(data)
-            if self._validate_results_data(data):
-                yield data
+        if self.streaming:
+            pass
+        else:
+            self._thread = threading.Thread(target=self._read_results)
+            self.streaming = True
+            self._thread.start()
+
+        while self.streaming:
+            data = self._read_buffer()
+            for result in data:
+                if self._validate_results_data(result):
+                    yield result
 
 
 if __name__ == "__main__":
@@ -130,10 +182,19 @@ if __name__ == "__main__":
     import threading
     import time
 
-    #reader =  TCPResultReader(config, device_id)
-    #reader._read_results()
+    reader =  TCPResultReader(config, device_id)
 
+
+    for data in reader.read_data():
+        print(data)
+    """
     reader = TCPReader(config, device_id)
+
+    thread.startself._data_buffer_1 = b""
+    self._data_buffer_2 = b""
+    self._data_buff = 1
+
     print(reader.read_config())
     #print(reader._read_sensor_data())
     print(reader.read_data())
+    """

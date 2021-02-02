@@ -14,13 +14,9 @@ from flask import (
     redirect,
     request,
 )
-import time
 from json import dumps
-import random, struct
-import math
 from forms import DeviceConfigureForm, DeviceScanForm
 from sources import get_source
-import sys
 import json
 from flask_cors import CORS
 from errors import errors
