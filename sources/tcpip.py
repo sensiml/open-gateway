@@ -49,9 +49,17 @@ class TCPIPReader(BaseReader):
 
         return self._validate_config(r.json())
 
+<<<<<<< HEAD
 
     def list_available_devices(self):
         return []
+=======
+    def get_port_info(self):
+        return {}
+
+    def list_available_devices(self):
+        return self.get_port_info()
+>>>>>>> 821da6e7f847e993ffa251186d56d6ca07e0ba13
 
 
     def _update_buffer(self, data):
