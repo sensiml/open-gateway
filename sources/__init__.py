@@ -28,8 +28,8 @@ def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs
         if data_source == "TEST":
             return TestResultReader(config, **kwargs)
 
-        if data_source == "TCPIIP":
-            return TCPIPResultReader(config, debice_id, **kwargs)
+        if data_source == "TCPIP":
+            return TCPIPResultReader(config, device_id, **kwargs)
 
     print(source_type, data_source)
     raise Exception("Invalid Data Source {}".format(data_source))

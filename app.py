@@ -52,6 +52,7 @@ def cache_config(config):
         "BLE_DEVICE_ID": app.config["BLE_DEVICE_ID"],
         "SERIAL_PORT": app.config["SERIAL_PORT"],
         "MODE": app.config["MODE"],
+        "TCPIP":app.config["TCPIP"],
     }
     json.dump(tmp, open("./.config.cache", "w"))
 
@@ -66,6 +67,8 @@ def get_device_id():
         return app.config["BLE_DEVICE_ID"]
     if app.config["DATA_SOURCE"] == "SERIAL":
         return app.config["SERIAL_PORT"]
+    if app.config["DATA_SOURCE"] == "TCPIP":
+        return app.config["TCPIP"]
     else:
         return "TESTER"
 

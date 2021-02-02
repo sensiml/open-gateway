@@ -8,23 +8,32 @@ import threading
 import copy
 from sources.base import BaseReader
 
-WIFI_PORT = 80
+WIFI_PORT = ':80'
 
 
-class TCPReader(BaseReader):
+class TCPIPReader(BaseReader):
     def __init__(self, config, device_id, **kwargs):
+        print(device_id)
         self.device_id = device_id
+
+
         self._address = device_id.split(':')[0]
-        self._port = device_id.split(':')[1]
+
+        if len(device_id.split(':')) == 2:
+            self._port = ':' + device_id.split(':')[1]
+        else:
+            self._port = WIFI_PORT
+
+
         self._data_buffer_1 = []
         self._data_buffer_2 = []
         self._data_buff = 1
 
-        super(TCPReader, self).__init__(config, **kwargs)
+        super(TCPIPReader, self).__init__(config, **kwargs)
 
     @property
     def address(self):
-        return "http://{}:{}".format(self._address, self._port)
+        return "http://{}{}".format(self._address, self._port)
 
     @property
     def port(self):
@@ -63,7 +72,6 @@ class TCPReader(BaseReader):
             self._data_buffer_2 = []
             return tmp
 
-
     def _read_stream(self, path):
 
         url = '{}/{}'.format(self.address, path)
@@ -75,8 +83,6 @@ class TCPReader(BaseReader):
             counter = 0
             for line in resp.iter_line():
                 pass
-
-
 
     def _read_line(self, path):
 
@@ -145,11 +151,12 @@ class TCPReader(BaseReader):
 
 
 
-class TCPIPResultReader(TCPReader):
+class TCPIPResultReader(TCPIPReader):
 
     def set_config(self, config):
         config["DATA_SOURCE"] = "TCPIP"
         config["TCPIP"] = self.device_id
+        print('config set')
 
     def send_connect(self):
         pass
@@ -174,7 +181,7 @@ class TCPIPResultReader(TCPReader):
             data = self._read_buffer()
             for result in data:
                 if self._validate_results_data(result):
-                    yield result
+                    yield json.dumps(json.loads(result))+ "\n"
 
 
 if __name__ == "__main__":
