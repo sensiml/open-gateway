@@ -114,7 +114,6 @@ class SerialResultReader(SerialReader):
         while self.streaming:
             data = self._read_line()
 
-            print(data)
             if self._validate_results_data(data):
                 yield data
 
