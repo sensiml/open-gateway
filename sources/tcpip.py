@@ -79,10 +79,10 @@ class TCPIPReader(BaseReader):
         s = requests.Session()
 
         with s.get(url, headers=None, stream=True) as resp:
-            s = b""
-            counter = 0
-            for line in resp.iter_line():
-                pass
+            for line in resp.iter_lines():
+                print(line)
+                self._update_buffer(line)
+
 
     def _read_line(self, path):
 
@@ -118,22 +118,20 @@ class TCPIPReader(BaseReader):
 
     def read_data(self):
 
-        if self._address is None:
-            raise Exception("IP Address is not configured!")
+        if self.device_id is None:
+            raise Exception("IP Adress not configured!")
 
-        self.streaming = True
+        if self.streaming:
+            pass
+        else:
+            self._thread = threading.Thread(target=self._read_sensor_data)
+            self.streaming = True
+            self._thread.start()
 
         while self.streaming:
-            if self._data_buff==1:
-                self._data_buffer_2=b""
-                self._data_buff=2
-                yield self._data_buffer_1
-            else:
-                self._data_buffer_1=b""
-                self._data_buff=1
-                self._data_buffer_1
-                yield self._data_buffer_2
-
+            data = self._read_buffer()
+            for result in data:
+                yield data
 
     def set_config(self, config):
 
@@ -190,20 +188,18 @@ if __name__ == "__main__":
 
     import threading
     import time
-
+    """
     reader =  TCPResultReader(config, device_id)
 
 
-    for data in reader.read_data():
-        print(data)
-    """
-    reader = TCPReader(config, device_id)
 
-    thread.startself._data_buffer_1 = b""
-    self._data_buffer_2 = b""
-    self._data_buff = 1
+   """
+
+    reader = TCPIPReader(config, device_id)
 
     print(reader.read_config())
     #print(reader._read_sensor_data())
-    print(reader.read_data())
-    """
+
+    for data in reader.read_data():
+        print(data)
+

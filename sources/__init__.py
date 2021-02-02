@@ -1,7 +1,7 @@
 from sources.ble import BLEReader, BLEResultReader
 from sources.test import TestReader, TestResultReader
 from sources.serial import SerialReader, SerialResultReader
-from sources.tcpip import TCPIPResultReader
+from sources.tcpip import TCPIPReader, TCPIPResultReader
 
 
 def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs):
@@ -17,6 +17,9 @@ def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs
 
         if data_source == "BLE":
             return BLEReader(config, device_id, **kwargs)
+
+        if data_source == "TCPIP":
+            return TCPIPReader(config, device_id, **kwargs)
 
     if source_type == "RESULTS":
         if data_source == "BLE":
