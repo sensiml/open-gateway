@@ -147,6 +147,11 @@ const ConfigureStream = (props) => {
                 control={<Radio />}
                 label="Serial"
               />
+              <FormControlLabel
+                value="TCPIP"
+                control={<Radio />}
+                label="TCP/IP"
+              />
               <FormControlLabel value="BLE" control={<Radio />} label="BLE" />
               <FormControlLabel value="TEST" control={<Radio />} label="Test" />
             </RadioGroup>
