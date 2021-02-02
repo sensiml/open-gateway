@@ -3,10 +3,10 @@ import struct
 import math
 import time
 import random
-from base import BaseReader
 import requests
 import threading
 import copy
+from sources.base import BaseReader
 
 WIFI_PORT = 80
 
@@ -74,6 +74,8 @@ class TCPReader(BaseReader):
             s = b""
             counter = 0
             for line in resp.iter_line():
+                pass
+
 
 
     def _read_line(self, path):
