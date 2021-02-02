@@ -49,17 +49,15 @@ python3 app.py
 
 **NOTE** To use Bluethooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
 
+```bash
+find ~/ -name bluepy-helper
+cd <PATH>
+sudo setcap 'cap_net_raw,cap_net_admin+eip' bluepy-helper
+```
+
 ## Data Collection from TCP/IP Source
 
     1. Connect edge node to network
     2. Go to Gateway Configure Screen, Select TCP/IP Radio Button
     3. Enter the Device ID (address:port) into the Text Field and Click Configure
     4. The Simple Streaming Gateway is now configured to Stream Data from your Device over Wi-Fi
-
-**NOTE** To use Bluethooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
-
-```bash
-find ~/ -name bluepy-helper
-cd <PATH>
-sudo setcap 'cap_net_raw,cap_net_admin+eip' bluepy-helper
-```
