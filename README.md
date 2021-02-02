@@ -31,7 +31,7 @@ To Start the application run
 python3 app.py
 ```
 
-## Data Collection over Serial
+## Data Collection over Serial Source
 
     1. Connect edge node to Gateway over USB serial
     2. Go to Gateway Configure Screen, Select Serial Radio and Click Scan
@@ -40,11 +40,20 @@ python3 app.py
 
 **NOTE** The BAUD RATE for the serial connection can be changed in the app.py by updating the default BAUD_RATE configuration.
 
-## Data Collection over BLE
+## Data Collection over BLE Source
 
     1. Connect edge node to Gateway over USB serial
     2. Go to Gateway Configure Screen, Select BLE Radio and Click Scan
     3. Enter the Device ID (which is the port) into the Text Field and Click Configure
+    4. The Simple Streaming Gateway is now configured to Stream Data from your Device over Wi-Fi
+
+**NOTE** To use Bluethooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
+
+## Data Collection from TCP/IP Source
+
+    1. Connect edge node to network
+    2. Go to Gateway Configure Screen, Select TCP/IP Radio Button
+    3. Enter the Device ID (address:port) into the Text Field and Click Configure
     4. The Simple Streaming Gateway is now configured to Stream Data from your Device over Wi-Fi
 
 **NOTE** To use Bluethooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
