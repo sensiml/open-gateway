@@ -7,7 +7,6 @@ from sources.tcpip import TCPIPReader, TCPIPResultReader
 def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs):
 
     data_source = data_source.upper()
-    print(data_source)
 
     if source_type == "STREAMING":
         if data_source == "TEST":

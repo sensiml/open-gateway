@@ -16,14 +16,16 @@ class TCPIPReader(BaseReader):
         
         self.device_id = device_id
 
-        self._address = device_id.split(':')[0]
+        if kwargs.get('connect', True) is True:
+                
+            self._address = device_id.split(':')[0]
 
-        if len(device_id.split(':')) == 2:
-            self._port = ':' + device_id.split(':')[1]
-        else:
-            self._port = WIFI_PORT
+            if len(device_id.split(':')) == 2:
+                self._port = ':' + device_id.split(':')[1]
+            else:
+                self._port = WIFI_PORT
 
-        self._init_buffer()
+            self._init_buffer()
 
         super(TCPIPReader, self).__init__(config, **kwargs)
 
@@ -47,11 +49,9 @@ class TCPIPReader(BaseReader):
 
         return self._validate_config(r.json())
 
-    def get_port_info(self):
-        return {}
 
     def list_available_devices(self):
-        return self.get_port_info()
+        return []
 
 
     def _update_buffer(self, data):

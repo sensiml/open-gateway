@@ -104,12 +104,15 @@ def get_config():
 def scan():
     form = DeviceScanForm()
 
+    print(form.data["source"].upper())
+
     source = get_source(
         app.config,
         device_id=None,
         data_source=form.data["source"].upper(),
         connect=False,
     )
+
 
     device_id_list = source.list_available_devices()
 
