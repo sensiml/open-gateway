@@ -31,10 +31,13 @@ class SerialReader(BaseReader):
 
     def _read_line(self):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
-            return ser.readline().decode("ascii")
+            value = ser.readline()
+            if value:
+                return value.decode("ascii")
+            return None
 
     def _read_buffer(self, buffer_size):
-        with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
+        with serial.Serial(self.port, self.baud_rate, timeout=4) as ser:
             return ser.read(buffer_size)
 
     def _flush_buffer(self):
@@ -88,16 +91,6 @@ class SerialReader(BaseReader):
         config["SERIAL_PORT"] = self.port
 
 
-def validate_results_data(data):
-    try:
-        tmp = json.loads(data)
-        if isinstance(tmp, dict):
-            return True
-    except Exception as e:
-        print(e)
-
-    return False
-
 
 class SerialResultReader(SerialReader):
     def set_config(self, config):
@@ -121,7 +114,7 @@ class SerialResultReader(SerialReader):
         while self.streaming:
             data = self._read_line()
 
-            if validate_results_data(data):
+            if self._validate_results_data(data):
                 yield data
 
 
