@@ -1,6 +1,6 @@
 flask
 flask-wtf
 wtforms
-bluepy
 flask-cors
 pyserial>=2.6
+bluepy

@@ -31,6 +31,10 @@ To Start the application run
 python3 app.py
 ```
 
+## Installation (Windows, Mac)
+
+Currently the application uses bluepy for BLE connections, which is not supported on windows or Mac. You can still use the gateway application for TCP/IP and Serial connections, but you need to modify the requirements.txt file to not install bluepy. You can do that by removing bluepy as a dependency in requirements.txt.
+
 ## Data Collection over Serial Source
 
     1. Connect edge node to Gateway over USB serial
