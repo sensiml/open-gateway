@@ -3,7 +3,7 @@ from sources.test import TestReader, TestResultReader
 from sources.serial import SerialReader, SerialResultReader
 from sources.tcpip import TCPIPReader, TCPIPResultReader
 
-if sys.platform != "win32":
+if sys.platform not in ["win32", "darwin"]:
     from sources.ble import BLEReader, BLEResultReader
 else:
     print("BLE is not supported on Windows!")
