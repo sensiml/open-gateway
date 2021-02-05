@@ -1,7 +1,12 @@
-from sources.ble import BLEReader, BLEResultReader
+import sys
 from sources.test import TestReader, TestResultReader
 from sources.serial import SerialReader, SerialResultReader
 from sources.tcpip import TCPIPReader, TCPIPResultReader
+
+if sys.platform != "win32":
+    from sources.ble import BLEReader, BLEResultReader
+else:
+    print("BLE is not supported on Windows!")
 
 
 def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs):
