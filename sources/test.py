@@ -107,6 +107,8 @@ class TestResultReader(BaseReader):
 
         self.streaming = False
 
+        super(TestResultReader, self).__init__(config, **kwargs)
+
     def set_config(self, config):
         config["DATA_SOURCE"] = "TEST"
 
