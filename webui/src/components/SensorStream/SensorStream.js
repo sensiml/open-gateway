@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Typography } from "@material-ui/core";
 import { Button } from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
 import StreamChart from "./StreamChart";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import Divider from "@material-ui/core/Divider";
+import { Grid } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,6 +23,13 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     paddingLeft: theme.spacing(1),
     paddingBottom: theme.spacing(1),
+  },
+  section1: {
+    margin: theme.spacing(3, 2),
+  },
+  section2: {
+    margin: theme.spacing(2),
+    textAlign: "center",
   },
 }));
 
@@ -88,34 +95,54 @@ const SensorStream = (props) => {
 
   return (
     <div className={classes.details}>
-      <Typography component="h5" variant="h5">
-        Sensor Data
-      </Typography>
-      <Typography variant="subtitle1" color="textSecondary"></Typography>
-      <StreamChart data={props.streamData} />
-      <div className={classes.controls}>
-        <Button
-          aria-label="disconnect"
-          onClick={() => {
-            handleStreamRequest(
-              "clicked",
-              `${process.env.REACT_APP_API_URL}stream`,
-              props.setStreamData,
-              props.columns
-            );
-          }}
-        >
-          Stream
-        </Button>
-        <Button
-          aria-label="disconnect"
-          onClick={() => {
-            handleDisconnectRequest("clicked");
-          }}
-        >
-          Disconnect
-        </Button>
+      <div className={classes.section1}>
+        <Grid container spacing={2} rows>
+          <Grid item xs={8}>
+            <Typography component="h3" variant="h3" color="secondary">
+              Mode: Data Collection
+            </Typography>
+          </Grid>
+
+          <Grid item>
+            <div className={classes.controls}>
+              <Button
+                aria-label="disconnect"
+                color="primary"
+                variant="contained"
+                onClick={() => {
+                  handleStreamRequest(
+                    "clicked",
+                    `${process.env.REACT_APP_API_URL}stream`,
+                    props.setStreamData,
+                    props.columns
+                  );
+                }}
+              >
+                Stream
+              </Button>
+            </div>
+          </Grid>
+          <Grid item>
+            <div className={classes.controls}>
+              <Button
+                color="secondary"
+                variant="contained"
+                aria-label="disconnect"
+                onClick={() => {
+                  handleDisconnectRequest("clicked");
+                }}
+              >
+                Disconnect
+              </Button>
+            </div>
+          </Grid>
+        </Grid>
       </div>
+      <Divider variant="middle" />
+      <div className={classes.section2}>
+        <Typography variant="subtitle1" color="textSecondary"></Typography>
+      </div>
+      <StreamChart data={props.streamData} />
     </div>
   );
 };

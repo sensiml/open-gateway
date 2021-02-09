@@ -109,7 +109,7 @@ const Results = (props) => {
         <Grid container spacing={2} rows>
           <Grid item xs={8}>
             <Typography component="h3" variant="h3" color="secondary">
-              Model Result
+              Mode: Recogntion
             </Typography>
           </Grid>
 
