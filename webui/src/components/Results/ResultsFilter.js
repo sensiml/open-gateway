@@ -1,21 +1,46 @@
 import React from "react";
-import Plot from "react-plotly.js";
-
+import { Typography } from "@material-ui/core";
 
 
 const ResultsFilter = (props) => {
 
-    useFFect()
+
+    function filterData(data, filter_length){ 
+        
+        if (data.length === 0)
+        {
+            return null
+        }
+
+        let m = {};
+        for (var i=data.length-filter_length; i<data.length; i++)
+        {
+            if (data[i].Classification in m)
+                { 
+                    m[data[i].Classification] += 1;
+                }
+            else{
+                m[data[i].Classification] = 1;
+            }
+        }
+
+        let index=0
+        let max = 0;
+        for(const [key, value] of Object.entries(m)) {
+            if(value > max) {
+              max = value;
+              index = key;
+            }
+        }
+        return index;
+    } 
 
 
     return (
-        data = { props.data }
-            layout = {{
-        autosize: true,
-            }
-}
-/>
-    );
+        <Typography variant="h1" component="h2">
+            { filterData(props.data, props.filter_length) }
+        </Typography>
+    )
 };
 
 export default ResultsFilter;

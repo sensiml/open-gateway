@@ -3,10 +3,10 @@ import axios from "axios";
 import { Typography } from "@material-ui/core";
 import { Button } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DataGrid } from "@material-ui/data-grid";
+import ResultsFilter from "./ResultsFilter"
+import Slider from '@material-ui/core/Slider';
 
 var id_counter = 0;
 
@@ -89,9 +89,16 @@ const Results = (props) => {
     { field: "ModelNumber", headerName: "Model ID", width: 240 },
     { field: "Classification", headerName: "Classification", width: 240 },
   ]);
+  const [filterLength, setfilterLength] = React.useState(1);
 
   const classes = useStyles();
   const theme = useTheme();
+
+  const handleFilterLengthSliderChange = (event, newValue) => {
+    console.log(newValue);
+    setfilterLength(newValue);
+  };
+
 
   return (
     <Grid>
@@ -100,6 +107,14 @@ const Results = (props) => {
           Model Result
         </Typography>
         <Typography variant="subtitle1" color="textSecondary"></Typography>
+
+        <ResultsFilter data={props.deviceRows} filter_length={filterLength}>          
+        </ResultsFilter>
+        <Slider
+            value={typeof filterLength === 'number' ? filterLength : 1}
+            onChange={handleFilterLengthSliderChange}
+            aria-labelledby="input-slider"
+        />
         <div className={classes.controls}>
           <Button
             aria-label="disconnect"
@@ -124,8 +139,7 @@ const Results = (props) => {
         </div>
       </div>
       <div>
-        <ResultFilter columns={deviceColumns}>
-        </ResultFilter>
+
       </div>
       <div style={{ height: 600, width: "100%" }}>
         <DataGrid
