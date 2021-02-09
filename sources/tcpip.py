@@ -221,7 +221,8 @@ class TCPIPResultReader(TCPIPReader):
             data = self._read_buffer()
             for result in data:
                 if self._validate_results_data(result):
-                    yield json.dumps(json.loads(result))+ "\n"
+                    result = self._map_classification(json.loads(result))
+                    yield json.dumps(result)+ "\n"
 
 
 if __name__ == "__main__":

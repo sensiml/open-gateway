@@ -13,6 +13,7 @@ class BaseReader(object):
         self.data_width = len(config.get("CONFIG_COLUMNS", []))
         self.streaming = False
         self._thread = None
+        self.class_map = config.get("CLASS_MAP", None)
 
     @property
     def packet_buffer_size(self):
@@ -44,6 +45,12 @@ class BaseReader(object):
 
         return False
 
+    def _map_classification(self, results):
+        
+        if self.class_map:
+            results['Classification'] = self.class_map.get(results['Classification'], results['Classification'])
+        
+        return results
 
     def read_config(self):
         pass

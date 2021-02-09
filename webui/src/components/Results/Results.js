@@ -123,6 +123,10 @@ const Results = (props) => {
           </Button>
         </div>
       </div>
+      <div>
+        <ResultFilter columns={deviceColumns}>
+        </ResultFilter>
+      </div>
       <div style={{ height: 600, width: "100%" }}>
         <DataGrid
           rows={props.deviceRows}
