@@ -39,7 +39,7 @@ app.config["RESULT_SOURCE"] = None
 app.config["MODE"] = None
 app.config["STREAMING"] = False
 app.config["BAUD_RATE"] = 460800
-app.config["CLASS_MAP"] = {1: "Ring", 2: "Slope", 4: "Wing", 3: "Unknown", 0: "Unknown"}
+app.config["CLASS_MAP"] = None
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
