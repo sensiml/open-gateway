@@ -28,6 +28,10 @@ const ResultsFilter = (props) => {
         index = key;
       }
     }
+
+    if (max < filter_length / 2) {
+      return "UNC";
+    }
     return index;
   }
 
