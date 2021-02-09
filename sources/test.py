@@ -73,12 +73,12 @@ class TestReader(BaseReader):
     def set_config(self, config):
 
         config["CONFIG_COLUMNS"] = {
-           "AccelerometerX": 0,
-            "AccelerometerY":1,
-            "AccelerometerZ":2,
-            "GyroscopeX":3,
-            "GyroscopeY":4,
-            "GyroscopeZ":5,
+            "AccelerometerX": 0,
+            "AccelerometerY": 1,
+            "AccelerometerZ": 2,
+            "GyroscopeX": 3,
+            "GyroscopeY": 4,
+            "GyroscopeZ": 5,
         }
         config["CONFIG_SAMPLE_RATE"] = 119
         config["DATA_SOURCE"] = "TEST"
@@ -118,6 +118,8 @@ class TestResultReader(BaseReader):
             time.sleep(1)
 
             yield json.dumps(
-                {"ModelNumber": 0, "Classification": random.randint(0, 10)}
+                self._map_classification(
+                    {"ModelNumber": 0, "Classification": random.randint(0, 10)}
+                )
             ) + "\n"
             counter += 1

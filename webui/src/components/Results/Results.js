@@ -5,8 +5,8 @@ import { Button } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DataGrid } from "@material-ui/data-grid";
-import ResultsFilter from "./ResultsFilter"
-import Slider from '@material-ui/core/Slider';
+import ResultsFilter from "./ResultsFilter";
+import Slider from "@material-ui/core/Slider";
 
 var id_counter = 0;
 
@@ -99,22 +99,27 @@ const Results = (props) => {
     setfilterLength(newValue);
   };
 
-
   return (
     <Grid>
       <div className={classes.details}>
         <Typography component="h5" variant="h5">
           Model Result
         </Typography>
-        <Typography variant="subtitle1" color="textSecondary"></Typography>
 
-        <ResultsFilter data={props.deviceRows} filter_length={filterLength}>          
-        </ResultsFilter>
-        <Slider
-            value={typeof filterLength === 'number' ? filterLength : 1}
+        <ResultsFilter
+          data={props.deviceRows}
+          filter_length={filterLength}
+        ></ResultsFilter>
+        <Grid xs={8}>
+          <Slider
+            value={typeof filterLength === "number" ? filterLength : 1}
             onChange={handleFilterLengthSliderChange}
             aria-labelledby="input-slider"
-        />
+            min={1}
+            max={10}
+          />
+          Filter Length: {filterLength}
+        </Grid>
         <div className={classes.controls}>
           <Button
             aria-label="disconnect"
@@ -138,9 +143,7 @@ const Results = (props) => {
           </Button>
         </div>
       </div>
-      <div>
-
-      </div>
+      <div></div>
       <div style={{ height: 600, width: "100%" }}>
         <DataGrid
           rows={props.deviceRows}

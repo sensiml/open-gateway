@@ -39,7 +39,7 @@ app.config["RESULT_SOURCE"] = None
 app.config["MODE"] = None
 app.config["STREAMING"] = False
 app.config["BAUD_RATE"] = 460800
-app.config["CLASS_MAP"] = {1:"Ring",2:"Slope",4:"Wing",3:"Unknown",0:"Unknown"}
+app.config["CLASS_MAP"] = {1: "Ring", 2: "Slope", 4: "Wing", 3: "Unknown", 0: "Unknown"}
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
@@ -53,7 +53,7 @@ def cache_config(config):
         "BLE_DEVICE_ID": app.config["BLE_DEVICE_ID"],
         "SERIAL_PORT": app.config["SERIAL_PORT"],
         "MODE": app.config["MODE"],
-        "TCPIP":app.config["TCPIP"],
+        "TCPIP": app.config["TCPIP"],
     }
     json.dump(tmp, open("./.config.cache", "w"))
 
@@ -113,7 +113,6 @@ def scan():
         data_source=form.data["source"].upper(),
         connect=False,
     )
-
 
     device_id_list = source.list_available_devices()
 
