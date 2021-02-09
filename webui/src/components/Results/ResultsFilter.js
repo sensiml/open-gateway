@@ -4,7 +4,7 @@ import { Typography } from "@material-ui/core";
 const ResultsFilter = (props) => {
   function filterData(data, filter_length) {
     if (data.length === 0) {
-      return null;
+      return "No Results";
     }
 
     if (filter_length > data.length) {
