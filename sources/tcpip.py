@@ -47,6 +47,8 @@ class TCPIPReader(BaseReader):
 
         s = requests.Session()
 
+        self.streaming = True
+
         with s.get(url, headers=None, stream=True) as resp:
             for line in resp.iter_content():
 
@@ -82,14 +84,17 @@ class TCPIPResultReader(TCPIPReader):
 
         s = requests.Session()
 
+        self.streaming = True
+
         with s.get(url, headers=None, stream=True) as resp:
             content = ""
 
             for cont in resp.iter_content():
+                
                 if not self.streaming:
                     return
 
-                try:
+                try:                
                     data = cont.decode("ascii")
                 except Exception as e:
                     print(e)
