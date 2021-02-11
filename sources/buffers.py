@@ -17,6 +17,8 @@ class CircularBufferQueue(object):
         for i in range(self._num_buffers):
             print(i, "len:", len(self._data[i]))
 
+        print(self._data)
+
     def _increment(self):
         """ Increment and clear next buffer """
         self._index = (self._index+1) % self._num_buffers

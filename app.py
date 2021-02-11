@@ -136,8 +136,10 @@ def config():
             device_id=form.data["device_id"],
         )
 
+        print("SET CONFIG")
         source.set_config(app.config)
 
+        print("SEND CONNECT")
         source.send_connect()
 
         app.config["MODE"] = "DATA_CAPTURE"

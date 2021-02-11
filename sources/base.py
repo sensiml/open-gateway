@@ -87,7 +87,8 @@ class BaseReader(object):
         self.streaming = False
         self._thread = None
 
-        self.buffer.init_buffer()
+        self.buffer.reset_buffer()
+        self.rbuffer.reset_buffer()
 
     def read_data(self):
 
@@ -144,8 +145,8 @@ class BaseReader(object):
                 data = self.rbuffer.read_buffer(index)
                 index = self.rbuffer.get_next_index(index)                    
 
-                for result in data:
-                    if self._validate_results_data(result):
+                for result in data:                    
+                    if self._validate_results_data(result):                        
                         result = self._map_classification(json.loads(result))
                         yield json.dumps(result) + "\n"
                 
