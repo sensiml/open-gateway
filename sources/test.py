@@ -79,7 +79,7 @@ class TestReader(BaseReader):
             "GyroscopeY": 4,
             "GyroscopeZ": 5,
         }
-        config["CONFIG_SAMPLE_RATE"] = 119
+        config["CONFIG_SAMPLE_RATE"] = 104
         config["DATA_SOURCE"] = "TEST"
 
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
@@ -117,12 +117,12 @@ class TestResultReader(BaseReader):
 
         while self.streaming:
 
-            self._update_result_buffer(
-                json.dumps(
+            self.rbuffer.update_buffer(
+                [json.dumps(
                     self._map_classification(
                         {"ModelNumber": 0, "Classification": random.randint(0, 10)}
                     )
-                )
+                )]
             )
             time.sleep(0.1)
 

@@ -132,7 +132,7 @@ class BLEReader(BaseReader):
                     with self._lock:
                         tmp = copy.deepcopy(self.delegate.data)
                         self.delegate.new_data = False
-                    self._update_buffer(tmp)
+                    self.buffer.update_buffer(tmp)
 
             except Exception as e:
                 print(e)
@@ -203,9 +203,8 @@ class BLEResultReader(BLEReader):
             if self.delegate.new_data:
                 tmp = struct.unpack("h" * 2, self.delegate.data)
                 self.delegate.new_data = False
-                self.delegate.data = ""
-                print(json.dumps({"model": tmp[0], "classification": tmp[1]}))
-                yield json.dumps({"model": tmp[0], "classification": tmp[1]}) + "\n"
+                self.delegate.data = ""            
+                self.rbuffer.update_buffer([json.dumps({"model": tmp[0], "classification": tmp[1]})])
 
 
 if __name__ == "__main__":

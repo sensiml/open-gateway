@@ -53,7 +53,7 @@ class TCPIPReader(BaseReader):
                 if not self.streaming:
                     return
 
-                self._update_buffer(line)
+                self.buffer.update_buffer(line)
 
     def set_config(self, config):
 
@@ -97,7 +97,7 @@ class TCPIPResultReader(TCPIPReader):
 
                 if data == "}":
                     content += data
-                    self._update_result_buffer(content)
+                    self.rbuffer.update_buffer([content])
                     content = ""
                 elif data == "{":
                     content = data

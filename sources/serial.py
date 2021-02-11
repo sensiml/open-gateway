@@ -106,7 +106,7 @@ class SerialResultReader(SerialReader):
         self.streaming = True
         while self.streaming:
             data = self._read_line()
-            self._update_result_buffer(data)
+            self.rbuffer.update_buffer([data])
 
 
 if __name__ == "__main__":
