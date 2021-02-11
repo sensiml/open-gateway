@@ -5,7 +5,7 @@ import math
 import time
 import random
 from sources.base import BaseReader
-
+import threading
 
 BAUD_RATE = 460800
 
@@ -15,7 +15,7 @@ class SerialReader(BaseReader):
         self._port = device_id
         self._baud_rate = config.get("BAUD_RATE", BAUD_RATE)
 
-        super(SerialReader, self).__init__(config, **kwargs)
+        super(SerialReader, self).__init__(config, device_id, **kwargs)
 
     @property
     def port(self):
@@ -36,7 +36,7 @@ class SerialReader(BaseReader):
                 return value.decode("ascii")
             return None
 
-    def _read_buffer(self, buffer_size):
+    def _read_serial_buffer(self, buffer_size):
         with serial.Serial(self.port, self.baud_rate, timeout=4) as ser:
             return ser.read(buffer_size)
 
@@ -59,22 +59,18 @@ class SerialReader(BaseReader):
     def list_available_devices(self):
         return self.get_port_info()
 
-    def send_connect(self):
+    def send_subscribe(self):
         self._write("connect")
 
-    def read_data(self):
-
-        if self.port is None:
-            raise Exception("Serial Port not configured!")
-
-        self.send_connect()
-        time.sleep(1)
+    def _read_source(self):
 
         self._flush_buffer()
 
         self.streaming = True
         while self.streaming:
-            yield self._read_buffer(self.packet_buffer_size)
+
+            data = self._read_serial_buffer(self.packet_buffer_size)
+            self._update_buffer(data)
 
     def set_config(self, config):
 
@@ -91,31 +87,22 @@ class SerialReader(BaseReader):
         config["SERIAL_PORT"] = self.port
 
 
-
 class SerialResultReader(SerialReader):
     def set_config(self, config):
         config["DATA_SOURCE"] = "SERIAL"
         config["SERIAL_PORT"] = self.port
 
-    def send_connect(self):
+    def send_subscribe(self):
         pass
 
-    def read_data(self):
-
-        if self.port is None:
-            raise Exception("Serial Port not configured!")
-
-        self.send_connect()
-        time.sleep(1)
+    def _read_source(self):
 
         self._flush_buffer()
 
         self.streaming = True
         while self.streaming:
             data = self._read_line()
-
-            if self._validate_results_data(data):
-                yield data
+            self._update_buffer(data)
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ app.config["BLE_DEVICE_ID"] = None
 app.config["STREAMING_SOURCE"] = None
 app.config["RESULT_SOURCE"] = None
 app.config["MODE"] = None
-app.config["STREAMING"] = False
+app.config["DATA_CAPTURE"] = False
 app.config["BAUD_RATE"] = 460800
 app.config["CLASS_MAP"] = None
 
@@ -82,7 +82,7 @@ def parse_current_config():
     ret["samples_per_packet"] = app.config["CONFIG_SAMPLES_PER_PACKET"]
     ret["source"] = app.config["DATA_SOURCE"]
     ret["device_id"] = get_device_id()
-    ret["streaming"] = app.config["STREAMING"]
+    ret["DATA_CAPTURE"] = app.config["DATA_CAPTURE"]
     ret["baud_rate"] = app.config["BAUD_RATE"]
     ret["mode"] = app.config["MODE"].lower()
 
@@ -125,12 +125,12 @@ def config():
 
     if request.method == "POST":
         disconnect()
-        app.config["STREAMING"] = False
+        app.config["DATA_CAPTURE"] = False
 
         source = get_source(
             app.config,
             data_source=form.data["source"].upper(),
-            source_type="STREAMING",
+            source_type="DATA_CAPTURE",
             device_id=form.data["device_id"],
         )
 
@@ -138,9 +138,11 @@ def config():
 
         source.send_connect()
 
-        app.config["MODE"] = "STREAMING"
+        app.config["MODE"] = "DATA_CAPTURE"
 
         cache_config(app.config)
+
+        app.config["STREAMING_SOURCE"] = source
 
     ret = parse_current_config()
 
@@ -152,6 +154,8 @@ def config_results():
     form = DeviceConfigureForm()
 
     if request.method == "POST":
+        disconnect()
+
         source = get_source(
             app.config,
             data_source=form.data["source"].upper(),
@@ -165,6 +169,8 @@ def config_results():
 
         app.config["MODE"] = "RESULTS"
 
+        app.config["RESULT_SOURCE"] = source
+
         cache_config(app.config)
 
         return get_config()
@@ -177,46 +183,38 @@ def config_results():
 @app.route("/stream")
 def stream():
 
-    if app.config.get("STREAMING_SOURCE", None):
-        print("Source is already Streaming! Call /disconnect to stop!.")
-        return "Source is already Streaming. Call /disconnect to stop."
-
-    source = get_source(
-        app.config,
-        device_id=get_device_id(),
-        data_source=app.config["DATA_SOURCE"],
-        source_type="STREAMING",
-    )
-
-    app.config["STREAMING_SOURCE"] = source
-
-    app.config["STREAMING"] = True
+    if app.config.get("STREAMING_SOURCE", None) is None:
+        app.config["STREAMING_SOURCE"] = get_source(
+            app.config,
+            device_id=get_device_id(),
+            data_source=app.config["DATA_SOURCE"],
+            source_type="DATA_CAPTURE",
+        )
+        app.config["DATA_CAPTURE"] = True
 
     return Response(
-        stream_with_context(source.read_data()), mimetype="application/octet-stream"
+        stream_with_context(app.config["STREAMING_SOURCE"].read_data()),
+        mimetype="application/octet-stream",
     )
 
 
 @app.route("/results")
 def results():
 
-    if app.config.get("RESULT_SOURCE", None):
-        print("Result Source is already Streaming! Call /disconnect to stop!.")
-        return "Result Source is already Streaming. Call /disconnect to stop."
+    if app.config.get("RESULT_SOURCE", None) is None:
 
-    source = get_source(
-        app.config,
-        device_id=get_device_id(),
-        data_source=app.config["DATA_SOURCE"],
-        source_type="RESULTS",
-    )
+        app.config["RESULT_SOURCE"] = get_source(
+            app.config,
+            device_id=get_device_id(),
+            data_source=app.config["DATA_SOURCE"],
+            source_type="RESULTS",
+        )
 
-    app.config["RESULT_SOURCE"] = source
-
-    app.config["STREAMING"] = True
+        app.config["DATA_CAPTURE"] = True
 
     return Response(
-        stream_with_context(source.read_data()), mimetype="application/octet-stream"
+        stream_with_context(app.config["RESULT_SOURCE"].read_result_data()),
+        mimetype="application/octet-stream",
     )
 
 
@@ -225,7 +223,9 @@ def disconnect():
 
     source = app.config.get("STREAMING_SOURCE", None)
     source_resutlts = app.config.get("RESULT_SOURCE", None)
-    app.config["STREAMING"] = False
+    app.config["DATA_CAPTURE"] = False
+
+    msg = ""
 
     if source is not None:
         source.disconnect()
@@ -233,7 +233,7 @@ def disconnect():
         del app.config["STREAMING_SOURCE"]
         app.config["STREAMING_SOURCE"] = None
 
-        return "Disconnected From Streaming Source"
+        msg = "Disconnected from Streaming Source. "
 
     if source_resutlts is not None:
         source_resutlts.disconnect()
@@ -241,7 +241,10 @@ def disconnect():
         del app.config["RESULT_SOURCE"]
         app.config["RESULT_SOURCE"] = None
 
-        return "Disconnected From Result Source"
+        msg += "Disconnected from Result Source."
+
+    if msg:
+        return msg
 
     return "No Sources Currently Connected"
 
@@ -258,4 +261,4 @@ if __name__ == "__main__":
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
 
-    app.run(HOST, 5555)
+    app.run(HOST, 5555, debug=True)

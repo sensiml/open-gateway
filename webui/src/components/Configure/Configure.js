@@ -39,7 +39,7 @@ const Configure = (props) => {
         <Typography color="primary">Device ID: </Typography>
         <Typography>{config.device_id}</Typography>
       </Grid>
-      {config.mode === "streaming" ? (
+      {config.mode === "DATA_CAPTURE" ? (
         <Grid>
           <Typography color="primary">Sample Rate: </Typography>
           <Typography>{config.sample_rate}</Typography>

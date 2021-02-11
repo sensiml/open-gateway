@@ -48,19 +48,18 @@ class BLEReader(BaseReader):
 
     def __init__(self, config, device_id, connect=True, **kwargs):
 
-        self.delegate = StreamingDelegate(None)
+        super(BLEReader, self).__init__(config, device_id, **kwargs)
+
+        self.delegate = StreamingDelegate(self._lock)
         self.new_data = False
         self.data = []
         self.streaming = False
         self.subscribed = False
-        self.device_id = device_id
         self.peripheral = None
 
         if self.device_id and connect:
             self.peripheral = btle.Peripheral(self.device_id)
             self.peripheral.setDelegate(self.delegate)
-
-        super(BLEReader, self).__init__(config, **kwargs)
 
     def disconnect(self):
         self.streaming = False
@@ -86,7 +85,7 @@ class BLEReader(BaseReader):
 
         return device_list
 
-    def send_connect(self):
+    def send_subscribe(self):
 
         if not self.subscribed:
             setup_data = b"\x01\x00"
@@ -112,9 +111,10 @@ class BLEReader(BaseReader):
             json.loads(source_config.decode("ascii").rstrip("\x00"))
         )
 
-    def read_data(self):
+    def _read_source(self):
 
-        self.send_connect()
+        self.send_subscribe()
+
         time.sleep(1)
 
         self.streaming = True
@@ -123,15 +123,13 @@ class BLEReader(BaseReader):
             try:
                 if self.peripheral.waitForNotifications(0.01):
                     continue
-                if self.delegate.new_data:
-                    tmp = copy.deepcopy(self.delegate.data)
-                    if len(tmp) >= self.packet_buffer_size:
-                        self.delegate.new_data = False
-                        self.delegate.data = self.delegate.data[
-                            self.packet_buffer_size :
-                        ]
 
-                        yield tmp[: self.packet_buffer_size]
+                if self.delegate.new_data:
+                    with self._lock:
+                        tmp = copy.deepcopy(self.delegate.data)
+                        self.delegate.new_data = False
+                    self._update_buffer(tmp)
+
             except:
                 self.streaming = False
 
@@ -155,7 +153,9 @@ class BLEResultReader(BLEReader):
 
     def __init__(self, config, device_id, connect=True, **kwargs):
 
-        self.delegate = ResultDelegate(None)
+        super(BLEReader, self).__init__(config, device_id, **kwargs)
+
+        self.delegate = ResultDelegate(self._lock)
         self.new_data = False
         self.data = []
         self.streaming = False
@@ -166,13 +166,11 @@ class BLEResultReader(BLEReader):
             self.peripheral = btle.Peripheral(self.device_id)
             self.peripheral.setDelegate(self.delegate)
 
-        super(BLEReader, self).__init__(config, **kwargs)
-
     def set_config(self, config):
         config["DATA_SOURCE"] = "BLE"
         config["BLE_DEVICE_ID"] = self.device_id
 
-    def send_connect(self):
+    def send_subscribe(self):
 
         print("sending connect")
         if not self.subscribed:
@@ -190,10 +188,7 @@ class BLEResultReader(BLEReader):
             self.subscribed = True
             print("subscribed")
 
-    def read_data(self):
-
-        self.send_connect()
-        time.sleep(1)
+    def _read_source(self):
 
         self.streaming = True
 
