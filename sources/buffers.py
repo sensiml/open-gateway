@@ -12,7 +12,8 @@ class CircularBufferQueue(object):
         return b""
 
     def describe_buffer_state(self):
-        print('current index', self._index)
+        print('max buffer size:', self._maxsize)
+        print('current index', self._index)        
         for i in range(self._num_buffers):
             print(i, "len:", len(self._data[i]))
 
@@ -27,25 +28,34 @@ class CircularBufferQueue(object):
             size = len(self._data[self._index])+len(data)
             # print('data', len(self._data[self._index]), 'new data', len(data), "max_size", self._maxsize)
 
-            if size > 2*self._maxsize:
-                raise Exception("Size of data is too large for buffer, increase max buffer size!")
+            if size > self._num_buffers*self._maxsize:
+                print("Buffer Size is Too Small, Data is being overwritten!")
 
             if  size <= self._maxsize:
                 # print('updatding data')
                 self._data[self._index] += data
             
             elif size >= self._maxsize:
-                self._data[self._index]+=data[:size-self._maxsize]
-                # print("first part", len(data[:size-self._maxsize]), "data size", len(self._data[self._index]))
+
+                # top off current index
+                taken = self._maxsize-len(self._data[self._index])
+                self._data[self._index]+=data[:taken]
                 self._increment()
-                self._data[self._index]+=data[size-self._maxsize:]
-                # print("second part", len(data[size-self._maxsize:]), "data size", len(self._data[self._index]))
+
+                size = len(data)-taken
+                while size > self._maxsize:                    
+                    self._data[self._index]=data[-size:-(size-self._maxsize)]
+                    self._increment()
+                    size -= self._maxsize
+                    #print(self._index)
+
+                self._data[self._index]+=data[-size:]                    
 
             if self.is_buffer_full(self._index):
                 # print('buffer was filled')
                 self._increment()
 
-            # self.describe_buffer_state()
+            #self.describe_buffer_state()
 
     def get_index(self, index):
         return index % self._num_buffers    

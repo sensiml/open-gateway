@@ -4,7 +4,10 @@ import struct
 import sys
 import json
 import copy
-from sources.base import BaseReader
+try:
+    from sources.base import BaseReader
+except:
+    from base import BaseReader
 import time
 
 uuidOfConfigChar = "16480001-0525-4ad5-b4fb-6dd83f49546b"
@@ -114,6 +117,8 @@ class BLEReader(BaseReader):
             0
         ].read()
 
+        print(source_config)
+
         return self._validate_config(
             json.loads(source_config.decode("ascii").rstrip("\x00"))
         )
@@ -132,6 +137,8 @@ class BLEReader(BaseReader):
                     with self._lock:
                         tmp = copy.deepcopy(self.delegate.data)
                         self.delegate.new_data = False
+                        self.delegate.data=b""
+                    print("got data: ", len(tmp))
                     self.buffer.update_buffer(tmp)
 
             except Exception as e:
@@ -209,11 +216,11 @@ class BLEResultReader(BLEReader):
 
 if __name__ == "__main__":
 
-    config = {"CONFIG_COLUMNS": [], "CONFIG_SAMPLE_RATE": [], "DATA_SOURCE": "BLE"}
+    config = {'DATA_SOURCE': 'BLE', 'CONFIG_SAMPLE_RATE': 119, 'CONFIG_SAMPLES_PER_PACKET': 10, 'BLE_DEVICE_ID': 'dd:6c:dc:c1:99:fb', 'CONFIG_COLUMNS': {'GyroscopeZ': 5, 'AccelerometerX': 0, 'AccelerometerY': 1, 'GyroscopeX': 3, 'AccelerometerZ': 2, 'GyroscopeY': 4}}
 
-    ble = BLEReader({})
+    device_id = "dd:6c:dc:c1:99:fb"
+    ble = BLEReader(config, device_id=device_id)
     ble.set_config(config)
-    ble.send_connect()
+    ble.send_subscribe()
 
-    for i in ble.read_data():
-        print(i)
+    ble._read_source()

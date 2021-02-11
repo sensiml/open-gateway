@@ -3,7 +3,10 @@ import copy
 import threading
 import array
 import time
-from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
+try:
+    from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
+except:
+    from buffers import CircularBufferQueue, CircularResultsBufferQueue
 SHORT = 2
 
 
