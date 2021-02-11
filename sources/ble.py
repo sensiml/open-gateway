@@ -62,11 +62,18 @@ class BLEReader(BaseReader):
             self.peripheral.setDelegate(self.delegate)
 
     def disconnect(self):
+
         self.streaming = False
-        self.subscribed = True
+        self.subscribed = False
 
         if self.peripheral:
-            self.peripheral.disconnect()
+            try:
+                self.peripheral.disconnect()
+            except Exception as e:
+                print(e)
+
+        self._thread = None
+
 
     def list_available_devices(self):
 
@@ -113,9 +120,6 @@ class BLEReader(BaseReader):
 
     def _read_source(self):
 
-        self.send_subscribe()
-
-        time.sleep(1)
 
         self.streaming = True
 
@@ -130,8 +134,9 @@ class BLEReader(BaseReader):
                         self.delegate.new_data = False
                     self._update_buffer(tmp)
 
-            except:
-                self.streaming = False
+            except Exception as e:
+                print(e)
+                self.disconnect()
 
     def set_config(self, config):
 

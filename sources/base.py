@@ -1,10 +1,72 @@
 import json
 import copy
 import threading
-
+import array
 SHORT = 2
 
 import time
+
+
+
+class RingBuffer(object):
+    """ class that implements a not-yet-full buffer """
+    def __init__(self,size_max):
+        self.max = size_max
+        self.data = array('h', [0 for _ in 512])
+
+    """ class that implements a full buffer """
+    def append(self, x):
+        """ Append an element overwriting the oldest one. """
+        self.data[self.cur] = x
+        self.cur = (self.cur+1) % self.max
+
+    def extend(self, x):
+        """ add multiple elements to the array, overwriting the oldes ones. """
+
+        end = self.get_post_to_end()
+        data_size = len(x)
+
+        if self.cur+data_size >= self.max:
+            self.data[self.cur:] = x[:end]
+            self.data[:data_size-end] = x[end:]
+            self.cur=data_size-end
+        else:
+            self.data[self.cur:self.cur+data_size]=x
+            self.cur+=data_size            
+
+    def get(self):
+        """ return list of elements in correct order """
+        return self.data[self.cur:]+self.data[:self.cur]
+
+
+    def get_size_to_end(self):
+        return self.max - self.cur
+
+    def get_size_from_start(self):
+        return self.cur
+
+    def get_data_length(self, pos):
+        if pos > self.cur:
+            return self.max-pos+self.cur
+
+        return self.cur-pos
+
+    def get_pos_to_end(self, pos):
+        if pos > self.cur:
+            return self.max - pos
+
+        return 0
+
+
+    def get_pos_from_start(self, pos):
+        if pos > self.cur:
+            return self.cur
+
+        return self.pos-self.cur
+
+    def get_data_packet(self, pos, packet_size):
+        pass
+
 
 
 class BufferMixin(object):
@@ -54,6 +116,8 @@ class BufferMixin(object):
     def _update_buffer(self, data):
 
         with self._lock:
+
+            print('update buffer')
             if self._data_buff == 1:
                 self._data_buffer_1 += data
             if self._data_buff == 2:
@@ -62,6 +126,8 @@ class BufferMixin(object):
     def _read_buffer(self, buffer_size):
 
         with self._lock:
+
+            print('read buffer')
             if self._data_buff == 1:
                 if len(self._data_buffer_1) < buffer_size:
                     return
@@ -142,7 +208,10 @@ class BaseReader(BufferMixin):
     def send_connect(self):
 
         if self._thread is None:
+
             self.send_subscribe()
+
+            time.sleep(1)
 
             self._init_buffer()
 
@@ -168,12 +237,14 @@ class BaseReader(BufferMixin):
             print("sent connect")
             self.send_connect()
 
-        print("starting stream")
         while self.streaming:
             data = self._read_buffer(self.packet_buffer_size)
 
             if data:
                 yield data
+
+            time.sleep(.1)
+
 
         print("stream ended")
 

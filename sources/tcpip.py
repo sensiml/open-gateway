@@ -97,7 +97,7 @@ class TCPIPResultReader(TCPIPReader):
 
                 if data == "}":
                     content += data
-                    self._update_buffer(content)
+                    self._update_result_buffer(content)
                     content = ""
                 elif data == "{":
                     content = data

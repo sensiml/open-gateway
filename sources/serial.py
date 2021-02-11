@@ -70,6 +70,7 @@ class SerialReader(BaseReader):
         while self.streaming:
 
             data = self._read_serial_buffer(self.packet_buffer_size)
+            print(data)
             self._update_buffer(data)
 
     def set_config(self, config):
@@ -102,7 +103,8 @@ class SerialResultReader(SerialReader):
         self.streaming = True
         while self.streaming:
             data = self._read_line()
-            self._update_buffer(data)
+            print(data)
+            self._update_result_buffer(data)
 
 
 if __name__ == "__main__":
