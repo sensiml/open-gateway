@@ -22,7 +22,7 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-#app.register_blueprint(errors)
+app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -37,7 +37,7 @@ app.config["BLE_DEVICE_ID"] = None
 app.config["STREAMING_SOURCE"] = None
 app.config["RESULT_SOURCE"] = None
 app.config["MODE"] = None
-app.config["DATA_CAPTURE"] = False
+app.config["STREAMING"] = False
 app.config["BAUD_RATE"] = 460800
 app.config["CLASS_MAP"] = None
 
@@ -82,7 +82,7 @@ def parse_current_config():
     ret["samples_per_packet"] = app.config["CONFIG_SAMPLES_PER_PACKET"]
     ret["source"] = app.config["DATA_SOURCE"]
     ret["device_id"] = get_device_id()
-    ret["DATA_CAPTURE"] = app.config["DATA_CAPTURE"]
+    ret["streaming"] = app.config["STREAMING"]
     ret["baud_rate"] = app.config["BAUD_RATE"]
     ret["mode"] = app.config["MODE"].lower()
 
@@ -90,8 +90,6 @@ def parse_current_config():
         ret["column_location"] = app.config["CONFIG_COLUMNS"]
     else:
         ret["column_location"] = {}
-
-    print(ret)
 
     return ret
 
@@ -127,7 +125,7 @@ def config():
 
     if request.method == "POST":
         disconnect()
-        app.config["DATA_CAPTURE"] = False
+        app.config["STREAMING"] = False
 
         source = get_source(
             app.config,
@@ -141,12 +139,14 @@ def config():
 
         print("SEND CONNECT")
         source.send_connect()
+        app.config["STREAMING"] = True
 
         app.config["MODE"] = "DATA_CAPTURE"
 
         cache_config(app.config)
 
         app.config["STREAMING_SOURCE"] = source
+        
         print(app.config)
 
     ret = parse_current_config()
@@ -160,6 +160,7 @@ def config_results():
 
     if request.method == "POST":
         disconnect()
+        app.config["STREAMING"] = False
 
         source = get_source(
             app.config,
@@ -171,6 +172,8 @@ def config_results():
         source.set_config(app.config)
 
         source.send_connect()
+
+        app.config["STREAMING"] = True
 
         app.config["MODE"] = "RESULTS"
 
@@ -195,7 +198,8 @@ def stream():
             data_source=app.config["DATA_SOURCE"],
             source_type="DATA_CAPTURE",
         )
-        app.config["DATA_CAPTURE"] = True
+
+        app.config["STREAMING"] = True
 
     return Response(
         stream_with_context(app.config["STREAMING_SOURCE"].read_data()),
@@ -215,7 +219,7 @@ def results():
             source_type="RESULTS",
         )
 
-        app.config["DATA_CAPTURE"] = True
+        app.config["STREAMING"] = True
 
     return Response(
         stream_with_context(app.config["RESULT_SOURCE"].read_result_data()),
@@ -228,7 +232,7 @@ def disconnect():
 
     source = app.config.get("STREAMING_SOURCE", None)
     source_resutlts = app.config.get("RESULT_SOURCE", None)
-    app.config["DATA_CAPTURE"] = False
+    app.config["STREAMING"] = False
 
     msg = ""
 
