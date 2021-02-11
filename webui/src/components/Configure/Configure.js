@@ -39,7 +39,7 @@ const Configure = (props) => {
         <Typography color="primary">Device ID: </Typography>
         <Typography>{config.device_id}</Typography>
       </Grid>
-      {config.mode === "DATA_CAPTURE" ? (
+      {config.mode === "data_capture" ? (
         <Grid>
           <Typography color="primary">Sample Rate: </Typography>
           <Typography>{config.sample_rate}</Typography>
@@ -47,8 +47,8 @@ const Configure = (props) => {
           <Typography>{config.column_location}</Typography>
         </Grid>
       ) : (
-        <></>
-      )}
+          <></>
+        )}
     </Grid>
   );
 };

@@ -86,6 +86,8 @@ class TestReader(BaseReader):
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
 
+        print(config)
+
     def _read_source(self):
         index = 0
         data = self._generate_samples(len(self.config_columns), self.sample_rate)
@@ -94,7 +96,7 @@ class TestReader(BaseReader):
             sample_data, index = self._pack_data(
                 data, self.byteSize, self.samples_per_packet, index
             )
-            self._update_buffer(sample_data)
+            self.buffer.update_buffer(sample_data)
 
             time.sleep(0.1)
 

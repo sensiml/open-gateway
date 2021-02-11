@@ -91,6 +91,8 @@ def parse_current_config():
     else:
         ret["column_location"] = {}
 
+    print(ret)
+
     return ret
 
 
@@ -143,6 +145,7 @@ def config():
         cache_config(app.config)
 
         app.config["STREAMING_SOURCE"] = source
+        print(app.config)
 
     ret = parse_current_config()
 

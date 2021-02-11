@@ -45,7 +45,11 @@ class SerialReader(BaseReader):
             return ser.reset_input_buffer()
 
     def read_config(self):
-        return self._validate_config(json.loads(self._read_line()))
+        config = json.loads(self._read_line())
+        if self._validate_config(config):
+            return config
+
+        raise Exception("Invalid Configuration File")
 
     def get_port_info(self):
         ports = serial.tools.list_ports.comports()
@@ -70,8 +74,7 @@ class SerialReader(BaseReader):
         while self.streaming:
 
             data = self._read_serial_buffer(self.packet_buffer_size)
-            print(data)
-            self._update_buffer(data)
+            self.buffer.update_buffer(data)
 
     def set_config(self, config):
 
@@ -103,7 +106,6 @@ class SerialResultReader(SerialReader):
         self.streaming = True
         while self.streaming:
             data = self._read_line()
-            print(data)
             self._update_result_buffer(data)
 
 

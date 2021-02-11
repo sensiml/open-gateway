@@ -69,12 +69,81 @@ class RingBuffer(object):
 
 
 
+class CircularBufferQueue(object):
+    def __init__(self, lock, num_buffers=4, buffer_size=128):
+        self._lock = lock
+        self._data = [b"" for _ in range(num_buffers)]
+        self._index = 0
+        self._maxsize = buffer_size
+        self._num_buffers = num_buffers
+
+    def describe_buffer_state(self):
+        print('current index', self._index)
+        for i in range(self._num_buffers):
+            print(i, "len:", len(self._data[i]))
+
+
+    def _increment(self):
+        """ Increment and clear next buffer """
+        self._index = (self._index+1) % self._num_buffers
+        self._data[self._index] = b""
+
+    def update_buffer(self, data):
+
+        with self._lock:             
+            size = len(self._data[self._index])+len(data)
+            # print('data', len(self._data[self._index]), 'new data', len(data), "max_size", self._maxsize)
+
+            if size > 2*self._maxsize:
+                raise Exception("Size of data is too large for buffer, increase max buffer size!")
+
+            if  size <= self._maxsize:
+                # print('updatding data')
+                self._data[self._index] += data
+            
+            elif size >= self._maxsize:
+                self._data[self._index]+=data[:size-self._maxsize]
+                # print("first part", len(data[:size-self._maxsize]), "data size", len(self._data[self._index]))
+                self._increment()
+                self._data[self._index]+=data[size-self._maxsize:]
+                # print("second part", len(data[size-self._maxsize:]), "data size", len(self._data[self._index]))
+
+            if self.is_buffer_full(self._index):
+                # print('buffer was filled')
+                self._increment()
+
+            # self.describe_buffer_state()
+
+    def get_index(self, index):
+        return index % self._num_buffers    
+
+    def is_buffer_full(self, index):
+        if len(self._data[index]) == self._maxsize:
+            return True
+        
+        return False
+
+    def read_buffer(self, buffer_index):
+
+        with self._lock:
+            return copy.deepcopy(self._data[buffer_index])
+
+    def reset_buffer(self):
+        for i in range(self._num_buffers):
+            self._data[i] = b""
+
+    def get_latest_buffer(self):
+        latest_buffer = self._index-1
+
+        if self.is_buffer_full(latest_buffer):
+            return latest_buffer
+        
+        return None
+
+    def get_next_index(self, index):
+        return (index+1) % self._num_buffers
+
 class BufferMixin(object):
-    def _init_buffer(self):
-        self._data_buffer_1 = b""
-        self._data_buffer_2 = b""
-        self._data_buff = 1
-        self._new_data = False
 
     def _init_result_buffer(self):
 
@@ -113,40 +182,6 @@ class BufferMixin(object):
             else:
                 return None
 
-    def _update_buffer(self, data):
-
-        with self._lock:
-
-            print('update buffer')
-            if self._data_buff == 1:
-                self._data_buffer_1 += data
-            if self._data_buff == 2:
-                self._data_buffer_2 += data
-
-    def _read_buffer(self, buffer_size):
-
-        with self._lock:
-
-            print('read buffer')
-            if self._data_buff == 1:
-                if len(self._data_buffer_1) < buffer_size:
-                    return
-                self._data_buffer_2 = self._data_buffer_1[buffer_size:]
-                self._data_buff = 2
-                tmp = copy.deepcopy(self._data_buffer_1[:buffer_size])
-                self._data_buffer_1 = b""
-
-                return tmp
-
-            if self._data_buff == 2:
-                if len(self._data_buffer_2) < buffer_size:
-                    return
-                self._data_buffer_1 = self._data_buffer_2[buffer_size:]
-                self._data_buff = 1
-                tmp = copy.deepcopy(self._data_buffer_2[:buffer_size])
-                self._data_buffer_2 = b""
-
-                return tmp
 
 
 class BaseReader(BufferMixin):
@@ -165,7 +200,8 @@ class BaseReader(BufferMixin):
         self._thread = None
         self._lock = threading.Lock()
 
-        self._init_buffer()
+        self.buffer = CircularBufferQueue(self._lock, buffer_size=self.packet_buffer_size)
+
         self._init_result_buffer()
 
     @property
@@ -208,12 +244,13 @@ class BaseReader(BufferMixin):
     def send_connect(self):
 
         if self._thread is None:
+            "Assume if there is a thread, we are already connected"
 
             self.send_subscribe()
 
             time.sleep(1)
 
-            self._init_buffer()
+            self.buffer.reset_buffer()
 
             self._thread = threading.Thread(target=self._read_source)
             self._thread.start()
@@ -237,11 +274,21 @@ class BaseReader(BufferMixin):
             print("sent connect")
             self.send_connect()
 
-        while self.streaming:
-            data = self._read_buffer(self.packet_buffer_size)
+        index = self.buffer.get_latest_buffer()
 
-            if data:
-                yield data
+        while self.streaming:                    
+
+            if index is None:
+                index = self.buffer.get_latest_buffer()                
+                time.sleep(.1)
+                continue
+            
+            if self.buffer.is_buffer_full(index):                
+                data = self.buffer.read_buffer(index)
+                index = self.buffer.get_next_index(index)                    
+
+                if data:
+                    yield data
 
             time.sleep(.1)
 
