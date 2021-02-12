@@ -3,11 +3,39 @@ import axios from "axios";
 import { Typography } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+  },
+  details: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  content: {
+    flex: "1 0 auto",
+  },
+  controls: {
+    display: "flex",
+    alignItems: "center",
+    paddingLeft: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+  },
+  section1: {
+    margin: theme.spacing(3, 2),
+  },
+  section2: {
+    margin: theme.spacing(2),
+    textAlign: "center",
+  },
+}));
 
 
 
 const Configure = (props) => {
+  const classes = useStyles();
+  const theme = useTheme();
   let [config, setConfig] = useState([]);
 
 
@@ -44,12 +72,54 @@ const Configure = (props) => {
   }
   return (
     <Grid>
+      <Grid container spacing={2} rows>
+        <Grid item xs={8}>
+          <Typography component="h3" variant="h3" color="secondary">
+            Connected: {config.streaming}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={4}>
+          <div className={classes.controls}>
+
+            <Grid container rows spacing={2}>
+              <Grid item>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  aria-label="connect"
+                  onClick={() => {
+                    handleConnectRequest("clicked", setConfig);
+                  }}
+
+                >
+                  Connect
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  aria-label="disconnect"
+                  onClick={() => {
+                    handleDisconnectRequest("clicked", setConfig);
+                  }}
+                >
+                  Disconnect
+</Button>
+              </Grid>
+            </Grid>
+          </div>
+        </Grid>
+
+      </Grid>
+
       <Grid xs={12}>
         <Grid>
+
           <Typography color="primary"> Configured Mode: </Typography>
           <Typography>{config.mode}</Typography>
-          <Typography color="primary">Streaming: </Typography>
-          <Typography>{config.streaming}</Typography>
+
           <Typography color="primary">Sensors: </Typography>
           <Typography>{config.source}</Typography>
           <Typography color="primary">Device ID: </Typography>
@@ -67,32 +137,7 @@ const Configure = (props) => {
           )}
 
       </Grid>
-      <Grid container rows spacing={2}>
-        <Grid item>
-          <Button
-            color="secondary"
-            variant="contained"
-            aria-label="disconnect"
-            onClick={() => {
-              handleDisconnectRequest("clicked", setConfig);
-            }}
-          >
-            Connect Source
-        </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            color="secondary"
-            variant="contained"
-            aria-label="disconnect"
-            onClick={() => {
-              handleConnectRequest("clicked", setConfig);
-            }}
-          >
-            Disconnect Source
-        </Button>
-        </Grid>
-      </Grid>
+
 
     </Grid>
 
@@ -100,3 +145,4 @@ const Configure = (props) => {
 };
 
 export default Configure;
+

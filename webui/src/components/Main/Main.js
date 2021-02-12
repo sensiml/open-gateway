@@ -12,7 +12,6 @@ const Main = () => {
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState(0);
   const [streamingSource, setStreamingSource] = React.useState(0);
-  const [deviceRows, setDeviceRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
   const [deviceID, setDeviceID] = React.useState([]);
 
@@ -48,7 +47,7 @@ const Main = () => {
           ) : null}
           {activeView === 2 ? (
             streamingMode == "results" ? (
-              <Results deviceRows={deviceRows} setDeviceRows={setDeviceRows} />
+              <Results />
             ) : (
                 <SensorStream
                   columns={columns}

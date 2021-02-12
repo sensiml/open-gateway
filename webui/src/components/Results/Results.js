@@ -33,11 +33,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const handleDisconnectRequest = (event) => {
-  axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((response) => {
-    console.log(response.data);
-  });
-};
 
 function bin2String(array) {
   var results = String.fromCharCode.apply(null, array).split("\n");
@@ -48,12 +43,14 @@ function bin2String(array) {
   });
 }
 
-const handleStreamRequest = (event, url, setStreamCallback) => {
+const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming) => {
   id_counter = 0;
   setStreamCallback([]);
+  setIsStreaming(true);
   fetch(url, {
     method: "GET",
   }).then((response) => {
+
     const reader = response.body.getReader();
     const stream = new ReadableStream({
       start(controller) {
@@ -64,6 +61,7 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
             // Is there no more data to read?
             if (done) {
               // Tell the browser that we have finished sending data
+              setIsStreaming(false);
               controller.close();
               return;
             }
@@ -88,6 +86,8 @@ const handleStreamRequest = (event, url, setStreamCallback) => {
 };
 
 const Results = (props) => {
+  const [deviceRows, setDeviceRows] = React.useState([]);
+  const [isStreaming, setIsStreaming] = React.useState(false);
   const [deviceColumns, setDeviceColumns] = React.useState([
     { field: "id", headerName: "ID", width: 70 },
     { field: "ModelNumber", headerName: "Model ID", width: 240 },
@@ -107,51 +107,40 @@ const Results = (props) => {
     <Grid>
       <div className={classes.section1}>
         <Grid container spacing={2} rows>
-          <Grid item xs={8}>
+          <Grid item xs={10}>
             <Typography component="h3" variant="h3" color="secondary">
               Mode: Recogntion
             </Typography>
           </Grid>
 
-          <Grid item>
+          <Grid item xs={2}>
             <div className={classes.controls}>
               <Button
                 aria-label="disconnect"
                 color="primary"
                 variant="contained"
+                disabled={isStreaming}
                 onClick={() => {
                   handleStreamRequest(
                     "clicked",
                     `${process.env.REACT_APP_API_URL}results`,
-                    props.setDeviceRows
+                    setDeviceRows,
+                    setIsStreaming
                   );
                 }}
               >
-                Connect
+                Start Stream
               </Button>
             </div>
           </Grid>
-          <Grid item>
-            <div className={classes.controls}>
-              <Button
-                aria-label="disconnect"
-                color="secondary"
-                variant="contained"
-                onClick={() => {
-                  handleDisconnectRequest("clicked");
-                }}
-              >
-                Disconnect
-              </Button>
-            </div>
-          </Grid>
+
         </Grid>
       </div>
       <Divider variant="middle" />
       <div className={classes.section2}>
         <Grid alignContent="center">
           <ResultsFilter
-            data={props.deviceRows}
+            data={deviceRows}
             filter_length={filterLength}
           ></ResultsFilter>
         </Grid>
@@ -179,7 +168,7 @@ const Results = (props) => {
       <div className={classes.section1}>
         <div style={{ height: 600, width: "100%" }}>
           <DataGrid
-            rows={props.deviceRows}
+            rows={deviceRows}
             columns={deviceColumns}
             pageSize={15}
             sortModel={[{ field: "id", sort: "desc" }]}

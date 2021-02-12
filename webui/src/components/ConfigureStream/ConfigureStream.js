@@ -185,11 +185,11 @@ const ConfigureStream = (props) => {
             />
             <Button
               type="submit"
-              variant="outlined"
+              variant="contained"
               color="primary"
               className={classes.button}
             >
-              Connect
+              Configure
             </Button>
 
             <FormHelperText>{helperText}</FormHelperText>
@@ -198,8 +198,20 @@ const ConfigureStream = (props) => {
       </Grid>
 
 
-      <Grid xs={8}>
+      <Grid xs={8} >
 
+        <Grid item>
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              handleDeviceScan("clicked", { source });
+            }}
+          >
+            Scan Devices
+        </Button>
+        </Grid>
 
         <DataGrid
           rows={deviceRows}
@@ -208,18 +220,6 @@ const ConfigureStream = (props) => {
         />
       </Grid>
 
-      <Grid item>
-        <Button
-          type="submit"
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            handleDeviceScan("clicked", { source });
-          }}
-        >
-          Scan Devices
-        </Button>
-      </Grid>
 
 
     </Grid>

@@ -98,13 +98,13 @@ const SensorStream = (props) => {
     <div className={classes.details}>
       <div className={classes.section1}>
         <Grid container spacing={2} rows>
-          <Grid item xs={8}>
+          <Grid item xs={10}>
             <Typography component="h3" variant="h3" color="secondary">
               Mode: Data Collection
             </Typography>
           </Grid>
 
-          <Grid item>
+          <Grid item xs={2}>
             <div className={classes.controls}>
               <Button
                 aria-label="disconnect"
@@ -122,7 +122,7 @@ const SensorStream = (props) => {
 
                 }}
               >
-                View Stream
+                Start Stream
               </Button>
             </div>
           </Grid>
