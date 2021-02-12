@@ -22,7 +22,7 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-app.register_blueprint(errors)
+#app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -118,6 +118,38 @@ def scan():
 
     return Response(json.dumps(device_id_list), mimetype="application/json")
 
+@app.route("/connect", methods=["GET"])
+def connect():
+
+    if app.config["MODE"] == "DATA_CAPTURE":
+        if app.config.get("STREAMING_SOURCE", None) is None:
+            app.config["STREAMING_SOURCE"] = get_source(
+                app.config,
+                device_id=get_device_id(),
+                data_source=app.config["DATA_SOURCE"],
+                source_type="DATA_CAPTURE",
+            )
+
+            app.config.get("STREAMING_SOURCE").send_connect()
+
+            app.config["STREAMING"] = True
+
+
+
+    elif app.config["MODE"] == "RESULTS":
+        if app.config.get("RESULTS_SOURCE", None) is None:
+            app.config["RESULTS_SOURCE"] = get_source(
+                app.config,
+                device_id=get_device_id(),
+                data_source=app.config["DATA_SOURCE"],
+                source_type="RESULTS",
+            )
+
+            app.config["STREAMING"] = True
+
+            app.config["RESULTS_SOURCE"].send_connect()
+
+    return get_config()
 
 @app.route("/config", methods=["GET", "POST"])
 def config():
@@ -130,21 +162,31 @@ def config():
         source = get_source(
             app.config,
             data_source=form.data["source"].upper(),
-            source_type="STREAMING",
+            source_type="DATA_CAPTURE",
             device_id=form.data["device_id"],
         )
 
+        print("SET CONFIG")
         source.set_config(app.config)
 
+        print("SEND CONNECT")
         source.send_connect()
+        app.config["STREAMING"] = True
 
-        app.config["MODE"] = "STREAMING"
+        app.config["MODE"] = "DATA_CAPTURE"
 
         cache_config(app.config)
+
+        app.config["STREAMING_SOURCE"] = source
+
+        print(app.config)
 
     ret = parse_current_config()
 
     return Response(dumps(ret), mimetype="application/json")
+
+
+        
 
 
 @app.route("/config-results", methods=["GET", "POST"])
@@ -152,6 +194,9 @@ def config_results():
     form = DeviceConfigureForm()
 
     if request.method == "POST":
+        disconnect()
+        app.config["STREAMING"] = False
+
         source = get_source(
             app.config,
             data_source=form.data["source"].upper(),
@@ -163,7 +208,11 @@ def config_results():
 
         source.send_connect()
 
+        app.config["STREAMING"] = True
+
         app.config["MODE"] = "RESULTS"
+
+        app.config["RESULT_SOURCE"] = source
 
         cache_config(app.config)
 
@@ -177,46 +226,40 @@ def config_results():
 @app.route("/stream")
 def stream():
 
-    if app.config.get("STREAMING_SOURCE", None):
-        print("Source is already Streaming! Call /disconnect to stop!.")
-        return "Source is already Streaming. Call /disconnect to stop."
+    if app.config.get("STREAMING_SOURCE", None) is None:
+        app.config["STREAMING_SOURCE"] = get_source(
+            app.config,
+            device_id=get_device_id(),
+            data_source=app.config["DATA_SOURCE"],
+            source_type="DATA_CAPTURE",
+        )
 
-    source = get_source(
-        app.config,
-        device_id=get_device_id(),
-        data_source=app.config["DATA_SOURCE"],
-        source_type="STREAMING",
-    )
-
-    app.config["STREAMING_SOURCE"] = source
-
-    app.config["STREAMING"] = True
+        app.config["STREAMING"] = True
+        print("source was none")
 
     return Response(
-        stream_with_context(source.read_data()), mimetype="application/octet-stream"
+        stream_with_context(app.config["STREAMING_SOURCE"].read_data()),
+        mimetype="application/octet-stream",
     )
 
 
 @app.route("/results")
 def results():
 
-    if app.config.get("RESULT_SOURCE", None):
-        print("Result Source is already Streaming! Call /disconnect to stop!.")
-        return "Result Source is already Streaming. Call /disconnect to stop."
+    if app.config.get("RESULT_SOURCE", None) is None:
 
-    source = get_source(
-        app.config,
-        device_id=get_device_id(),
-        data_source=app.config["DATA_SOURCE"],
-        source_type="RESULTS",
-    )
+        app.config["RESULT_SOURCE"] = get_source(
+            app.config,
+            device_id=get_device_id(),
+            data_source=app.config["DATA_SOURCE"],
+            source_type="RESULTS",
+        )
 
-    app.config["RESULT_SOURCE"] = source
-
-    app.config["STREAMING"] = True
+        app.config["STREAMING"] = True
 
     return Response(
-        stream_with_context(source.read_data()), mimetype="application/octet-stream"
+        stream_with_context(app.config["RESULT_SOURCE"].read_result_data()),
+        mimetype="application/octet-stream",
     )
 
 
@@ -225,7 +268,7 @@ def disconnect():
 
     source = app.config.get("STREAMING_SOURCE", None)
     source_resutlts = app.config.get("RESULT_SOURCE", None)
-    app.config["STREAMING"] = False
+    
 
     if source is not None:
         source.disconnect()
@@ -233,7 +276,7 @@ def disconnect():
         del app.config["STREAMING_SOURCE"]
         app.config["STREAMING_SOURCE"] = None
 
-        return "Disconnected From Streaming Source"
+        print("Disconnected from Streaming Source.")
 
     if source_resutlts is not None:
         source_resutlts.disconnect()
@@ -241,9 +284,11 @@ def disconnect():
         del app.config["RESULT_SOURCE"]
         app.config["RESULT_SOURCE"] = None
 
-        return "Disconnected From Result Source"
+        print("Disconnected from Result Source.")
 
-    return "No Sources Currently Connected"
+    app.config["STREAMING"] = False
+
+    return get_config()
 
 
 if __name__ == "__main__":
@@ -258,4 +303,4 @@ if __name__ == "__main__":
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
 
-    app.run(HOST, 5555)
+    app.run(HOST, 5555, debug=True)

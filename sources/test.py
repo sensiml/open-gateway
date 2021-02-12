@@ -1,4 +1,3 @@
-import serial.tools.list_ports
 import json
 import struct
 import math
@@ -15,7 +14,7 @@ class TestReader(BaseReader):
 
     def __init__(self, config, device_id=None, **kwargs):
 
-        super(TestReader, self).__init__(config, **kwargs)
+        super(TestReader, self).__init__(config, device_id, **kwargs)
 
     @property
     def delay(self):
@@ -80,26 +79,29 @@ class TestReader(BaseReader):
             "GyroscopeY": 4,
             "GyroscopeZ": 5,
         }
-        config["CONFIG_SAMPLE_RATE"] = 119
+        config["CONFIG_SAMPLE_RATE"] = 104
         config["DATA_SOURCE"] = "TEST"
 
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
 
-    def send_connect(self):
-        pass
+        print(config)
 
-    def read_data(self):
+    def _read_source(self):
         index = 0
+        
         data = self._generate_samples(len(self.config_columns), self.sample_rate)
+
         self.streaming = True
+
         while self.streaming:
             sample_data, index = self._pack_data(
                 data, self.byteSize, self.samples_per_packet, index
             )
-            yield sample_data
-            time.sleep(self.delay)
+            self.buffer.update_buffer(sample_data)
+
+            time.sleep(0.1)
 
 
 class TestResultReader(BaseReader):
@@ -112,16 +114,34 @@ class TestResultReader(BaseReader):
     def set_config(self, config):
         config["DATA_SOURCE"] = "TEST"
 
-    def read_data(self):
+    def _read_source(self):
 
         self.streaming = True
-        counter = 0
-        while self.streaming:
-            time.sleep(1)
 
-            yield json.dumps(
-                self._map_classification(
-                    {"ModelNumber": 0, "Classification": random.randint(0, 10)}
-                )
-            ) + "\n"
-            counter += 1
+        while self.streaming:
+
+            self.rbuffer.update_buffer(
+                [json.dumps(
+                    self._map_classification(
+                        {"ModelNumber": 0, "Classification": random.randint(0, 10)}
+                    )
+                )]
+            )
+            time.sleep(0.1)
+
+
+if __name__ == "__main__":
+    config = {
+        "CONFIG_SAMPLES_PER_PACKET": 10,
+        "CONFIG_SAMPLE_RATE": 100,
+        "CONFIG_COLUMNS": ["X", "Y", "Z"],
+    }
+    t = TestReader(config, "tester")
+
+    t.send_connect()
+
+    s = t.read_data()
+    for i in range(5):
+        print(next(s))
+
+    t.disconnect()

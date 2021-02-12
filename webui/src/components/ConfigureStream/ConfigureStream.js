@@ -56,6 +56,9 @@ const ConfigureStream = (props) => {
     { field: "name", headerName: "Name", width: 240 },
   ]);
 
+
+
+
   const handleRadioChange = (event) => {
     setSource(event.target.value);
   };
@@ -152,7 +155,7 @@ const ConfigureStream = (props) => {
                 value="TCPIP"
                 control={<Radio />}
                 label="TCP/IP"
-              />              
+              />
               <FormControlLabel value="TEST" control={<Radio />} label="Test" />
             </RadioGroup>
             <FormLabel component="legend">Mode:</FormLabel>
@@ -182,34 +185,43 @@ const ConfigureStream = (props) => {
             />
             <Button
               type="submit"
-              variant="outlined"
+              variant="contained"
               color="primary"
               className={classes.button}
             >
               Configure
             </Button>
+
             <FormHelperText>{helperText}</FormHelperText>
           </FormControl>
         </form>
       </Grid>
-      <Grid xs={8}>
-        <Button
-          type="submit"
-          variant="outlined"
-          color="primary"
-          className={classes.button}
-          onClick={() => {
-            handleDeviceScan("clicked", { source });
-          }}
-        >
-          Scan
+
+
+      <Grid xs={8} >
+
+        <Grid item>
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              handleDeviceScan("clicked", { source });
+            }}
+          >
+            Scan Devices
         </Button>
+        </Grid>
+
         <DataGrid
           rows={deviceRows}
           columns={deviceColumns}
           onRowSelected={handleRowSelection}
         />
       </Grid>
+
+
+
     </Grid>
   );
 };

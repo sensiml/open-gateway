@@ -25,14 +25,7 @@ class TCPIPReader(BaseReader):
             else:
                 self._port = WIFI_PORT
 
-            self._init_buffer()
-
-        super(TCPIPReader, self).__init__(config, **kwargs)
-
-    def _init_buffer(self):
-        self._data_buffer_1 = b""
-        self._data_buffer_2 = b""
-        self._data_buff = 1
+        super(TCPIPReader, self).__init__(config, device_id, **kwargs)
 
     @property
     def address(self):
@@ -43,46 +36,18 @@ class TCPIPReader(BaseReader):
         return self._port
 
     def read_config(self):
+
         r = requests.get("{}/config".format(self.address))
 
         return self._validate_config(r.json())
 
-    def list_available_devices(self):
-        return []
+    def _read_source(self):
 
-    def _update_buffer(self, data):
-
-        if self._data_buff == 1:
-            self._data_buffer_1 += data
-        if self._data_buff == 2:
-            self._data_buffer_2 += data
-
-    def _read_buffer(self, buffer_size):
-
-        if self._data_buff == 1:
-            if len(self._data_buffer_1) < buffer_size:
-                return
-            self._data_buffer_2 = self._data_buffer_1[buffer_size:]
-            self._data_buff = 2
-            tmp = copy.deepcopy(self._data_buffer_1[:buffer_size])
-            self._data_buffer_1 = b""
-
-            return tmp
-
-        if self._data_buff == 2:
-            if len(self._data_buffer_2) < buffer_size:
-                return
-            self._data_buffer_1 = self._data_buffer_2[buffer_size:]
-            self._data_buff = 1
-            tmp = copy.deepcopy(self._data_buffer_2[:buffer_size])
-            self._data_buffer_2 = b""
-            return tmp
-
-    def _read_stream(self, path):
-
-        url = "{}/{}".format(self.address, path)
+        url = "{}/{}".format(self.address, "stream")
 
         s = requests.Session()
+
+        self.streaming = True
 
         with s.get(url, headers=None, stream=True) as resp:
             for line in resp.iter_content():
@@ -90,30 +55,7 @@ class TCPIPReader(BaseReader):
                 if not self.streaming:
                     return
 
-                self._update_buffer(line)
-
-    def _read_sensor_data(self):
-        return self._read_stream("stream")
-
-    def read_data(self):
-
-        if self.device_id is None:
-            raise Exception("IP Adress not configured!")
-
-        if self.streaming:
-            pass
-        else:
-            self._thread = threading.Thread(target=self._read_sensor_data)
-            self.streaming = True
-            self._thread.start()
-            print("starting thread")
-
-        while self.streaming:
-
-            data = self._read_buffer(self.packet_buffer_size)
-
-            if data:
-                yield data
+                self.buffer.update_buffer(line)
 
     def set_config(self, config):
 
@@ -131,54 +73,28 @@ class TCPIPReader(BaseReader):
 
 
 class TCPIPResultReader(TCPIPReader):
-    def _init_buffer(self):
-        self._data_buffer_1 = []
-        self._data_buffer_2 = []
-        self._data_buff = 1
-
     def set_config(self, config):
         config["DATA_SOURCE"] = "TCPIP"
         config["TCPIP"] = self.device_id
         print("config set")
 
-    def send_connect(self):
-        pass
+    def _read_source(self):
 
-    def _update_buffer(self, data):
-
-        if self._data_buff == 1:
-            self._data_buffer_1.append(data)
-        if self._data_buff == 2:
-            self._data_buffer_2.append(data)
-
-    def _read_buffer(self):
-
-        if self._data_buff == 1:
-            self._data_buff = 2
-            tmp = copy.deepcopy(self._data_buffer_1)
-            self._data_buffer_1 = []
-            return tmp
-
-        if self._data_buff == 2:
-            self._data_buff = 1
-            tmp = copy.deepcopy(self._data_buffer_2)
-            self._data_buffer_2 = []
-            return tmp
-
-    def _read_line(self, path):
-
-        url = "{}/{}".format(self.address, path)
+        url = "{}/{}".format(self.address, "results")
 
         s = requests.Session()
+
+        self.streaming = True
 
         with s.get(url, headers=None, stream=True) as resp:
             content = ""
 
             for cont in resp.iter_content():
+                
                 if not self.streaming:
                     return
 
-                try:
+                try:                
                     data = cont.decode("ascii")
                 except Exception as e:
                     print(e)
@@ -186,34 +102,12 @@ class TCPIPResultReader(TCPIPReader):
 
                 if data == "}":
                     content += data
-                    self._update_buffer(content)
+                    self.rbuffer.update_buffer([content])
                     content = ""
                 elif data == "{":
                     content = data
                 else:
                     content += data
-
-    def _read_results(self):
-        return self._read_line("results")
-
-    def read_data(self):
-
-        if self.device_id is None:
-            raise Exception("IP Adress not configured!")
-
-        if self.streaming:
-            pass
-        else:
-            self._thread = threading.Thread(target=self._read_results)
-            self.streaming = True
-            self._thread.start()
-
-        while self.streaming:
-            data = self._read_buffer()
-            for result in data:
-                if self._validate_results_data(result):
-                    result = self._map_classification(json.loads(result))
-                    yield json.dumps(result) + "\n"
 
 
 if __name__ == "__main__":

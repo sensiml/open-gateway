@@ -9,11 +9,11 @@ else:
     print("BLE is not supported on Windows!")
 
 
-def get_source(config, data_source, device_id, source_type="STREAMING", **kwargs):
+def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwargs):
 
     data_source = data_source.upper()
 
-    if source_type == "STREAMING":
+    if source_type == "DATA_CAPTURE":
         if data_source == "TEST":
             return TestReader(config, **kwargs)
 
