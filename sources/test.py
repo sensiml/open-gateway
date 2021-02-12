@@ -90,8 +90,11 @@ class TestReader(BaseReader):
 
     def _read_source(self):
         index = 0
+        
         data = self._generate_samples(len(self.config_columns), self.sample_rate)
+
         self.streaming = True
+
         while self.streaming:
             sample_data, index = self._pack_data(
                 data, self.byteSize, self.samples_per_packet, index

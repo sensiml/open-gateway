@@ -22,7 +22,7 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-app.register_blueprint(errors)
+#app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -121,7 +121,7 @@ def scan():
 @app.route("/connect", methods=["GET"])
 def connect():
 
-    if app.config["MODE"] = "DATA_CAPTURE":
+    if app.config["MODE"] == "DATA_CAPTURE":
         if app.config.get("STREAMING_SOURCE", None) is None:
             app.config["STREAMING_SOURCE"] = get_source(
                 app.config,
@@ -130,24 +130,24 @@ def connect():
                 source_type="DATA_CAPTURE",
             )
 
-            source.send_connect()
+            app.config.get("STREAMING_SOURCE").send_connect()
 
             app.config["STREAMING"] = True
 
 
 
-    elif app.config["MODE"] = "RESULTS":
+    elif app.config["MODE"] == "RESULTS":
         if app.config.get("RESULTS_SOURCE", None) is None:
-            app.config["STREAMING_SOURCE"] = get_source(
+            app.config["RESULTS_SOURCE"] = get_source(
                 app.config,
                 device_id=get_device_id(),
                 data_source=app.config["DATA_SOURCE"],
-                source_type="DATA_CAPTURE",
+                source_type="RESULTS",
             )
 
             app.config["STREAMING"] = True
 
-            source.send_connect()
+            app.config["RESULTS_SOURCE"].send_connect()
 
     return get_config()
 
@@ -235,6 +235,7 @@ def stream():
         )
 
         app.config["STREAMING"] = True
+        print("source was none")
 
     return Response(
         stream_with_context(app.config["STREAMING_SOURCE"].read_data()),
@@ -267,9 +268,7 @@ def disconnect():
 
     source = app.config.get("STREAMING_SOURCE", None)
     source_resutlts = app.config.get("RESULT_SOURCE", None)
-    app.config["STREAMING"] = False
-
-    msg = ""
+    
 
     if source is not None:
         source.disconnect()
@@ -277,7 +276,7 @@ def disconnect():
         del app.config["STREAMING_SOURCE"]
         app.config["STREAMING_SOURCE"] = None
 
-        msg = "Disconnected from Streaming Source. "
+        print("Disconnected from Streaming Source.")
 
     if source_resutlts is not None:
         source_resutlts.disconnect()
@@ -285,12 +284,11 @@ def disconnect():
         del app.config["RESULT_SOURCE"]
         app.config["RESULT_SOURCE"] = None
 
-        msg += "Disconnected from Result Source."
+        print("Disconnected from Result Source.")
 
-    if msg:
-        return msg
+    app.config["STREAMING"] = False
 
-    return "No Sources Currently Connected"
+    return get_config()
 
 
 if __name__ == "__main__":

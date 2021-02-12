@@ -80,6 +80,9 @@ class BaseReader(object):
             self._thread = threading.Thread(target=self._read_source)
             self._thread.start()
 
+            
+            time.sleep(1)
+
         else:
             print("Thread Already Started!")
 
@@ -99,6 +102,7 @@ class BaseReader(object):
         else:
             print("sent connect")
             self.send_connect()
+            self.streaming = True
 
         index = self.buffer.get_latest_buffer()
 
@@ -130,6 +134,7 @@ class BaseReader(object):
         else:
             print("sent connect")
             self.send_connect()
+            
 
 
         index = self.buffer.get_latest_buffer()
