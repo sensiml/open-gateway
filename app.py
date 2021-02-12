@@ -118,6 +118,38 @@ def scan():
 
     return Response(json.dumps(device_id_list), mimetype="application/json")
 
+@app.route("/connect", methods=["GET"])
+def connect():
+
+    if app.config["MODE"] = "DATA_CAPTURE":
+        if app.config.get("STREAMING_SOURCE", None) is None:
+            app.config["STREAMING_SOURCE"] = get_source(
+                app.config,
+                device_id=get_device_id(),
+                data_source=app.config["DATA_SOURCE"],
+                source_type="DATA_CAPTURE",
+            )
+
+            source.send_connect()
+
+            app.config["STREAMING"] = True
+
+
+
+    elif app.config["MODE"] = "RESULTS":
+        if app.config.get("RESULTS_SOURCE", None) is None:
+            app.config["STREAMING_SOURCE"] = get_source(
+                app.config,
+                device_id=get_device_id(),
+                data_source=app.config["DATA_SOURCE"],
+                source_type="DATA_CAPTURE",
+            )
+
+            app.config["STREAMING"] = True
+
+            source.send_connect()
+
+    return get_config()
 
 @app.route("/config", methods=["GET", "POST"])
 def config():
@@ -146,12 +178,15 @@ def config():
         cache_config(app.config)
 
         app.config["STREAMING_SOURCE"] = source
-        
+
         print(app.config)
 
     ret = parse_current_config()
 
     return Response(dumps(ret), mimetype="application/json")
+
+
+        
 
 
 @app.route("/config-results", methods=["GET", "POST"])

@@ -12,7 +12,6 @@ const Main = () => {
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState(0);
   const [streamingSource, setStreamingSource] = React.useState(0);
-  const [streamData, setStreamData] = React.useState([]);
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
   const [deviceID, setDeviceID] = React.useState([]);
@@ -51,12 +50,10 @@ const Main = () => {
             streamingMode == "results" ? (
               <Results deviceRows={deviceRows} setDeviceRows={setDeviceRows} />
             ) : (
-              <SensorStream
-                streamData={streamData}
-                setStreamData={setStreamData}
-                columns={columns}
-              />
-            )
+                <SensorStream
+                  columns={columns}
+                />
+              )
           ) : null}
         </main>
       </Grid>

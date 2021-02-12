@@ -33,11 +33,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const handleDisconnectRequest = (event) => {
-  axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((response) => {
-    console.log(response.data);
-  });
-};
 
 function splitArray(data, columns) {
   var size = data.length / columns.length;
@@ -58,13 +53,15 @@ function splitArray(data, columns) {
   return lines;
 }
 
-const handleStreamRequest = (event, url, setStreamCallback, columns) => {
+const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming, columns) => {
+  setIsStreaming(true);
   fetch(url, {
     method: "GET",
   }).then((response) => {
     const reader = response.body.getReader();
     const stream = new ReadableStream({
       start(controller) {
+
         // The following function handles each data chunk
         function push() {
           // "done" is a Boolean and value a "Uint8Array"
@@ -72,9 +69,11 @@ const handleStreamRequest = (event, url, setStreamCallback, columns) => {
             // Is there no more data to read?
             if (done) {
               // Tell the browser that we have finished sending data
+              setIsStreaming(false);
               controller.close();
               return;
             }
+
             var int16Array = new Int16Array(value.buffer);
             setStreamCallback(splitArray(int16Array, columns));
             push();
@@ -92,6 +91,8 @@ const handleStreamRequest = (event, url, setStreamCallback, columns) => {
 const SensorStream = (props) => {
   const classes = useStyles();
   const theme = useTheme();
+  const [streamData, setStreamData] = React.useState([]);
+  const [isStreaming, setIsStreaming] = React.useState(false);
 
   return (
     <div className={classes.details}>
@@ -109,40 +110,30 @@ const SensorStream = (props) => {
                 aria-label="disconnect"
                 color="primary"
                 variant="contained"
+                disabled={isStreaming}
                 onClick={() => {
                   handleStreamRequest(
                     "clicked",
                     `${process.env.REACT_APP_API_URL}stream`,
-                    props.setStreamData,
+                    setStreamData,
+                    setIsStreaming,
                     props.columns
                   );
+
                 }}
               >
-                Stream
+                View Stream
               </Button>
             </div>
           </Grid>
-          <Grid item>
-            <div className={classes.controls}>
-              <Button
-                color="secondary"
-                variant="contained"
-                aria-label="disconnect"
-                onClick={() => {
-                  handleDisconnectRequest("clicked");
-                }}
-              >
-                Disconnect
-              </Button>
-            </div>
-          </Grid>
+
         </Grid>
       </div>
       <Divider variant="middle" />
       <div className={classes.section2}>
         <Typography variant="subtitle1" color="textSecondary"></Typography>
       </div>
-      <StreamChart data={props.streamData} />
+      <StreamChart data={streamData} />
     </div>
   );
 };
