@@ -118,9 +118,13 @@ const Results = (props) => {
                 variant="h2"
                 color="secondary"
               >
-                Device Mode: Recogntion
+                Device Mode: Recognition
               </Typography>
             </Grid>
+
+            <div className={classes.section1}>
+              <Divider variant="middle" />
+            </div>
 
             <Grid item xs={12}>
               <div className={classes.controls}>
@@ -144,7 +148,6 @@ const Results = (props) => {
               </div>
             </Grid>
           </div>
-          <Divider variant="middle" />
 
           <Grid item alignContent="center" xs={12}>
             <ResultsFilter

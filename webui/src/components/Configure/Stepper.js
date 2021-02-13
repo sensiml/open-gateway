@@ -17,27 +17,30 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  stepIcon: {
+    color: "primary",
+  },
 }));
 
 function getSteps() {
   return [
     "Select Connection Type",
-    "Scan and Select Device",
+    "Scan and Select Device ID",
     "Select Mode",
-    "Configure Gateway",
+    "Click Configure Gateway",
   ];
 }
 
 function getStepContent(stepIndex) {
   switch (stepIndex) {
     case 0:
-      return "Scan and select Devicee";
+      return "Select Connection Type";
     case 1:
-      return "Scan and select Device";
+      return "Scan and Select Device ID";
     case 2:
-      return "Select Mode";
+      return "Select Device Mode";
     case 3:
-      return "Configure Gateway";
+      return "Click Configure Gateway";
     default:
       return "";
   }
@@ -45,7 +48,7 @@ function getStepContent(stepIndex) {
 
 const HorizontalLabelPositionBelowStepper = (props) => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(-1);
+  const [activeStep, setActiveStep] = React.useState();
   const steps = getSteps();
 
   return (
@@ -53,15 +56,17 @@ const HorizontalLabelPositionBelowStepper = (props) => {
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label) => (
           <Step key={label} color="primary">
-            <StepLabel>{label}</StepLabel>
+            <StepLabel
+              active={true}
+              StepIconProps={{
+                classes: { root: classes.stepIcon },
+              }}
+            >
+              {label}
+            </StepLabel>
           </Step>
         ))}
       </Stepper>
-      <div>
-        <Typography className={classes.instructions}>
-          {getStepContent(activeStep)}
-        </Typography>
-      </div>
     </div>
   );
 };
