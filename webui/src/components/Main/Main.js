@@ -2,8 +2,8 @@ import React from "react";
 import { Header, NavBar } from "../Layout";
 import useStyles from "./MainStyles";
 import { Grid } from "@material-ui/core";
+import { Status } from "../Status";
 import { Configure } from "../Configure";
-import { ConfigureStream } from "../ConfigureStream";
 import { SensorStream } from "../SensorStream";
 import { Results } from "../Results";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -30,7 +30,7 @@ const Main = () => {
         <NavBar onChange={handleChange} />
         <main className={classes.content}>
           {activeView === 0 ? (
-            <Configure
+            <Status
               setStreamingMode={setStreamingMode}
               setColumns={setColumns}
               setStreamingSource={setStreamingSource}
@@ -38,7 +38,7 @@ const Main = () => {
             />
           ) : null}
           {activeView === 1 ? (
-            <ConfigureStream
+            <Configure
               setStreamingMode={setStreamingMode}
               streamingSource={streamingSource}
               streamingMode={streamingMode}
@@ -49,10 +49,8 @@ const Main = () => {
             streamingMode == "results" ? (
               <Results />
             ) : (
-                <SensorStream
-                  columns={columns}
-                />
-              )
+              <SensorStream columns={columns} />
+            )
           ) : null}
         </main>
       </Grid>
