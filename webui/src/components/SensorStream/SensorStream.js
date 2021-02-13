@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Typography } from "@material-ui/core";
+import { Card, CardContent, Typography } from "@material-ui/core";
 import { Button } from "@material-ui/core";
 import StreamChart from "./StreamChart";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -33,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
 function splitArray(data, columns) {
   var size = data.length / columns.length;
   var x_array = [...Array(size).keys()];
@@ -53,7 +52,13 @@ function splitArray(data, columns) {
   return lines;
 }
 
-const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming, columns) => {
+const handleStreamRequest = (
+  event,
+  url,
+  setStreamCallback,
+  setIsStreaming,
+  columns
+) => {
   setIsStreaming(true);
   fetch(url, {
     method: "GET",
@@ -61,7 +66,6 @@ const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming, colu
     const reader = response.body.getReader();
     const stream = new ReadableStream({
       start(controller) {
-
         // The following function handles each data chunk
         function push() {
           // "done" is a Boolean and value a "Uint8Array"
@@ -95,45 +99,42 @@ const SensorStream = (props) => {
   const [isStreaming, setIsStreaming] = React.useState(false);
 
   return (
-    <div className={classes.details}>
-      <div className={classes.section1}>
-        <Grid container spacing={2} rows>
-          <Grid item xs={10}>
-            <Typography component="h3" variant="h3" color="secondary">
-              Mode: Data Collection
-            </Typography>
-          </Grid>
-
-          <Grid item xs={2}>
-            <div className={classes.controls}>
-              <Button
-                aria-label="disconnect"
-                color="primary"
-                variant="contained"
-                disabled={isStreaming}
-                onClick={() => {
-                  handleStreamRequest(
-                    "clicked",
-                    `${process.env.REACT_APP_API_URL}stream`,
-                    setStreamData,
-                    setIsStreaming,
-                    props.columns
-                  );
-
-                }}
-              >
-                Start Stream
-              </Button>
-            </div>
-          </Grid>
-
-        </Grid>
-      </div>
-      <Divider variant="middle" />
-      <div className={classes.section2}>
-        <Typography variant="subtitle1" color="textSecondary"></Typography>
-      </div>
-      <StreamChart data={streamData} />
+    <div className={classes.root}>
+      <Card>
+        <CardContent>
+          <div className={classes.section1}>
+            <Grid container spacing={2} rows>
+              <Typography component="h3" variant="h3" color="secondary">
+                Mode: Data Collection
+              </Typography>
+            </Grid>
+          </div>
+          <Divider variant="middle" />
+          <div className={classes.section2}>
+            <Typography variant="subtitle1" color="textSecondary"></Typography>
+          </div>
+          <StreamChart data={streamData} />
+          <div className={classes.controls}>
+            <Button
+              aria-label="disconnect"
+              color="primary"
+              variant="contained"
+              disabled={isStreaming}
+              onClick={() => {
+                handleStreamRequest(
+                  "clicked",
+                  `${process.env.REACT_APP_API_URL}stream`,
+                  setStreamData,
+                  setIsStreaming,
+                  props.columns
+                );
+              }}
+            >
+              Start Stream
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
