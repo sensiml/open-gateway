@@ -1,41 +1,66 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
+import { Grid } from "@material-ui/core";
 import CardContent from "@material-ui/core/CardContent";
-import Button from "@material-ui/core/Button";
+
 import Typography from "@material-ui/core/Typography";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 
 const useStyles = makeStyles({
   root: {
     minWidth: 275,
   },
   bullet: {
-    display: "inline-block",
-    margin: "0 2px",
-    transform: "scale(0.8)",
+    transform: "scale(1.0)",
   },
   title: {
-    fontSize: 14,
+    fontSize: 20,
+    backgroundColor: "#e0e0e0",
   },
   pos: {
-    marginBottom: 12,
+    marginBottom: 2,
+    marginTop: 2,
   },
 });
 
 const SimpleCard = (props) => {
   const classes = useStyles();
   return (
-    <Card className={classes.root}>
-      <CardContent>
-        <Typography className={classes.title} color="textPrimary">
-          {props.name}
-        </Typography>
-        <Typography className={classes.pos} color="textSecondary">
-          {props.value}
-        </Typography>
-      </CardContent>
-    </Card>
+    <Grid item xs={props.xs}>
+      <Card className={classes.root}>
+        <CardContent>
+          <Typography
+            align="center"
+            className={classes.title}
+            color="textPrimary"
+          >
+            {props.name}
+          </Typography>
+          {props.list ? (
+            <div className={classes.bullet}>
+              <List dense={true}>
+                {props.value.split(",").map((value) => (
+                  <ListItem>
+                    <ListItemText align="center" primary={value} />
+                  </ListItem>
+                ))}
+              </List>
+            </div>
+          ) : (
+            <Typography
+              align="center"
+              className={classes.pos}
+              color="textSecondary"
+            >
+              {props.value}
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+    </Grid>
   );
 };
 

@@ -36,7 +36,7 @@ const ResultsFilter = (props) => {
   }
 
   return (
-    <Typography variant="h1" component="h2">
+    <Typography align="center" variant="h1" component="h2">
       {filterData(props.data, props.filter_length)}
     </Typography>
   );

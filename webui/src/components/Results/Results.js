@@ -8,18 +8,20 @@ import { DataGrid } from "@material-ui/data-grid";
 import ResultsFilter from "./ResultsFilter";
 import Slider from "@material-ui/core/Slider";
 import Divider from "@material-ui/core/Divider";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 
 var id_counter = 0;
 
 const useStyles = makeStyles((theme) => ({
   controls: {
-    display: "flex-right",
+    display: "flex",
     alignItems: "center",
     paddingLeft: theme.spacing(1),
     paddingBottom: theme.spacing(1),
   },
   sliderroot: {
-    width: 250,
+    width: "100%",
   },
   sliderinput: {
     width: 42,
@@ -32,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
 }));
-
 
 function bin2String(array) {
   var results = String.fromCharCode.apply(null, array).split("\n");
@@ -50,7 +51,6 @@ const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming) => {
   fetch(url, {
     method: "GET",
   }).then((response) => {
-
     const reader = response.body.getReader();
     const stream = new ReadableStream({
       start(controller) {
@@ -104,22 +104,28 @@ const Results = (props) => {
   };
 
   return (
-    <Grid>
-      <div className={classes.section1}>
-        <Grid container spacing={2} rows>
-          <Grid item xs={10}>
-            <Typography component="h3" variant="h3" color="secondary">
+    <Card>
+      <CardContent>
+        <div className={classes.section1}>
+          <Grid item xs={12}>
+            <Typography
+              align="center"
+              component="h2"
+              variant="h2"
+              color="secondary"
+            >
               Mode: Recogntion
             </Typography>
           </Grid>
 
-          <Grid item xs={2}>
+          <Grid item xs={12}>
             <div className={classes.controls}>
               <Button
                 aria-label="disconnect"
                 color="primary"
                 variant="contained"
                 disabled={isStreaming}
+                fullWidth={true}
                 onClick={() => {
                   handleStreamRequest(
                     "clicked",
@@ -133,49 +139,56 @@ const Results = (props) => {
               </Button>
             </div>
           </Grid>
+        </div>
+        <Divider variant="middle" />
 
-        </Grid>
-      </div>
-      <Divider variant="middle" />
-      <div className={classes.section2}>
-        <Grid alignContent="center">
+        <Grid item alignContent="center" xs={12}>
           <ResultsFilter
             data={deviceRows}
             filter_length={filterLength}
           ></ResultsFilter>
         </Grid>
-      </div>
-      <Divider variant="middle" />
-      <div className={classes.section1}>
-        <Grid container spacing={3} alignItems="center">
-          <Grid item> Filter Length </Grid>
-          <div className={classes.sliderroot}>
-            <Grid item xs>
-              <Slider
-                value={typeof filterLength === "number" ? filterLength : 1}
-                onChange={handleFilterLengthSliderChange}
-                aria-labelledby="input-slider"
-                min={1}
-                max={10}
-              />
-            </Grid>
-          </div>
-          <Grid item> {filterLength} </Grid>
-        </Grid>
-      </div>
-      <Divider variant="middle" />
 
-      <div className={classes.section1}>
-        <div style={{ height: 600, width: "100%" }}>
-          <DataGrid
-            rows={deviceRows}
-            columns={deviceColumns}
-            pageSize={15}
-            sortModel={[{ field: "id", sort: "desc" }]}
-          />
+        <Divider variant="middle" />
+        <div className={classes.section1}>
+          <Grid container spacing={4} rows alignItems="center">
+            <Grid item xs={4}>
+              <Typography align="center" component="h6" variant="h6">
+                Filter Length{" "}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={6}>
+              <div className={classes.sliderroot}>
+                <Slider
+                  value={typeof filterLength === "number" ? filterLength : 1}
+                  onChange={handleFilterLengthSliderChange}
+                  aria-labelledby="input-slider"
+                  min={1}
+                  max={10}
+                />
+              </div>
+            </Grid>
+
+            <Grid item xs={1}>
+              <Typography align="center" component="h6" variant="h6">
+                {filterLength}
+              </Typography>
+            </Grid>
+          </Grid>
         </div>
-      </div>
-    </Grid>
+        <div className={classes.section1}>
+          <div style={{ height: 600, width: "100%" }}>
+            <DataGrid
+              rows={deviceRows}
+              columns={deviceColumns}
+              pageSize={15}
+              sortModel={[{ field: "id", sort: "desc" }]}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

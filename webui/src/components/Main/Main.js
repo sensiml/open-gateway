@@ -14,6 +14,7 @@ const Main = () => {
   const [streamingSource, setStreamingSource] = React.useState(0);
   const [columns, setColumns] = React.useState([]);
   const [deviceID, setDeviceID] = React.useState([]);
+  const [isConnected, setIsConnected] = React.useState(false);
 
   function handleChange(newValue) {
     if (activeView != newValue) {
@@ -27,7 +28,7 @@ const Main = () => {
       <CssBaseline />
       <Grid container direction="column" justify="center" alignItems="center">
         <Header />
-        <NavBar onChange={handleChange} />
+        <NavBar onChange={handleChange} isConnected={isConnected} />
         <main className={classes.content}>
           {activeView === 0 ? (
             <Status
@@ -35,9 +36,11 @@ const Main = () => {
               setColumns={setColumns}
               setStreamingSource={setStreamingSource}
               setDeviceID={setDeviceID}
+              setIsConnected={setIsConnected}
+              isConnected={isConnected}
             />
           ) : null}
-          {activeView === 1 ? (
+          {activeView === 2 ? (
             <Configure
               setStreamingMode={setStreamingMode}
               streamingSource={streamingSource}
@@ -45,7 +48,7 @@ const Main = () => {
               deviceID={deviceID}
             />
           ) : null}
-          {activeView === 2 ? (
+          {activeView === 1 ? (
             streamingMode == "results" ? (
               <Results />
             ) : (
