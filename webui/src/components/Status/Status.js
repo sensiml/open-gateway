@@ -113,7 +113,7 @@ const Status = (props) => {
                       handleDisconnectRequest("clicked", setConfig);
                     }}
                   >
-                    Disconnect
+                    Disconnect From Device
                   </Button>
                 ) : (
                   <Button
@@ -125,7 +125,7 @@ const Status = (props) => {
                       handleConnectRequest("clicked", setConfig);
                     }}
                   >
-                    Connect Device
+                    Connect To Device
                   </Button>
                 )}
               </div>

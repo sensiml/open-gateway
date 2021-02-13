@@ -16,9 +16,6 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 
 const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(3),
-  },
   root: {
     display: "flex",
   },
@@ -130,115 +127,145 @@ const Configure = (props) => {
   return (
     <Card>
       <CardContent>
-        <Grid xs={12} container rows>
+        <Grid xs={12} container rows spacing={6}>
           <HorizontalLabelPositionBelowStepper />
-          <Grid item xs={12}>
-            <form onSubmit={handleDeviceScan}>
-              <FormControl
-                component="fieldset"
-                error={error}
-                className={classes.formControl}
-              >
-                <FormLabel>Select Source</FormLabel>
-                <RadioGroup
-                  aria-label="source"
-                  name="source"
-                  value={source}
-                  onChange={handleRadioChange}
-                  row
-                >
-                  <FormControlLabel
-                    value="SERIAL"
-                    control={<Radio />}
-                    label="Serial"
-                  />
-                  <FormControlLabel
-                    value="BLE"
-                    control={<Radio />}
-                    label="BLE"
-                  />
-                  <FormControlLabel
-                    value="TCPIP"
-                    control={<Radio />}
-                    label="TCP/IP"
-                  />
-                  <FormControlLabel
-                    value="TEST"
-                    control={<Radio />}
-                    label="Test"
-                  />
-                </RadioGroup>
+          <Grid item columns xs={6} alignItems="center">
+            <Card>
+              <CardContent>
+                <form onSubmit={handleDeviceScan}>
+                  <FormControl component="fieldset" error={error}>
+                    <Grid container columns spacing={2}>
+                      <Grid item xs={12}>
+                        <Card>
+                          <CardContent>
+                            <FormLabel>Connection Type</FormLabel>
+                            <RadioGroup
+                              aria-label="source"
+                              value={source}
+                              onChange={handleRadioChange}
+                              row
+                            >
+                              <FormControlLabel
+                                value="SERIAL"
+                                control={<Radio />}
+                                label="Serial"
+                              />
+                              <FormControlLabel
+                                value="BLE"
+                                control={<Radio />}
+                                label="BLE"
+                              />
+                              <FormControlLabel
+                                value="TCPIP"
+                                control={<Radio />}
+                                label="TCP/IP"
+                              />
+                              <FormControlLabel
+                                value="TEST"
+                                control={<Radio />}
+                                label="Test"
+                              />
+                            </RadioGroup>
+                          </CardContent>
+                        </Card>
+                      </Grid>
 
-                <Grid item>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                    fullWidth={true}
-                  >
-                    Scan Devices
-                  </Button>
-                </Grid>
-                <FormHelperText>{scanHelperText}</FormHelperText>
-              </FormControl>
-            </form>
-            <div style={{ height: 350, width: "100%" }}>
-              <DataGrid
-                rows={deviceRows}
-                columns={deviceColumns}
-                onRowSelected={handleRowSelection}
-                pageSize={4}
-              />
-            </div>
+                      <Grid item xs={12}>
+                        <Card>
+                          <CardContent>
+                            <FormLabel component="legend">Device ID:</FormLabel>
+                            <TextField
+                              id="outlined-basic"
+                              variant="outlined"
+                              value={deviceID}
+                              onChange={handleDeviceIDChange}
+                              fullWidth={true}
+                            />
+                          </CardContent>
+                        </Card>
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          color="secondary"
+                          fullWidth={true}
+                        >
+                          Scan
+                        </Button>
+                      </Grid>
+
+                      <FormHelperText>{scanHelperText}</FormHelperText>
+                      <Grid item xs={12}>
+                        <div style={{ height: 350, width: "100%" }}>
+                          <DataGrid
+                            rows={deviceRows}
+                            columns={deviceColumns}
+                            onRowSelected={handleRowSelection}
+                            pageSize={4}
+                          />
+                        </div>
+                      </Grid>
+                    </Grid>
+                  </FormControl>
+                </form>
+              </CardContent>
+            </Card>
           </Grid>
-          <Grid item xs={12}>
-            <form onSubmit={handleSubmit}>
-              <FormControl
-                component="fieldset"
-                error={error}
-                className={classes.formControl}
-              >
-                <Grid item>
-                  <FormLabel component="legend">Mode:</FormLabel>
-                  <RadioGroup
-                    aria-label="mode"
-                    name="Streaming Source"
-                    value={modeUrl}
-                    onChange={handleModeChange}
-                    row
+          <Grid item columns xs={6} alignItems="center">
+            <Card>
+              <CardContent>
+                <form onSubmit={handleSubmit}>
+                  <FormControl
+                    component="fieldset"
+                    error={error}
+                    className={classes.formControl}
                   >
-                    <FormControlLabel
-                      value="config"
-                      control={<Radio />}
-                      label="Data Collection"
-                    />
-                    <FormControlLabel
-                      value="config-results"
-                      control={<Radio />}
-                      label="Recognition"
-                    />
-                  </RadioGroup>
-                  <FormLabel component="legend">Device ID:</FormLabel>
-                  <TextField
-                    id="outlined-basic"
-                    variant="outlined"
-                    value={deviceID}
-                    onChange={handleDeviceIDChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    fullWidth={true}
-                  >
-                    Configure
-                  </Button>
-                </Grid>
-                <FormHelperText>{helperText}</FormHelperText>
-              </FormControl>
-            </form>
+                    <Grid container columns spacing={2}>
+                      <Grid item xs={12}>
+                        <Card>
+                          <CardContent>
+                            <FormLabel component="legend">
+                              Device Mode:
+                            </FormLabel>
+                            <RadioGroup
+                              aria-label="mode"
+                              name="Streaming Source"
+                              value={modeUrl}
+                              onChange={handleModeChange}
+                              row
+                            >
+                              <FormControlLabel
+                                value="config"
+                                control={<Radio />}
+                                label="Data Collection"
+                              />
+                              <FormControlLabel
+                                value="config-results"
+                                control={<Radio />}
+                                label="Recognition"
+                              />
+                            </RadioGroup>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          color="primary"
+                          fullWidth={true}
+                        >
+                          Configure Gateway
+                        </Button>
+                      </Grid>
+                      <FormHelperText>{helperText}</FormHelperText>
+                    </Grid>
+                  </FormControl>
+                </form>
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
       </CardContent>

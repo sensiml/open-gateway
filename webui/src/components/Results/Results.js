@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(1),
     paddingBottom: theme.spacing(1),
   },
+  root: {
+    width: "800px",
+  },
   sliderroot: {
     width: "100%",
   },
@@ -104,91 +107,93 @@ const Results = (props) => {
   };
 
   return (
-    <Card>
-      <CardContent>
-        <div className={classes.section1}>
-          <Grid item xs={12}>
-            <Typography
-              align="center"
-              component="h2"
-              variant="h2"
-              color="secondary"
-            >
-              Mode: Recogntion
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <div className={classes.controls}>
-              <Button
-                aria-label="disconnect"
-                color="primary"
-                variant="contained"
-                disabled={isStreaming}
-                fullWidth={true}
-                onClick={() => {
-                  handleStreamRequest(
-                    "clicked",
-                    `${process.env.REACT_APP_API_URL}results`,
-                    setDeviceRows,
-                    setIsStreaming
-                  );
-                }}
+    <div className={classes.root}>
+      <Card>
+        <CardContent>
+          <div className={classes.section1}>
+            <Grid item xs={12}>
+              <Typography
+                align="center"
+                component="h2"
+                variant="h2"
+                color="secondary"
               >
-                Start Stream
-              </Button>
-            </div>
-          </Grid>
-        </div>
-        <Divider variant="middle" />
-
-        <Grid item alignContent="center" xs={12}>
-          <ResultsFilter
-            data={deviceRows}
-            filter_length={filterLength}
-          ></ResultsFilter>
-        </Grid>
-
-        <Divider variant="middle" />
-        <div className={classes.section1}>
-          <Grid container spacing={4} rows alignItems="center">
-            <Grid item xs={4}>
-              <Typography align="center" component="h6" variant="h6">
-                Filter Length{" "}
+                Device Mode: Recogntion
               </Typography>
             </Grid>
 
-            <Grid item xs={6}>
-              <div className={classes.sliderroot}>
-                <Slider
-                  value={typeof filterLength === "number" ? filterLength : 1}
-                  onChange={handleFilterLengthSliderChange}
-                  aria-labelledby="input-slider"
-                  min={1}
-                  max={10}
-                />
+            <Grid item xs={12}>
+              <div className={classes.controls}>
+                <Button
+                  aria-label="disconnect"
+                  color="primary"
+                  variant="contained"
+                  disabled={isStreaming}
+                  fullWidth={true}
+                  onClick={() => {
+                    handleStreamRequest(
+                      "clicked",
+                      `${process.env.REACT_APP_API_URL}results`,
+                      setDeviceRows,
+                      setIsStreaming
+                    );
+                  }}
+                >
+                  Start Stream
+                </Button>
               </div>
             </Grid>
-
-            <Grid item xs={1}>
-              <Typography align="center" component="h6" variant="h6">
-                {filterLength}
-              </Typography>
-            </Grid>
-          </Grid>
-        </div>
-        <div className={classes.section1}>
-          <div style={{ height: 600, width: "100%" }}>
-            <DataGrid
-              rows={deviceRows}
-              columns={deviceColumns}
-              pageSize={15}
-              sortModel={[{ field: "id", sort: "desc" }]}
-            />
           </div>
-        </div>
-      </CardContent>
-    </Card>
+          <Divider variant="middle" />
+
+          <Grid item alignContent="center" xs={12}>
+            <ResultsFilter
+              data={deviceRows}
+              filter_length={filterLength}
+            ></ResultsFilter>
+          </Grid>
+
+          <Divider variant="middle" />
+          <div className={classes.section1}>
+            <Grid container spacing={4} rows alignItems="center">
+              <Grid item xs={4}>
+                <Typography align="center" component="h6" variant="h6">
+                  Filter Length{" "}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <div className={classes.sliderroot}>
+                  <Slider
+                    value={typeof filterLength === "number" ? filterLength : 1}
+                    onChange={handleFilterLengthSliderChange}
+                    aria-labelledby="input-slider"
+                    min={1}
+                    max={10}
+                  />
+                </div>
+              </Grid>
+
+              <Grid item xs={1}>
+                <Typography align="center" component="h6" variant="h6">
+                  {filterLength}
+                </Typography>
+              </Grid>
+            </Grid>
+          </div>
+          <div className={classes.section1}>
+            <div style={{ height: 600, width: "100%" }}>
+              <DataGrid
+                rows={deviceRows}
+                columns={deviceColumns}
+                pageSize={15}
+                sortModel={[{ field: "id", sort: "desc" }]}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

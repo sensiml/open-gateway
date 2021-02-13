@@ -21,9 +21,9 @@ const useStyles = makeStyles((theme) => ({
 
 function getSteps() {
   return [
-    "Select Source",
-    "Scan for Devices",
-    "Select Device",
+    "Select Connection Type",
+    "Scan and Select Device",
+    "Select Mode",
     "Configure Gateway",
   ];
 }
@@ -31,11 +31,11 @@ function getSteps() {
 function getStepContent(stepIndex) {
   switch (stepIndex) {
     case 0:
-      return "Select Source";
+      return "Scan and select Devicee";
     case 1:
-      return "Scan for Devices";
+      return "Scan and select Device";
     case 2:
-      return "Select Device";
+      return "Select Mode";
     case 3:
       return "Configure Gateway";
     default:
