@@ -2,8 +2,8 @@ import React from "react";
 import { Header, NavBar } from "../Layout";
 import useStyles from "./MainStyles";
 import { Grid } from "@material-ui/core";
+import { Status } from "../Status";
 import { Configure } from "../Configure";
-import { ConfigureStream } from "../ConfigureStream";
 import { SensorStream } from "../SensorStream";
 import { Results } from "../Results";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -14,6 +14,7 @@ const Main = () => {
   const [streamingSource, setStreamingSource] = React.useState(0);
   const [columns, setColumns] = React.useState([]);
   const [deviceID, setDeviceID] = React.useState([]);
+  const [isConnected, setIsConnected] = React.useState(false);
 
   function handleChange(newValue) {
     if (activeView != newValue) {
@@ -27,32 +28,32 @@ const Main = () => {
       <CssBaseline />
       <Grid container direction="column" justify="center" alignItems="center">
         <Header />
-        <NavBar onChange={handleChange} />
+        <NavBar onChange={handleChange} isConnected={isConnected} />
         <main className={classes.content}>
           {activeView === 0 ? (
-            <Configure
+            <Status
               setStreamingMode={setStreamingMode}
               setColumns={setColumns}
               setStreamingSource={setStreamingSource}
               setDeviceID={setDeviceID}
+              setIsConnected={setIsConnected}
+              isConnected={isConnected}
             />
           ) : null}
-          {activeView === 1 ? (
-            <ConfigureStream
+          {activeView === 2 ? (
+            <Configure
               setStreamingMode={setStreamingMode}
               streamingSource={streamingSource}
               streamingMode={streamingMode}
               deviceID={deviceID}
             />
           ) : null}
-          {activeView === 2 ? (
+          {activeView === 1 ? (
             streamingMode == "results" ? (
               <Results />
             ) : (
-                <SensorStream
-                  columns={columns}
-                />
-              )
+              <SensorStream columns={columns} />
+            )
           ) : null}
         </main>
       </Grid>

@@ -11,6 +11,8 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import InfoIcon from "@material-ui/icons/Info";
 import AssessmentIcon from "@material-ui/icons/Assessment";
 import AssignmentIcon from "@material-ui/icons/Assignment";
+import { Grid } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 
 const drawerWidth = 240;
 
@@ -42,12 +44,28 @@ const InconSelector = (props) => {
     case 0:
       return <InfoIcon />;
     case 1:
-      return <SettingsIcon />;
-    case 2:
       return <AssessmentIcon />;
+    case 2:
+      return <SettingsIcon />;
     default:
       return <InboxIcon />;
   }
+};
+
+const Connected = (props) => {
+  return (
+    <Grid>
+      {props.isConnected ? (
+        <Button color="green" variant="contained" aria-label="disconnect">
+          Connected
+        </Button>
+      ) : (
+        <Button color="red" variant="contained" aria-label="disconnect">
+          Disconnected
+        </Button>
+      )}
+    </Grid>
+  );
 };
 
 const NavBar = (props) => {
@@ -68,16 +86,17 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Gateway Status", "Configure Gateway", "Stream"].map(
-            (text, index) => (
-              <ListItem button key={text} onClick={handleMenu(index)}>
-                <ListItemIcon>
-                  <InconSelector index={index}> </InconSelector>
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            )
-          )}
+          {["Device Info", "Stream", "Configure Gateway"].map((text, index) => (
+            <ListItem button key={text} onClick={handleMenu(index)}>
+              <ListItemIcon>
+                <InconSelector index={index}> </InconSelector>
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItem>
+          ))}
+          <ListItem>
+            <Connected isConnected={props.isConnected}></Connected>
+          </ListItem>
         </List>
       </div>
     </Drawer>
