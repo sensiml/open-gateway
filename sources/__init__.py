@@ -41,4 +41,3 @@ def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwa
 
     print(source_type, data_source)
     raise Exception("Invalid Data Source {}".format(data_source))
-

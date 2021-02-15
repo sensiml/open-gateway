@@ -90,11 +90,11 @@ class TCPIPResultReader(TCPIPReader):
             content = ""
 
             for cont in resp.iter_content():
-                
+
                 if not self.streaming:
                     return
 
-                try:                
+                try:
                     data = cont.decode("ascii")
                 except Exception as e:
                     print(e)
@@ -132,4 +132,3 @@ if __name__ == "__main__":
 
     for data in reader.read_data():
         print(data)
-

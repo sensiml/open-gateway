@@ -3,6 +3,7 @@ import copy
 import threading
 import array
 import time
+
 try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
 except:
@@ -26,7 +27,9 @@ class BaseReader(object):
         self._thread = None
         self._lock = threading.Lock()
 
-        self.buffer = CircularBufferQueue(self._lock, buffer_size=self.packet_buffer_size)
+        self.buffer = CircularBufferQueue(
+            self._lock, buffer_size=self.packet_buffer_size
+        )
         self.rbuffer = CircularResultsBufferQueue(self._lock, buffer_size=1)
 
     @property
@@ -80,7 +83,6 @@ class BaseReader(object):
             self._thread = threading.Thread(target=self._read_source)
             self._thread.start()
 
-            
             time.sleep(1)
 
         else:
@@ -106,22 +108,21 @@ class BaseReader(object):
 
         index = self.buffer.get_latest_buffer()
 
-        while self.streaming:                    
+        while self.streaming:
 
             if index is None:
-                index = self.buffer.get_latest_buffer()                
-                time.sleep(.1)
+                index = self.buffer.get_latest_buffer()
+                time.sleep(0.1)
                 continue
-            
-            if self.buffer.is_buffer_full(index):                
+
+            if self.buffer.is_buffer_full(index):
                 data = self.buffer.read_buffer(index)
-                index = self.buffer.get_next_index(index)                    
+                index = self.buffer.get_next_index(index)
 
                 if data:
                     yield data
 
-            time.sleep(.1)
-
+            time.sleep(0.1)
 
         print("stream ended")
 
@@ -134,31 +135,27 @@ class BaseReader(object):
         else:
             print("sent connect")
             self.send_connect()
-            
-
 
         index = self.buffer.get_latest_buffer()
 
-        while self.streaming:                    
+        while self.streaming:
 
             if index is None:
-                index = self.rbuffer.get_latest_buffer()                
-                time.sleep(.1)
+                index = self.rbuffer.get_latest_buffer()
+                time.sleep(0.1)
                 continue
-            
-            if self.rbuffer.is_buffer_full(index):                
-                data = self.rbuffer.read_buffer(index)
-                index = self.rbuffer.get_next_index(index)                    
 
-                for result in data:                    
-                    if self._validate_results_data(result):                        
+            if self.rbuffer.is_buffer_full(index):
+                data = self.rbuffer.read_buffer(index)
+                index = self.rbuffer.get_next_index(index)
+
+                for result in data:
+                    if self._validate_results_data(result):
                         result = self._map_classification(json.loads(result))
                         yield json.dumps(result) + "\n"
-                
+
             else:
-                time.sleep(.1)
-
-
+                time.sleep(0.1)
 
     def read_config(self):
         pass

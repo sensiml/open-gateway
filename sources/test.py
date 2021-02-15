@@ -90,7 +90,7 @@ class TestReader(BaseReader):
 
     def _read_source(self):
         index = 0
-        
+
         data = self._generate_samples(len(self.config_columns), self.sample_rate)
 
         self.streaming = True
@@ -121,11 +121,13 @@ class TestResultReader(BaseReader):
         while self.streaming:
 
             self.rbuffer.update_buffer(
-                [json.dumps(
-                    self._map_classification(
-                        {"ModelNumber": 0, "Classification": random.randint(0, 10)}
+                [
+                    json.dumps(
+                        self._map_classification(
+                            {"ModelNumber": 0, "Classification": random.randint(0, 10)}
+                        )
                     )
-                )]
+                ]
             )
             time.sleep(0.1)
 

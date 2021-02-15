@@ -22,7 +22,7 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-#app.register_blueprint(errors)
+# app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -118,6 +118,7 @@ def scan():
 
     return Response(json.dumps(device_id_list), mimetype="application/json")
 
+
 @app.route("/connect", methods=["GET"])
 def connect():
 
@@ -134,8 +135,6 @@ def connect():
 
             app.config["STREAMING"] = True
 
-
-
     elif app.config["MODE"] == "RESULTS":
         if app.config.get("RESULTS_SOURCE", None) is None:
             app.config["RESULTS_SOURCE"] = get_source(
@@ -150,6 +149,7 @@ def connect():
             app.config["RESULTS_SOURCE"].send_connect()
 
     return get_config()
+
 
 @app.route("/config", methods=["GET", "POST"])
 def config():
@@ -184,9 +184,6 @@ def config():
     ret = parse_current_config()
 
     return Response(dumps(ret), mimetype="application/json")
-
-
-        
 
 
 @app.route("/config-results", methods=["GET", "POST"])
@@ -268,7 +265,6 @@ def disconnect():
 
     source = app.config.get("STREAMING_SOURCE", None)
     source_resutlts = app.config.get("RESULT_SOURCE", None)
-    
 
     if source is not None:
         source.disconnect()

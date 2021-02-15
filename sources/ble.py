@@ -4,6 +4,7 @@ import struct
 import sys
 import json
 import copy
+
 try:
     from sources.base import BaseReader
 except:
@@ -61,7 +62,7 @@ class BLEReader(BaseReader):
 
         if self.device_id and connect:
             self.peripheral = btle.Peripheral(self.device_id)
-            print('getting characteristics')
+            print("getting characteristics")
             print(self.peripheral.getCharacteristics())
             self.peripheral.setDelegate(self.delegate)
 
@@ -80,8 +81,6 @@ class BLEReader(BaseReader):
 
         self.buffer.reset_buffer()
         self.rbuffer.reset_buffer()
-
-
 
     def list_available_devices(self):
 
@@ -116,7 +115,7 @@ class BLEReader(BaseReader):
 
     def read_config(self):
 
-        print('reading config')
+        print("reading config")
         if self.peripheral is None:
             raise Exception("BLE Device ID Not Configured.")
 
@@ -132,7 +131,6 @@ class BLEReader(BaseReader):
 
     def _read_source(self):
 
-
         self.streaming = True
 
         while self.streaming:
@@ -144,8 +142,8 @@ class BLEReader(BaseReader):
                     with self._lock:
                         tmp = copy.deepcopy(self.delegate.data)
                         self.delegate.new_data = False
-                        self.delegate.data=b""
-                    
+                        self.delegate.data = b""
+
                     self.buffer.update_buffer(tmp)
 
             except Exception as e:
@@ -153,7 +151,7 @@ class BLEReader(BaseReader):
                 self.disconnect()
 
     def set_config(self, config):
-        
+
         print("BLE SET CONFIG")
 
         source_config = self.read_config()
@@ -195,7 +193,7 @@ class BLEResultReader(BLEReader):
 
         print("sending connect")
         if not self.subscribed:
-            print("subscring",)
+            print("subscring")
             setup_data = b"\x01\x00"
             notify_handle = (
                 self.peripheral.getCharacteristics(uuid=RecognitionClassUUID)[
@@ -219,16 +217,35 @@ class BLEResultReader(BLEReader):
             if self.delegate.data is not None:
 
                 if len(self.delegate.data) > 4:
-                    raise Exception("Length of Delegeate data larger than a signle packet {}".format(len(self.delegate.data)))                    
+                    raise Exception(
+                        "Length of Delegeate data larger than a signle packet {}".format(
+                            len(self.delegate.data)
+                        )
+                    )
 
                 tmp = struct.unpack("h" * 2, self.delegate.data)
-                self.delegate.data = None                            
-                self.rbuffer.update_buffer([json.dumps({"ModelNumber": tmp[0], "Classification": tmp[1]})])
+                self.delegate.data = None
+                self.rbuffer.update_buffer(
+                    [json.dumps({"ModelNumber": tmp[0], "Classification": tmp[1]})]
+                )
 
 
 if __name__ == "__main__":
 
-    config = {'DATA_SOURCE': 'BLE', 'CONFIG_SAMPLE_RATE': 119, 'CONFIG_SAMPLES_PER_PACKET': 10, 'BLE_DEVICE_ID': 'dd:6c:dc:c1:99:fb', 'CONFIG_COLUMNS': {'GyroscopeZ': 5, 'AccelerometerX': 0, 'AccelerometerY': 1, 'GyroscopeX': 3, 'AccelerometerZ': 2, 'GyroscopeY': 4}}
+    config = {
+        "DATA_SOURCE": "BLE",
+        "CONFIG_SAMPLE_RATE": 119,
+        "CONFIG_SAMPLES_PER_PACKET": 10,
+        "BLE_DEVICE_ID": "dd:6c:dc:c1:99:fb",
+        "CONFIG_COLUMNS": {
+            "GyroscopeZ": 5,
+            "AccelerometerX": 0,
+            "AccelerometerY": 1,
+            "GyroscopeX": 3,
+            "AccelerometerZ": 2,
+            "GyroscopeY": 4,
+        },
+    }
 
     device_id = "dd:6c:dc:c1:99:fb"
     """
@@ -245,4 +262,3 @@ if __name__ == "__main__":
     ble.send_subscribe()
 
     ble._read_source()
-    
