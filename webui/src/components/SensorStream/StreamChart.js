@@ -7,6 +7,7 @@ const StreamChart = (data) => {
       data={data.data}
       layout={{
         autosize: true,
+        width: 1080,
       }}
     />
   );

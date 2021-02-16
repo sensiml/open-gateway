@@ -10,6 +10,7 @@ import { Grid } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    width: "100%",
   },
   details: {
     display: "flex",
@@ -109,7 +110,13 @@ function handleRecord(event, setIsRecording, setRecordBuffer) {
   setIsRecording(true);
 }
 
-function handleStopStreaming(event, reader, setIsStreaming, setIsRecording) {
+function handleStopStreaming(
+  event,
+  reader,
+  setIsStreaming,
+  setIsRecording,
+  set
+) {
   //debugger;
   reader.cancel();
   setIsStreaming(false);
@@ -175,8 +182,11 @@ const SensorStream = (props) => {
     }
     if (isStreaming) {
       setChartData(splitArrays(streamData, props.columns));
-
-      setStreamData(streamData.slice(streamData.length / 4));
+      if (streamData.length > 10) {
+        setStreamData(streamData.slice(streamData.length / 4));
+      }
+    } else {
+      setStreamData([]);
     }
   }, 1000);
 
@@ -225,15 +235,13 @@ const SensorStream = (props) => {
   }
 
   return (
-    <div className={classes.root}>
+    <Grid xs={12}>
       <Card>
         <CardContent>
           <div className={classes.section1}>
-            <Grid container spacing={2} rows>
-              <Typography component="h3" variant="h3" color="secondary">
-                Mode: Data Collection
-              </Typography>
-            </Grid>
+            <Typography component="h3" variant="h3" color="secondary">
+              Mode: Data Collection
+            </Typography>
           </div>
           <Divider variant="middle" />
           <div className={classes.section2}>
@@ -241,80 +249,87 @@ const SensorStream = (props) => {
           </div>
           <StreamChart data={chartData} />
 
-          <Grid container rows>
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={isStreaming}
-                  onClick={() => {
-                    handleStreamRequest(
-                      "clicked",
-                      `${process.env.REACT_APP_API_URL}stream`
-                    );
-                  }}
-                >
-                  Start Stream
-                </Button>
-              </div>
-            </Grid>
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={!isStreaming}
-                  onClick={() => {
-                    handleStopStreaming(
-                      "stopstreaming",
-                      reader,
-                      setIsStreaming,
-                      setIsRecording
-                    );
-                  }}
-                >
-                  Stop Stream
-                </Button>
-              </div>
-            </Grid>
-
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={isStreaming ? (isRecording ? true : false) : true}
-                  onClick={() => {
-                    handleRecord("record", setIsRecording, setRecordBuffer);
-                  }}
-                >
-                  Start Record
-                </Button>
-              </div>
-            </Grid>
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={isStreaming ? (isRecording ? false : true) : true}
-                  onClick={(e) => {
-                    handleStopRecord(e);
-                  }}
-                >
-                  Stop Record
-                </Button>
-              </div>
-            </Grid>
+          <Grid container rows spacing={3}>
+            {!isStreaming ? (
+              <Grid item xs={2}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="primary"
+                    variant="contained"
+                    fullWidth={true}
+                    onClick={() => {
+                      handleStreamRequest(
+                        "clicked",
+                        `${process.env.REACT_APP_API_URL}stream`
+                      );
+                    }}
+                  >
+                    Start Streaming
+                  </Button>
+                </div>
+              </Grid>
+            ) : (
+              <Grid item xs={2}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="secondary"
+                    variant="contained"
+                    fullWidth={true}
+                    onClick={() => {
+                      handleStopStreaming(
+                        "stopstreaming",
+                        reader,
+                        setIsStreaming,
+                        setIsRecording
+                      );
+                    }}
+                  >
+                    Stop Streaming
+                  </Button>
+                </div>
+              </Grid>
+            )}
+            {!isRecording ? (
+              <Grid item xs={2}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="primary"
+                    variant="contained"
+                    fullWidth={true}
+                    disabled={isStreaming ? (isRecording ? true : false) : true}
+                    onClick={() => {
+                      handleRecord("record", setIsRecording, setRecordBuffer);
+                    }}
+                  >
+                    Begin Record
+                  </Button>
+                </div>
+              </Grid>
+            ) : (
+              <Grid item xs={2}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="secondary"
+                    variant="contained"
+                    fullWidth={true}
+                    disabled={isStreaming ? (isRecording ? false : true) : true}
+                    onClick={(e) => {
+                      handleStopRecord(e);
+                    }}
+                  >
+                    Stop
+                  </Button>
+                </div>
+              </Grid>
+            )}
           </Grid>
         </CardContent>
       </Card>
-    </div>
+    </Grid>
   );
 };
 
