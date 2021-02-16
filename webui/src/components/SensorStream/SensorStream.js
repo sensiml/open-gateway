@@ -182,13 +182,13 @@ const SensorStream = (props) => {
     }
     if (isStreaming) {
       setChartData(splitArrays(streamData, props.columns));
-      if (streamData.length > 10) {
-        setStreamData(streamData.slice(streamData.length / 4));
+      if (streamData.length > 40) {
+        setStreamData(streamData.slice(streamData.length - 40));
       }
     } else {
       setStreamData([]);
     }
-  }, 1000);
+  }, 100);
 
   const handleStreamRequest = (event, url) => {
     setIsStreaming(true);
