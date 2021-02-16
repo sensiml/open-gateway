@@ -273,7 +273,7 @@ const SensorStream = (props) => {
         <CardContent>
           <div className={classes.section1}>
             <Typography component="h3" variant="h3" color="secondary">
-              Mode: Data Collection
+              Test Mode: Data Stream
             </Typography>
           </div>
           <Divider variant="middle" />

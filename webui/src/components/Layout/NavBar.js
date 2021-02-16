@@ -86,14 +86,16 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Device Info", "Stream", "Configure Gateway"].map((text, index) => (
-            <ListItem button key={text} onClick={handleMenu(index)}>
-              <ListItemIcon>
-                <InconSelector index={index}> </InconSelector>
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+          {["Device Info", "Test Stream", "Configure Gateway"].map(
+            (text, index) => (
+              <ListItem button key={text} onClick={handleMenu(index)}>
+                <ListItemIcon>
+                  <InconSelector index={index}> </InconSelector>
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            )
+          )}
           <ListItem>
             <Connected isConnected={props.isConnected}></Connected>
           </ListItem>
