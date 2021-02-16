@@ -1,5 +1,5 @@
-import React from "react";
 import { Typography } from "@material-ui/core";
+import React from "react";
 
 const ResultsFilter = (props) => {
   function filterData(data, filter_length) {

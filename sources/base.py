@@ -2,7 +2,10 @@ import json
 import copy
 import threading
 import array
+import struct
 import time
+import csv
+import os
 
 try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
@@ -16,33 +19,36 @@ class BaseReader(object):
 
     def __init__(self, config, device_id=None, **kwargs):
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
-        self.sample_rate = config["CONFIG_SAMPLE_RATE"]
-        self.config_columns = config.get("CONFIG_COLUMNS")
-        self.data_width = len(config.get("CONFIG_COLUMNS", []))
-        self.class_map = config.get("CLASS_MAP", None)
+        self.class_map = config["CLASS_MAP"]
+        self.source_samples_per_packet = None
+        self.sample_rate = None
+        self.config_columns = None
         self.device_id = device_id
-        self.source_samples_per_packet  = config.get("SOURCE_SAMPLES_PER_PACKET")
-
+        self.recording = False
         self.streaming = False
-
         self._thread = None
+        self._record_thread = None
+        self.buffer = None
+        self.rbuffer = None
         self._lock = threading.Lock()
 
-        self.buffer = CircularBufferQueue(
-            self._lock, buffer_size=self.packet_buffer_size
-        )
-        self.rbuffer = CircularResultsBufferQueue(self._lock, buffer_size=1)
+    @property
+    def data_width(self):
+        if self.config_columns is None:
+            return 0
+
+        return len(self.config_columns)
 
     @property
     def packet_buffer_size(self):
-        return self.samples_per_packet * self.data_width * SHORT
+        return self.samples_per_packet * self.source_buffer_size
 
     @property
     def source_buffer_size(self):
         return self.source_samples_per_packet * self.data_width * SHORT
 
-
-    def _validate_config(self, config):
+    @staticmethod
+    def _validate_config(config):
 
         if not isinstance(config, dict):
             raise Exception("Invalid Configuration")
@@ -56,7 +62,8 @@ class BaseReader(object):
 
         return config
 
-    def _validate_results_data(self, data):
+    @staticmethod
+    def _validate_results_data(data):
         try:
             tmp = json.loads(data)
             if isinstance(tmp, dict) and tmp:
@@ -66,21 +73,51 @@ class BaseReader(object):
 
         return False
 
-    def _map_classification(self, results):
+    def is_recording(self):
+        return self.recording
 
-        if self.class_map:
-            results["Classification"] = self.class_map.get(
-                results["Classification"], results["Classification"]
-            )
+    def is_streaming(self):
+        return self.streaming
 
-        return results
+    def list_available_devices(self):
+        return []
 
-    def send_connect(self):
+    def _send_subscribe(self):
+        pass
+
+    def read_config(self):
+        """ read the config from the device and set the properties of the object """
+
+        config = self.read_device_config()
+
+        self.source_samples_per_packet = config.get("samples_per_packet", None)
+        self.sample_rate = config.get("sample_rate", None)
+        self.config_columns = config.get("column_location", None)
+
+        print("Setting Configuration")
+
+        return config
+
+    def update_config(self, config):
+        """ update the objects local config values from the app cache """
+
+        self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
+        self.source_samples_per_packet = config["SOURCE_SAMPLES_PER_PACKET"]
+        self.sample_rate = config["CONFIG_SAMPLE_RATE"]
+        self.config_columns = config.get("CONFIG_COLUMNS")
+        self.class_map = config.get("CLASS_MAP")
+
+    def connect(self):
 
         if self._thread is None:
             "Assume if there is a thread, we are already connected"
 
-            self.send_subscribe()
+            self.buffer = CircularBufferQueue(
+                self._lock, buffer_size=self.packet_buffer_size
+            )
+            self.rbuffer = CircularResultsBufferQueue(self._lock, buffer_size=1)
+
+            self._send_subscribe()
 
             time.sleep(1)
 
@@ -97,11 +134,51 @@ class BaseReader(object):
     def disconnect(self):
         self.streaming = False
         self._thread = None
+        self._record_thread = None
+        self.recording = False
 
         self.buffer.reset_buffer()
         self.rbuffer.reset_buffer()
 
+    def record_start(self, filename):
+
+        if not self.streaming:
+            raise Exception("Must start streaming before begging to record!")
+
+        if self.recording:
+            raise Exception("Only a single recording can occur at one time")
+
+        if filename is None:
+            raise Exception("Invalid Filename")
+
+        if not os.path.exists(os.path.dirname(filename)):
+            print(
+                "File directory does not exist,  recording to data directory in gateway location."
+            )
+            if not os.path.exists("./data"):
+                os.mkdir("./data")
+
+            filename = os.path.join("./data", os.path.basename(filename))
+
+        self.recording = True
+        self._record_thread = threading.Thread(
+            target=self._record_data, kwargs={"filename": filename}
+        )
+        self._record_thread.start()
+
+    def record_stop(self, filename=None):
+        if self.recording != True:
+            raise Exception("Not currently recording")
+
+        self._record_thread = None
+        self.recording = False
+
+        return True
+
+
+class BaseStreamReaderMixin(object):
     def read_data(self):
+        """ Generator to read the data stream out of the buffer """
 
         print("starting read")
 
@@ -109,7 +186,7 @@ class BaseReader(object):
             pass
         else:
             print("sent connect")
-            self.send_connect()
+            self.connect()
             self.streaming = True
 
         index = self.buffer.get_latest_buffer()
@@ -128,22 +205,62 @@ class BaseReader(object):
                 if data:
                     yield data
 
-            else:
-                time.sleep(0.001)
+            time.sleep(0.001)
 
         print("stream ended")
 
-    def read_result_data(self):
+    def _record_data(self, filename):
 
-        print("starting read")
+        with open(filename + ".csv", "w", newline="") as csvfile:
+            datawriter = csv.writer(csvfile, delimiter=",")
+
+            datawriter.writerow(self.config_columns)
+            struct_info = "h" * self.data_width
+
+            data_reader = self.read_data()
+
+            while self.recording:
+
+                data = next(data_reader)
+
+                if data:
+                    for row_index in range(len(data) // (self.data_width * 2)):
+                        buff_index = row_index * self.data_width * 2
+                        datawriter.writerow(
+                            struct.unpack(
+                                struct_info,
+                                data[buff_index : buff_index + self.data_width * 2],
+                            )
+                        )
+
+        print("recording thread finished")
+
+
+class BaseResultReaderMixin(object):
+    def read_device_config(self):
+        return {"samples_per_packet": 1}
+
+    def _map_classification(self, results):
+
+        if self.class_map:
+            results["Classification"] = self.class_map.get(
+                results["Classification"], results["Classification"]
+            )
+
+        return results
+
+    def read_data(self):
+        """ Genrator to read the result stream out of the buffer """
+
+        print("starting result read")
 
         if self._thread:
             pass
         else:
             print("sent connect")
-            self.send_connect()
+            self.connect()
 
-        index = self.buffer.get_latest_buffer()
+        index = self.rbuffer.get_latest_buffer()
 
         while self.streaming:
 
@@ -159,22 +276,25 @@ class BaseReader(object):
                 for result in data:
                     if self._validate_results_data(result):
                         result = self._map_classification(json.loads(result))
+                        result["timestap"] = time.time()
+                        print(result)
                         yield json.dumps(result) + "\n"
 
             else:
                 time.sleep(0.1)
 
-    def read_config(self):
-        pass
+        print("result stream ended")
 
-    def list_available_devices(self):
-        return []
+    def _record_data(self, filename):
 
-    def _read_source(self):
-        pass
+        with open(filename + ".csv", "w", newline="") as out:
+            data_reader = self.read_data()
 
-    def set_config(self, config):
-        pass
+            while self.recording:
 
-    def send_subscribe(self):
-        pass
+                data = next(data_reader)
+
+                if data:
+                    out.write(data)
+
+        print("recording thread finished")

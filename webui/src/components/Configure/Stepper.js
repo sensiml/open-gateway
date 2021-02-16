@@ -1,10 +1,8 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
+import Stepper from "@material-ui/core/Stepper";
+import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,25 +29,11 @@ function getSteps() {
   ];
 }
 
-function getStepContent(stepIndex) {
-  switch (stepIndex) {
-    case 0:
-      return "Select Connection Type";
-    case 1:
-      return "Scan and Select Device ID";
-    case 2:
-      return "Select Device Mode";
-    case 3:
-      return "Click Configure Gateway";
-    default:
-      return "";
-  }
-}
-
 const HorizontalLabelPositionBelowStepper = (props) => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState();
   const steps = getSteps();
+
+  let activeStep = null;
 
   return (
     <div className={classes.root}>

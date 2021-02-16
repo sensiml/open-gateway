@@ -1,12 +1,12 @@
-import React from "react";
+import { Paper, Tabs } from "@material-ui/core/";
 import { makeStyles } from "@material-ui/core/styles";
 import Tab from "@material-ui/core/Tab";
-import { Paper, Tabs } from "@material-ui/core/";
+import React from "react";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex"
-  }
+    display: "flex",
+  },
 }));
 
 function Footer() {

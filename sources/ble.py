@@ -6,9 +6,9 @@ import json
 import copy
 
 try:
-    from sources.base import BaseReader
+    from sources.base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 except:
-    from base import BaseReader
+    from base import BaseReader, BaseResultReaderMixin
 import time
 
 uuidOfConfigChar = "16480001-0525-4ad5-b4fb-6dd83f49546b"
@@ -28,17 +28,21 @@ class ScanDelegate(DefaultDelegate):
 
 
 class StreamingDelegate(btle.DefaultDelegate):
-    def __init__(self, params):
+    def __init__(self, lock):
         btle.DefaultDelegate.__init__(self)
         self.data = None
         self.new_data = False
+        self._lock = lock
 
     def handleNotification(self, cHandle, value):
-        if self.data:
-            self.data += value
-        else:
-            self.data = value
-        self.new_data = True
+
+        with self._lock:
+
+            if self.data:
+                self.data += value
+            else:
+                self.data = value
+            self.new_data = True
 
 
 class ResultDelegate(StreamingDelegate):
@@ -99,7 +103,23 @@ class BLEReader(BaseReader):
 
         return device_list
 
-    def send_subscribe(self):
+    def read_device_config(self):
+
+        print("reading config")
+        if self.peripheral is None:
+            raise Exception("BLE Device ID Not Configured.")
+
+        source_config = self.peripheral.getCharacteristics(uuid=uuidOfConfigChar)[
+            0
+        ].read()
+
+        return self._validate_config(
+            json.loads(source_config.decode("ascii").rstrip("\x00"))
+        )
+
+
+class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
+    def _send_subscribe(self):
 
         if not self.subscribed:
             print("subscrbing")
@@ -113,29 +133,17 @@ class BLEReader(BaseReader):
             )
             self.subscribed = True
 
-    def read_config(self):
-
-        print("reading config")
-        if self.peripheral is None:
-            raise Exception("BLE Device ID Not Configured.")
-
-        source_config = self.peripheral.getCharacteristics(uuid=uuidOfConfigChar)[
-            0
-        ].read()
-
-        print(source_config)
-
-
-        return self._validate_config(
-            json.loads(source_config.decode("ascii").rstrip("\x00"))
-        )
-
     def _read_source(self):
 
         self.streaming = True
 
-        while self.streaming:
-            try:
+        # clear ble buffer
+        self.delegate.new_data = False
+        self.delegate.data = b""
+
+        try:
+            while self.streaming:
+
                 if self.peripheral.waitForNotifications(0.01):
                     continue
 
@@ -147,11 +155,14 @@ class BLEReader(BaseReader):
 
                     self.buffer.update_buffer(tmp)
 
-            except Exception as e:
-                print(e)
-                self.disconnect()
+        except Exception as e:
+            print(e)
+            self.disconnect()
+            raise e
 
-    def set_config(self, config):
+        print("streaming source stopped")
+
+    def set_app_config(self, config):
 
         print("BLE SET CONFIG")
 
@@ -161,16 +172,14 @@ class BLEReader(BaseReader):
         if not source_config:
             raise Exception("Invalid Source Configuration")
 
-        self.data_width = len(source_config["column_location"])
-
         config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["CONFIG_COLUMNS"] = source_config["column_location"]
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "BLE"
-        config["BLE_DEVICE_ID"] = self.device_id
+        config["DEVICE_ID"] = self.device_id
 
 
-class BLEResultReader(BLEReader):
+class BLEResultReader(BLEReader, BaseResultReaderMixin):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
     def __init__(self, config, device_id, connect=True, **kwargs):
@@ -188,11 +197,11 @@ class BLEResultReader(BLEReader):
             self.peripheral = btle.Peripheral(self.device_id)
             self.peripheral.setDelegate(self.delegate)
 
-    def set_config(self, config):
+    def set_app_config(self, config):
         config["DATA_SOURCE"] = "BLE"
-        config["BLE_DEVICE_ID"] = self.device_id
+        config["DEVICE_ID"] = self.device_id
 
-    def send_subscribe(self):
+    def _send_subscribe(self):
 
         print("sending connect")
         if not self.subscribed:
@@ -218,7 +227,6 @@ class BLEResultReader(BLEReader):
             if self.peripheral.waitForNotifications(0.1):
                 continue
             if self.delegate.data is not None:
-
                 if len(self.delegate.data) > 4:
                     raise Exception(
                         "Length of Delegeate data larger than a signle packet {}".format(
@@ -239,7 +247,7 @@ if __name__ == "__main__":
         "DATA_SOURCE": "BLE",
         "CONFIG_SAMPLE_RATE": 119,
         "CONFIG_SAMPLES_PER_PACKET": 10,
-        "BLE_DEVICE_ID": "dd:6c:dc:c1:99:fb",
+        "DEVICE_ID": "dd:6c:dc:c1:99:fb",
         "CONFIG_COLUMNS": {
             "GyroscopeZ": 5,
             "AccelerometerX": 0,
@@ -253,15 +261,15 @@ if __name__ == "__main__":
     device_id = "dd:6c:dc:c1:99:fb"
     """
     ble = BLEReader(config, device_id=device_id)
-    ble.set_config(config)
-    ble.send_subscribe()
+    ble.set_app_config(config)
+    ble._send_subscribe()
 
     ble._read_source()
     """
     config["CONFIG_SAMPLES_PER_PACKET"] = 1
 
     ble = BLEResultReader(config, device_id=device_id)
-    ble.set_config(config)
-    ble.send_subscribe()
+    ble.set_app_config(config)
+    ble._send_subscribe()
 
     ble._read_source()
