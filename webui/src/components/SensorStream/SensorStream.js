@@ -82,6 +82,35 @@ function convertToJson(data, columns, isRecording) {
   return lines;
 }
 
+function convertToCSV(data, columns, isRecording) {
+  if (!isRecording) {
+    {
+      return;
+    }
+  }
+
+  let csv = "";
+  for (col in columns) {
+    csv += columns[col] + ",";
+  }
+  csv += "\n";
+
+  var marker = columns.length - 1;
+  for (var k = 0; k < data.length; k++) {
+    for (var i = 0; i < data[k].length; i += columns.length) {
+      for (var col = 0; col < columns.length; col++) {
+        csv += data[k][i + col].toString();
+        if (col != marker) {
+          csv += ",";
+        }
+      }
+      csv += "\n";
+    }
+  }
+
+  return csv;
+}
+
 function useInterval(callback, delay) {
   const savedCallback = useRef();
 
@@ -206,12 +235,17 @@ const SensorStream = (props) => {
   function handleStopRecord(event) {
     event.preventDefault();
     // Prepare the file
+    let output = convertToCSV(recordBuffer, props.columns, isRecording);
+
+    /* FOR JSON OUTPUT
     let output = JSON.stringify(
       convertToJson(recordBuffer, props.columns, isRecording),
       //{ test: "test" },
       null,
       4
     );
+    */
+
     var blob1 = new Blob([output], { type: "text/plain;charset=utf-8" });
 
     //Check the Browser.
@@ -250,7 +284,7 @@ const SensorStream = (props) => {
 
           <Grid container rows spacing={3}>
             {!isStreaming ? (
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <div className={classes.controls}>
                   <Button
                     aria-label="disconnect"
@@ -269,7 +303,7 @@ const SensorStream = (props) => {
                 </div>
               </Grid>
             ) : (
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <div className={classes.controls}>
                   <Button
                     aria-label="disconnect"
@@ -291,7 +325,7 @@ const SensorStream = (props) => {
               </Grid>
             )}
             {!isRecording ? (
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <div className={classes.controls}>
                   <Button
                     aria-label="disconnect"
@@ -308,7 +342,7 @@ const SensorStream = (props) => {
                 </div>
               </Grid>
             ) : (
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <div className={classes.controls}>
                   <Button
                     aria-label="disconnect"
@@ -320,7 +354,7 @@ const SensorStream = (props) => {
                       handleStopRecord(e);
                     }}
                   >
-                    Stop
+                    Stop Record
                   </Button>
                 </div>
               </Grid>
