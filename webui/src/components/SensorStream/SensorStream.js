@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Card, CardContent, Typography } from "@material-ui/core";
 import { Button } from "@material-ui/core";
@@ -33,8 +33,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function splitArray(data, columns) {
-  var size = data.length / columns.length;
+function splitArrays(data, columns) {
+  console.log(data);
+  var l = 0;
+  for (var i = 0; i < data.length; i++) {
+    l += data[i].length;
+  }
+  var size = l / columns.length;
   var x_array = [...Array(size).keys()];
   var lines = columns.map((x) => {
     return {
@@ -44,9 +49,11 @@ function splitArray(data, columns) {
     };
   });
 
-  for (var i = 0; i < data.length; i += columns.length) {
-    for (var col = 0; col < columns.length; col++) {
-      lines[col].y.push(data[i + col]);
+  for (var k = 0; k < data.length; k++) {
+    for (var i = 0; i < data[[k]].length; i += columns.length) {
+      for (var col = 0; col < columns.length; col++) {
+        lines[col].y.push(data[k][i + col]);
+      }
     }
   }
   return lines;
@@ -59,7 +66,6 @@ function convertToJson(data, columns, isRecording) {
     }
   }
 
-  console.log("Columns", columns);
   var lines = {};
   for (col in columns) {
     lines[columns[col]] = [];
@@ -76,6 +82,26 @@ function convertToJson(data, columns, isRecording) {
   return lines;
 }
 
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
 function handleRecord(event, setIsRecording, setRecordBuffer) {
   console.log("set recording true");
   var int16Array = new Int16Array();
@@ -85,7 +111,6 @@ function handleRecord(event, setIsRecording, setRecordBuffer) {
 
 function handleStopStreaming(event, reader, setIsStreaming, setIsRecording) {
   //debugger;
-  console.log(reader);
   reader.cancel();
   setIsStreaming(false);
   setIsRecording(false);
@@ -121,8 +146,8 @@ const getReader = (
             }
 
             var int16Array = new Int16Array(value.buffer);
-            setStreamCallback(splitArray(int16Array, columns));
-            //setRecordBufferCallback((x) => [...x, int16Array]);
+            setStreamCallback((x) => [...x, int16Array]);
+            setRecordBufferCallback((x) => [...x, int16Array]);
 
             push();
           });
@@ -137,10 +162,23 @@ const SensorStream = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const [streamData, setStreamData] = React.useState([]);
+  const [chartData, setChartData] = React.useState([]);
   const [isStreaming, setIsStreaming] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
   const [recordBuffer, setRecordBuffer] = React.useState([]);
   const [reader, setReader] = React.useState();
+
+  useInterval(() => {
+    if (!isRecording) {
+      var int16Array = new Int16Array();
+      setRecordBuffer(int16Array);
+    }
+    if (isStreaming) {
+      setChartData(splitArrays(streamData, props.columns));
+
+      setStreamData(streamData.slice(streamData.length / 4));
+    }
+  }, 1000);
 
   const handleStreamRequest = (event, url) => {
     setIsStreaming(true);
@@ -161,6 +199,7 @@ const SensorStream = (props) => {
     // Prepare the file
     let output = JSON.stringify(
       convertToJson(recordBuffer, props.columns, isRecording),
+      //{ test: "test" },
       null,
       4
     );
@@ -200,7 +239,7 @@ const SensorStream = (props) => {
           <div className={classes.section2}>
             <Typography variant="subtitle1" color="textSecondary"></Typography>
           </div>
-          <StreamChart data={streamData} />
+          <StreamChart data={chartData} />
 
           <Grid container rows>
             <Grid item>
@@ -241,16 +280,6 @@ const SensorStream = (props) => {
                 </Button>
               </div>
             </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-export default SensorStream;
-
-/*
 
             <Grid item>
               <div className={classes.controls}>
@@ -282,4 +311,11 @@ export default SensorStream;
                 </Button>
               </div>
             </Grid>
-*/
+          </Grid>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default SensorStream;
