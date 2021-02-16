@@ -47,7 +47,13 @@ function bin2String(array) {
   });
 }
 
-const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming) => {
+const handleStreamRequest = (
+  event,
+  url,
+  setStreamCallback,
+  setIsStreaming,
+  setReader
+) => {
   id_counter = 0;
   setStreamCallback([]);
   setIsStreaming(true);
@@ -55,6 +61,7 @@ const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming) => {
     method: "GET",
   }).then((response) => {
     const reader = response.body.getReader();
+    setReader(reader);
     const stream = new ReadableStream({
       start(controller) {
         // The following function handles each data chunk
@@ -88,9 +95,17 @@ const handleStreamRequest = (event, url, setStreamCallback, setIsStreaming) => {
   });
 };
 
+function handleStopStreaming(event, reader, setIsStreaming) {
+  //debugger;
+  console.log(reader);
+  reader.cancel();
+  setIsStreaming(false);
+}
+
 const Results = (props) => {
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [isStreaming, setIsStreaming] = React.useState(false);
+  const [reader, setReader] = React.useState();
   const [deviceColumns, setDeviceColumns] = React.useState([
     { field: "id", headerName: "ID", width: 70 },
     { field: "ModelNumber", headerName: "Model ID", width: 240 },
@@ -127,25 +142,45 @@ const Results = (props) => {
             </div>
 
             <Grid item xs={12}>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={isStreaming}
-                  fullWidth={true}
-                  onClick={() => {
-                    handleStreamRequest(
-                      "clicked",
-                      `${process.env.REACT_APP_API_URL}results`,
-                      setDeviceRows,
-                      setIsStreaming
-                    );
-                  }}
-                >
-                  Start Stream
-                </Button>
-              </div>
+              {isStreaming ? (
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="primary"
+                    variant="contained"
+                    fullWidth={true}
+                    onClick={() => {
+                      handleStopStreaming(
+                        "stopstreaming",
+                        reader,
+                        setIsStreaming
+                      );
+                    }}
+                  >
+                    Stop Stream
+                  </Button>
+                </div>
+              ) : (
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="primary"
+                    variant="contained"
+                    fullWidth={true}
+                    onClick={() => {
+                      handleStreamRequest(
+                        "clicked",
+                        `${process.env.REACT_APP_API_URL}results`,
+                        setDeviceRows,
+                        setIsStreaming,
+                        setReader
+                      );
+                    }}
+                  >
+                    Start Stream
+                  </Button>
+                </div>
+              )}
             </Grid>
           </div>
 
