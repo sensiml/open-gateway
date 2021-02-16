@@ -161,7 +161,6 @@ const SensorStream = (props) => {
     // Prepare the file
     let output = JSON.stringify(
       convertToJson(recordBuffer, props.columns, isRecording),
-      //{ test: "test" },
       null,
       4
     );
