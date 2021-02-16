@@ -74,7 +74,8 @@ const Configure = (props) => {
         console.log(response.data);
         console.log(props);
         props.setStreamingMode(response.data.mode);
-        setHelperText("Configured Device");
+        props.setIsConnected(true);
+        setHelperText("Gateway Connected to device, now ready to stream.");
       })
       .catch(function (error) {
         if (error.response) {

@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function splitArrays(data, columns) {
-  console.log(data);
   var l = 0;
   for (var i = 0; i < data.length; i++) {
     l += data[i].length;
@@ -218,12 +217,12 @@ const SensorStream = (props) => {
     //Check the Browser.
     var isIE = false || !!document.documentMode;
     if (isIE) {
-      window.navigator.msSaveBlob(blob1, "Customers.txt");
+      window.navigator.msSaveBlob(blob1, "data.json");
     } else {
       var url = window.URL || window.webkitURL;
       var link = url.createObjectURL(blob1);
       var a = document.createElement("a");
-      a.download = "data.txt";
+      a.download = "data.json";
       a.href = link;
       document.body.appendChild(a);
       a.click();
