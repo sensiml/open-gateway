@@ -192,11 +192,22 @@ const Results = (props) => {
           </Grid>
 
           <Divider variant="middle" />
+
           <div className={classes.section1}>
             <Grid container spacing={4} rows alignItems="center">
-              <Grid item xs={4}>
+              <Grid item xs={12}>
+                <Typography
+                  align="left"
+                  color="primary"
+                  component="h5"
+                  variant="h5"
+                >
+                  Post Processing:
+                </Typography>
+              </Grid>
+              <Grid item xs={2}>
                 <Typography align="center" component="h6" variant="h6">
-                  Filter Length{" "}
+                  Buffer:
                 </Typography>
               </Grid>
 
@@ -219,6 +230,8 @@ const Results = (props) => {
               </Grid>
             </Grid>
           </div>
+
+          <Divider variant="middle" />
           <div className={classes.section1}>
             <div style={{ height: 600, width: "100%" }}>
               <DataGrid
