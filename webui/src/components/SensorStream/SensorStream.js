@@ -251,12 +251,12 @@ const SensorStream = (props) => {
     //Check the Browser.
     var isIE = false || !!document.documentMode;
     if (isIE) {
-      window.navigator.msSaveBlob(blob1, "data.json");
+      window.navigator.msSaveBlob(blob1, "data.csv");
     } else {
       var url = window.URL || window.webkitURL;
       var link = url.createObjectURL(blob1);
       var a = document.createElement("a");
-      a.download = "data.json";
+      a.download = "data.csv";
       a.href = link;
       document.body.appendChild(a);
       a.click();
