@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const InconSelector = (props) => {
+const IconSelector = (props) => {
   switch (props.index) {
     case 0:
       return <InfoIcon />;
@@ -60,10 +60,10 @@ const Connected = (props) => {
           Connected
         </Button>
       ) : (
-        <Button color="red" variant="contained" aria-label="disconnect">
-          Disconnected
-        </Button>
-      )}
+          <Button color="red" variant="contained" aria-label="disconnect">
+            Disconnected
+          </Button>
+        )}
     </Grid>
   );
 };
@@ -90,7 +90,7 @@ const NavBar = (props) => {
             (text, index) => (
               <ListItem button key={text} onClick={handleMenu(index)}>
                 <ListItemIcon>
-                  <InconSelector index={index}> </InconSelector>
+                  <IconSelector index={index}> </IconSelector>
                 </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItem>
