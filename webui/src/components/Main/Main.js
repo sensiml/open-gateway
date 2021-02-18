@@ -46,6 +46,7 @@ const Main = () => {
               streamingSource={streamingSource}
               streamingMode={streamingMode}
               deviceID={deviceID}
+              setIsConnected={setIsConnected}
             />
           ) : null}
           {activeView === 1 ? (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Card, CardContent, Typography } from "@material-ui/core";
 import { Button } from "@material-ui/core";
@@ -10,6 +10,7 @@ import { Grid } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    width: "100%",
   },
   details: {
     display: "flex",
@@ -33,8 +34,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function splitArray(data, columns) {
-  var size = data.length / columns.length;
+function splitArrays(data, columns) {
+  var l = 0;
+  for (var i = 0; i < data.length; i++) {
+    l += data[i].length;
+  }
+  var size = l / columns.length;
   var x_array = [...Array(size).keys()];
   var lines = columns.map((x) => {
     return {
@@ -44,9 +49,11 @@ function splitArray(data, columns) {
     };
   });
 
-  for (var i = 0; i < data.length; i += columns.length) {
-    for (var col = 0; col < columns.length; col++) {
-      lines[col].y.push(data[i + col]);
+  for (var k = 0; k < data.length; k++) {
+    for (var i = 0; i < data[[k]].length; i += columns.length) {
+      for (var col = 0; col < columns.length; col++) {
+        lines[col].y.push(data[k][i + col]);
+      }
     }
   }
   return lines;
@@ -59,7 +66,6 @@ function convertToJson(data, columns, isRecording) {
     }
   }
 
-  console.log("Columns", columns);
   var lines = {};
   for (col in columns) {
     lines[columns[col]] = [];
@@ -76,6 +82,55 @@ function convertToJson(data, columns, isRecording) {
   return lines;
 }
 
+function convertToCSV(data, columns, isRecording) {
+  if (!isRecording) {
+    {
+      return;
+    }
+  }
+
+  let csv = "";
+  for (col in columns) {
+    csv += columns[col] + ",";
+  }
+  csv += "\n";
+
+  var marker = columns.length - 1;
+  for (var k = 0; k < data.length; k++) {
+    for (var i = 0; i < data[k].length; i += columns.length) {
+      for (var col = 0; col < columns.length; col++) {
+        csv += data[k][i + col].toString();
+        if (col != marker) {
+          csv += ",";
+        }
+      }
+      csv += "\n";
+    }
+  }
+
+  return csv;
+}
+
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
 function handleRecord(event, setIsRecording, setRecordBuffer) {
   console.log("set recording true");
   var int16Array = new Int16Array();
@@ -83,9 +138,14 @@ function handleRecord(event, setIsRecording, setRecordBuffer) {
   setIsRecording(true);
 }
 
-function handleStopStreaming(event, reader, setIsStreaming, setIsRecording) {
+function handleStopStreaming(
+  event,
+  reader,
+  setIsStreaming,
+  setIsRecording,
+  set
+) {
   //debugger;
-  console.log(reader);
   reader.cancel();
   setIsStreaming(false);
   setIsRecording(false);
@@ -121,8 +181,8 @@ const getReader = (
             }
 
             var int16Array = new Int16Array(value.buffer);
-            setStreamCallback(splitArray(int16Array, columns));
-            //setRecordBufferCallback((x) => [...x, int16Array]);
+            setStreamCallback((x) => [...x, int16Array]);
+            setRecordBufferCallback((x) => [...x, int16Array]);
 
             push();
           });
@@ -137,10 +197,26 @@ const SensorStream = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const [streamData, setStreamData] = React.useState([]);
+  const [chartData, setChartData] = React.useState([]);
   const [isStreaming, setIsStreaming] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
   const [recordBuffer, setRecordBuffer] = React.useState([]);
   const [reader, setReader] = React.useState();
+
+  useInterval(() => {
+    if (!isRecording) {
+      var int16Array = new Int16Array();
+      setRecordBuffer(int16Array);
+    }
+    if (isStreaming) {
+      setChartData(splitArrays(streamData, props.columns));
+      if (streamData.length > 40) {
+        setStreamData(streamData.slice(streamData.length - 40));
+      }
+    } else {
+      setStreamData([]);
+    }
+  }, 100);
 
   const handleStreamRequest = (event, url) => {
     setIsStreaming(true);
@@ -159,23 +235,28 @@ const SensorStream = (props) => {
   function handleStopRecord(event) {
     event.preventDefault();
     // Prepare the file
+    let output = convertToCSV(recordBuffer, props.columns, isRecording);
+
+    /* FOR JSON OUTPUT
     let output = JSON.stringify(
       convertToJson(recordBuffer, props.columns, isRecording),
       //{ test: "test" },
       null,
       4
     );
+    */
+
     var blob1 = new Blob([output], { type: "text/plain;charset=utf-8" });
 
     //Check the Browser.
     var isIE = false || !!document.documentMode;
     if (isIE) {
-      window.navigator.msSaveBlob(blob1, "Customers.txt");
+      window.navigator.msSaveBlob(blob1, "data.csv");
     } else {
       var url = window.URL || window.webkitURL;
       var link = url.createObjectURL(blob1);
       var a = document.createElement("a");
-      a.download = "data.txt";
+      a.download = "data.csv";
       a.href = link;
       document.body.appendChild(a);
       a.click();
@@ -187,100 +268,102 @@ const SensorStream = (props) => {
   }
 
   return (
-    <div className={classes.root}>
+    <Grid xs={12}>
       <Card>
         <CardContent>
           <div className={classes.section1}>
-            <Grid container spacing={2} rows>
-              <Typography component="h3" variant="h3" color="secondary">
-                Mode: Data Collection
-              </Typography>
-            </Grid>
+            <Typography component="h3" variant="h3" color="secondary">
+              Test Mode: Data Stream
+            </Typography>
           </div>
           <Divider variant="middle" />
           <div className={classes.section2}>
             <Typography variant="subtitle1" color="textSecondary"></Typography>
           </div>
-          <StreamChart data={streamData} />
+          <StreamChart data={chartData} />
 
-          <Grid container rows>
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={isStreaming}
-                  onClick={() => {
-                    handleStreamRequest(
-                      "clicked",
-                      `${process.env.REACT_APP_API_URL}stream`
-                    );
-                  }}
-                >
-                  Start Stream
-                </Button>
-              </div>
-            </Grid>
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={!isStreaming}
-                  onClick={() => {
-                    handleStopStreaming(
-                      "stopstreaming",
-                      reader,
-                      setIsStreaming,
-                      setIsRecording
-                    );
-                  }}
-                >
-                  Stop Stream
-                </Button>
-              </div>
-            </Grid>
+          <Grid container rows spacing={3}>
+            {!isStreaming ? (
+              <Grid item xs={3}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="primary"
+                    variant="contained"
+                    fullWidth={true}
+                    onClick={() => {
+                      handleStreamRequest(
+                        "clicked",
+                        `${process.env.REACT_APP_API_URL}stream`
+                      );
+                    }}
+                  >
+                    Start Streaming
+                  </Button>
+                </div>
+              </Grid>
+            ) : (
+              <Grid item xs={3}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="secondary"
+                    variant="contained"
+                    fullWidth={true}
+                    onClick={() => {
+                      handleStopStreaming(
+                        "stopstreaming",
+                        reader,
+                        setIsStreaming,
+                        setIsRecording
+                      );
+                    }}
+                  >
+                    Stop Streaming
+                  </Button>
+                </div>
+              </Grid>
+            )}
+            {!isRecording ? (
+              <Grid item xs={3}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="primary"
+                    variant="contained"
+                    fullWidth={true}
+                    disabled={isStreaming ? (isRecording ? true : false) : true}
+                    onClick={() => {
+                      handleRecord("record", setIsRecording, setRecordBuffer);
+                    }}
+                  >
+                    Begin Record
+                  </Button>
+                </div>
+              </Grid>
+            ) : (
+              <Grid item xs={3}>
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="secondary"
+                    variant="contained"
+                    fullWidth={true}
+                    disabled={isStreaming ? (isRecording ? false : true) : true}
+                    onClick={(e) => {
+                      handleStopRecord(e);
+                    }}
+                  >
+                    Stop Record
+                  </Button>
+                </div>
+              </Grid>
+            )}
           </Grid>
         </CardContent>
       </Card>
-    </div>
+    </Grid>
   );
 };
 
 export default SensorStream;
-
-/*
-
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={isStreaming ? (isRecording ? true : false) : true}
-                  onClick={() => {
-                    handleRecord("record", setIsRecording, setRecordBuffer);
-                  }}
-                >
-                  Start Record
-                </Button>
-              </div>
-            </Grid>
-            <Grid item>
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  disabled={isStreaming ? (isRecording ? false : true) : true}
-                  onClick={(e) => {
-                    handleStopRecord(e);
-                  }}
-                >
-                  Stop Record
-                </Button>
-              </div>
-            </Grid>
-*/
