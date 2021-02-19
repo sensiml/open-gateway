@@ -53,7 +53,6 @@ class TCPIPReader(BaseReader):
         start = time.time()
         buffer_size=0
         counter=0
-        buff = b""
         with s.get(url, headers=None, stream=True) as resp:
             for line in resp.iter_content(chunk_size=None):
 
@@ -67,9 +66,6 @@ class TCPIPReader(BaseReader):
                 buffer_size += len(line)
                 counter+=1
                 incycle = time.time()-incycle
-
-                buff = b""
-
 
 
                 #print("time",  time.time() - start, "incycle", incycle,
