@@ -73,7 +73,7 @@ class SerialReader(BaseReader):
         self.streaming = True
         while self.streaming:
 
-            data = self._read_serial_buffer(self.packet_buffer_size)
+            data = self._read_serial_buffer(self.source_buffer_size)
             self.buffer.update_buffer(data)
 
     def set_config(self, config):

@@ -85,6 +85,7 @@ def parse_current_config():
     ret["sample_rate"] = app.config["CONFIG_SAMPLE_RATE"]
     ret["column_location"] = dict()
     ret["samples_per_packet"] = app.config["CONFIG_SAMPLES_PER_PACKET"]
+    ret["source_samples_per_packet"] = app.config["SOURCE_SAMPLES_PER_PACKET"]
     ret["source"] = app.config["DATA_SOURCE"]
     ret["device_id"] = get_device_id()
     ret["streaming"] = app.config["STREAMING"]
