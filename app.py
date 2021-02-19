@@ -28,7 +28,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config["SECRET_KEY"] = "any secret string"
 app.config["CONFIG_SAMPLE_RATE"] = None
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 4000
+app.config["CONFIG_SAMPLES_PER_PACKET"] = 240
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []
@@ -41,6 +41,7 @@ app.config["MODE"] = ""
 app.config["STREAMING"] = False
 app.config["BAUD_RATE"] = 460800
 app.config["CLASS_MAP"] = None
+app.config["TEST_DEVICE"] = None
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
@@ -55,6 +56,7 @@ def cache_config(config):
         "SERIAL_PORT": app.config["SERIAL_PORT"],
         "MODE": app.config["MODE"],
         "TCPIP": app.config["TCPIP"],
+        "TEST_DEVICE": app.config["TEST_DEVICE"],
         "SOURCE_SAMPLES_PER_PACKET":app.config["SOURCE_SAMPLES_PER_PACKET"]
     }
     json.dump(tmp, open("./.config.cache", "w"))
@@ -73,7 +75,7 @@ def get_device_id():
     if app.config["DATA_SOURCE"] == "TCPIP":
         return app.config["TCPIP"]
     else:
-        return "TESTER"
+        return app.config["TEST_DEVICE"]
 
 
 def parse_current_config():

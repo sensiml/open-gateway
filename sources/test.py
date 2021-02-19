@@ -23,7 +23,7 @@ class TestReader(BaseReader):
     @property
     def byteSize(self):
         if self.config_columns:
-            return self.samples_per_packet * len(self.config_columns) * INT16_BYTE_SIZE
+            return self.source_samples_per_packet * len(self.config_columns) * INT16_BYTE_SIZE
 
         return 0
 
@@ -39,7 +39,7 @@ class TestReader(BaseReader):
                 + 1000 * math.sin(2 * math.pi * f * (float(xs * offset * 3.14) / fs))
                 for xs in x
             ]
-            for offset in range(num_columns)
+            for offset in range(1,num_columns+1)
         ]
 
     def _pack_data(self, data, byteSize, samples_per_packet, start_index):
@@ -83,9 +83,9 @@ class TestReader(BaseReader):
             }
             config["CONFIG_SAMPLE_RATE"] = 104
             config["DATA_SOURCE"] = "TEST"
-            config["SOURCE_SAMPLES_PER_PACKET"] = 32
+            config["SOURCE_SAMPLES_PER_PACKET"] = 6
 
-        if self.device_id == "Test Audio":
+        elif self.device_id == "Test Audio":
             config["CONFIG_COLUMNS"] = {
                 "Microphone": 0,
 
@@ -94,12 +94,22 @@ class TestReader(BaseReader):
             config["DATA_SOURCE"] = "TEST"
             config["SOURCE_SAMPLES_PER_PACKET"] = 240
 
+        else:
+            raise Exception("Invalid Device ID")
+
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.source_samples_per_packet = config["SOURCE_SAMPLES_PER_PACKET"]
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
 
-        print(config)
+        
+        config["CONFIG_COLUMNS"] = config.get("CONFIG_COLUMNS")
+        config["CONFIG_SAMPLE_RATE"] = config["CONFIG_SAMPLE_RATE"]
+        config["DATA_SOURCE"] = "TEST"
+        config["SOURCE_SAMPLES_PER_PACKET"] = config["SOURCE_SAMPLES_PER_PACKET"]
+        config["TEST_DEVICE"] = self.device_id
+        
+        
 
     def _read_source(self):
         index = 0
@@ -108,13 +118,15 @@ class TestReader(BaseReader):
 
         self.streaming = True
 
+        start = time.time()
         while self.streaming:
             sample_data, index = self._pack_data(
                 data, self.byteSize, self.source_samples_per_packet, index
             )
             self.buffer.update_buffer(sample_data)
 
-            time.sleep(float(self.sample_rate)/self.source_samples_per_packet)
+            time.sleep(self.source_samples_per_packet/float(self.sample_rate))            
+            print(start - time.time())
 
 
 class TestResultReader(BaseReader):
