@@ -23,7 +23,11 @@ class TestReader(BaseReader):
     @property
     def byteSize(self):
         if self.config_columns:
-            return self.source_samples_per_packet * len(self.config_columns) * INT16_BYTE_SIZE
+            return (
+                self.source_samples_per_packet
+                * len(self.config_columns)
+                * INT16_BYTE_SIZE
+            )
 
         return 0
 
@@ -39,7 +43,7 @@ class TestReader(BaseReader):
                 + 1000 * math.sin(2 * math.pi * f * (float(xs * offset * 3.14) / fs))
                 for xs in x
             ]
-            for offset in range(1,num_columns+1)
+            for offset in range(1, num_columns + 1)
         ]
 
     def _pack_data(self, data, byteSize, samples_per_packet, start_index):
@@ -64,15 +68,17 @@ class TestReader(BaseReader):
         return bytes(sample_data), end_index
 
     def list_available_devices(self):
-        return [{"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
-                {"id": 2, "name": "Test Data", "device_id": "Test Audio"}]
+        return [
+            {"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
+            {"id": 2, "name": "Test Data", "device_id": "Test Audio"},
+        ]
 
     def get_device_info(self):
         pass
 
     def set_config(self, config):
 
-        if self.device_id == "Test IMU 6-axis":        
+        if self.device_id == "Test IMU 6-axis":
             config["CONFIG_COLUMNS"] = {
                 "AccelerometerX": 0,
                 "AccelerometerY": 1,
@@ -88,7 +94,6 @@ class TestReader(BaseReader):
         elif self.device_id == "Test Audio":
             config["CONFIG_COLUMNS"] = {
                 "Microphone": 0,
-
             }
             config["CONFIG_SAMPLE_RATE"] = 16000
             config["DATA_SOURCE"] = "TEST"
@@ -102,14 +107,11 @@ class TestReader(BaseReader):
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
 
-        
         config["CONFIG_COLUMNS"] = config.get("CONFIG_COLUMNS")
         config["CONFIG_SAMPLE_RATE"] = config["CONFIG_SAMPLE_RATE"]
         config["DATA_SOURCE"] = "TEST"
         config["SOURCE_SAMPLES_PER_PACKET"] = config["SOURCE_SAMPLES_PER_PACKET"]
         config["TEST_DEVICE"] = self.device_id
-        
-        
 
     def _read_source(self):
         index = 0
@@ -121,27 +123,46 @@ class TestReader(BaseReader):
         self.streaming = True
 
         start = time.time()
-        sleep_time = self.source_samples_per_packet/float(self.sample_rate)
+
+        sleep_time = self.source_samples_per_packet / float(self.sample_rate)
+
         cycle = time.time()
+
         while self.streaming:
             incycle = time.time()
-            
             sample_data, index = self._pack_data(
                 data, self.byteSize, self.source_samples_per_packet, index
             )
+            print("pack_data", time.time() - incycle)
+            buffer_time = time.time()
             self.buffer.update_buffer(sample_data)
+            print("buffer_time", time.time() - buffer_time)
             buffer_size += self.source_samples_per_packet
             counter += 1
-            incycle = time.time() - incycle   
-            time.sleep(sleep_time)                     
-            if time.time()- start > 1:
+            incycle = time.time() - incycle
+
+            time.sleep(sleep_time)
+
+            if time.time() - start > 1:
                 start = time.time()
-                counter=0
-                buffer_size=0
-            
-            print(start-time.time(), cycle - time.time(), incycle,  sleep_time, counter, buffer_size, len(sample_data))
+                counter = 0
+                buffer_size = 0
+
+            print(
+                "total",
+                start - time.time(),
+                "cycle",
+                cycle - time.time(),
+                "incycle",
+                incycle,
+                "timer",
+                sleep_time,
+                counter,
+                buffer_size,
+                len(sample_data),
+            )
+
             cycle = time.time()
-            
 
 
 class TestResultReader(BaseReader):
