@@ -62,6 +62,7 @@ class TCPIPReader(BaseReader):
         source_config = self.read_config()
 
         self.data_width = len(source_config["column_location"])
+        self.source_samples_per_packet = source_config["samples_per_packet"]
 
         if not source_config:
             raise Exception("No configuration received from edge device.")
@@ -69,8 +70,9 @@ class TCPIPReader(BaseReader):
         config["CONFIG_COLUMNS"] = source_config["column_location"]
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "TCPIP"
+        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["TCPIP"] = self.device_id
-
+        
 
 class TCPIPResultReader(TCPIPReader):
     def set_config(self, config):

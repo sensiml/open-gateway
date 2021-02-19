@@ -21,6 +21,7 @@ class BaseReader(object):
         self.data_width = len(config.get("CONFIG_COLUMNS", []))
         self.class_map = config.get("CLASS_MAP", None)
         self.device_id = device_id
+        self.source_samples_per_packet  = config.get("SOURCE_SAMPLES_PER_PACKET")
 
         self.streaming = False
 
@@ -35,6 +36,11 @@ class BaseReader(object):
     @property
     def packet_buffer_size(self):
         return self.samples_per_packet * self.data_width * SHORT
+
+    @property
+    def source_buffer_size(self):
+        self.source_samples_per_packet * self.data_width * SHORT
+        
 
     def _validate_config(self, config):
 

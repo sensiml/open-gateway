@@ -22,13 +22,14 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-app.register_blueprint(errors)
+#app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 app.config["SECRET_KEY"] = "any secret string"
 app.config["CONFIG_SAMPLE_RATE"] = None
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 10
+app.config["CONFIG_SAMPLES_PER_PACKET"] = 4000
+app.config["SOURCE_SAMPLES_PER_PACKET"] = None
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []
 app.config["SERIAL_PORT"] = None
@@ -54,6 +55,7 @@ def cache_config(config):
         "SERIAL_PORT": app.config["SERIAL_PORT"],
         "MODE": app.config["MODE"],
         "TCPIP": app.config["TCPIP"],
+        "SOURCE_SAMPLES_PER_PACKET":app.config["SOURCE_SAMPLES_PER_PACKET"]
     }
     json.dump(tmp, open("./.config.cache", "w"))
 
@@ -299,5 +301,5 @@ if __name__ == "__main__":
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
 
-    app.run(HOST, 5555)  # , debug=True)
+    app.run(HOST, 5555 , debug=True)
 

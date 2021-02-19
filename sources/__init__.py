@@ -15,7 +15,7 @@ def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwa
 
     if source_type == "DATA_CAPTURE":
         if data_source == "TEST":
-            return TestReader(config, **kwargs)
+            return TestReader(config, device_id, **kwargs)
 
         if data_source == "SERIAL":
             return SerialReader(config, device_id, **kwargs)
@@ -34,7 +34,7 @@ def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwa
             return SerialResultReader(config, device_id, **kwargs)
 
         if data_source == "TEST":
-            return TestResultReader(config, **kwargs)
+            return TestResultReader(config, device_id, **kwargs)
 
         if data_source == "TCPIP":
             return TCPIPResultReader(config, device_id, **kwargs)

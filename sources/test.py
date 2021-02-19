@@ -64,25 +64,38 @@ class TestReader(BaseReader):
         return bytes(sample_data), end_index
 
     def list_available_devices(self):
-        return [{"id": 1, "name": "Test Data", "device_id": "Tester"}]
+        return [{"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
+                {"id": 2, "name": "Test Data", "device_id": "Test Audio"}]
 
     def get_device_info(self):
         pass
 
     def set_config(self, config):
 
-        config["CONFIG_COLUMNS"] = {
-            "AccelerometerX": 0,
-            "AccelerometerY": 1,
-            "AccelerometerZ": 2,
-            "GyroscopeX": 3,
-            "GyroscopeY": 4,
-            "GyroscopeZ": 5,
-        }
-        config["CONFIG_SAMPLE_RATE"] = 104
-        config["DATA_SOURCE"] = "TEST"
+        if self.device_id == "Test IMU 6-axis":        
+            config["CONFIG_COLUMNS"] = {
+                "AccelerometerX": 0,
+                "AccelerometerY": 1,
+                "AccelerometerZ": 2,
+                "GyroscopeX": 3,
+                "GyroscopeY": 4,
+                "GyroscopeZ": 5,
+            }
+            config["CONFIG_SAMPLE_RATE"] = 104
+            config["DATA_SOURCE"] = "TEST"
+            config["SOURCE_SAMPLES_PER_PACKET"] = 32
+
+        if self.device_id == "Test Audio":
+            config["CONFIG_COLUMNS"] = {
+                "Microphone": 0,
+
+            }
+            config["CONFIG_SAMPLE_RATE"] = 16000
+            config["DATA_SOURCE"] = "TEST"
+            config["SOURCE_SAMPLES_PER_PACKET"] = 240
 
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
+        self.source_samples_per_packet = config["SOURCE_SAMPLES_PER_PACKET"]
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
 
@@ -97,11 +110,11 @@ class TestReader(BaseReader):
 
         while self.streaming:
             sample_data, index = self._pack_data(
-                data, self.byteSize, self.samples_per_packet, index
+                data, self.byteSize, self.source_samples_per_packet, index
             )
             self.buffer.update_buffer(sample_data)
 
-            time.sleep(0.1)
+            time.sleep(float(self.sample_rate)/self.source_samples_per_packet)
 
 
 class TestResultReader(BaseReader):
