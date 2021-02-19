@@ -73,7 +73,7 @@ class SerialReader(BaseReader):
         self.streaming = True
         while self.streaming:
 
-            data = self._read_serial_buffer(self.packet_buffer_size)
+            data = self._read_serial_buffer(self.source_buffer_size)
             self.buffer.update_buffer(data)
 
     def set_config(self, config):
@@ -84,7 +84,8 @@ class SerialReader(BaseReader):
 
         if not source_config:
             raise Exception("No configuration received from edge device.")
-
+        self.source_samples_per_packet = source_config["samples_per_packet"]
+        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["CONFIG_COLUMNS"] = source_config["column_location"]
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "SERIAL"

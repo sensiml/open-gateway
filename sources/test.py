@@ -23,7 +23,11 @@ class TestReader(BaseReader):
     @property
     def byteSize(self):
         if self.config_columns:
-            return self.samples_per_packet * len(self.config_columns) * INT16_BYTE_SIZE
+            return (
+                self.source_samples_per_packet
+                * len(self.config_columns)
+                * INT16_BYTE_SIZE
+            )
 
         return 0
 
@@ -33,75 +37,143 @@ class TestReader(BaseReader):
 
         x = list(range(0, fs))  # the points on the x axis for plotting
 
-        return [
+        data =  [
             [
                 1000 * offset
                 + 1000 * math.sin(2 * math.pi * f * (float(xs * offset * 3.14) / fs))
                 for xs in x
             ]
-            for offset in range(num_columns)
+            for offset in range(1, num_columns + 1)
         ]
 
-    def _pack_data(self, data, byteSize, samples_per_packet, start_index):
-        sample_data = bytearray(byteSize)
-        num_cols = len(data)
-        data_len = len(data[0])
-        end_index = start_index + samples_per_packet
-        if end_index > data_len:
-            end_index -= data_len
-
-        for x in range(0, samples_per_packet):
-            if x + start_index >= data_len:
-                start_index = 0
-            for y in range(0, num_cols):
+        sample_data = bytearray(num_columns*len(x)*2)
+        for index in x:
+            for y in range(0, num_columns):
                 struct.pack_into(
                     "<h",
                     sample_data,
-                    (y + (x * num_cols)) * 2,
-                    random.randint(-50, 50) + int(data[y][x + start_index]),
+                    (y + (index * num_columns)) * 2,
+                    int(data[y][index]),
                 )
 
-        return bytes(sample_data), end_index
+        return bytes(sample_data), len(x)
+
+    def _pack_data(self, data, data_len, num_columns, samples_per_packet, start_index):
+
+        start = start_index*2*num_columns
+
+        if samples_per_packet + start_index > data_len:
+            end_index = data_len - (start_index+samples_per_packet)
+            end = end_index*2*num_columns
+
+            return data[start:]+data[:end], end_index
+
+        else:
+            end_index = start_index+samples_per_packet
+            end  = end_index*2*num_columns
+            return data[start:end], end_index
+
 
     def list_available_devices(self):
-        return [{"id": 1, "name": "Test Data", "device_id": "Tester"}]
+        return [
+            {"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
+            {"id": 2, "name": "Test Data", "device_id": "Test Audio"},
+        ]
 
     def get_device_info(self):
         pass
 
     def set_config(self, config):
 
-        config["CONFIG_COLUMNS"] = {
-            "AccelerometerX": 0,
-            "AccelerometerY": 1,
-            "AccelerometerZ": 2,
-            "GyroscopeX": 3,
-            "GyroscopeY": 4,
-            "GyroscopeZ": 5,
-        }
-        config["CONFIG_SAMPLE_RATE"] = 104
-        config["DATA_SOURCE"] = "TEST"
+        if self.device_id == "Test IMU 6-axis":
+            config["CONFIG_COLUMNS"] = {
+                "AccelerometerX": 0,
+                "AccelerometerY": 1,
+                "AccelerometerZ": 2,
+                "GyroscopeX": 3,
+                "GyroscopeY": 4,
+                "GyroscopeZ": 5,
+            }
+            config["CONFIG_SAMPLE_RATE"] = 104
+            config["DATA_SOURCE"] = "TEST"
+            config["SOURCE_SAMPLES_PER_PACKET"] = 6
+
+        elif self.device_id == "Test Audio":
+            config["CONFIG_COLUMNS"] = {
+                "Microphone": 0,
+            }
+            config["CONFIG_SAMPLE_RATE"] = 16000
+            config["DATA_SOURCE"] = "TEST"
+            config["SOURCE_SAMPLES_PER_PACKET"] = 480
+
+        else:
+            raise Exception("Invalid Device ID")
 
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
+        self.source_samples_per_packet = config["SOURCE_SAMPLES_PER_PACKET"]
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
 
-        print(config)
+        config["CONFIG_COLUMNS"] = config.get("CONFIG_COLUMNS")
+        config["CONFIG_SAMPLE_RATE"] = config["CONFIG_SAMPLE_RATE"]
+        config["DATA_SOURCE"] = "TEST"
+        config["SOURCE_SAMPLES_PER_PACKET"] = config["SOURCE_SAMPLES_PER_PACKET"]
+        config["TEST_DEVICE"] = self.device_id
 
     def _read_source(self):
         index = 0
+        counter = 0
+        buffer_size = 0
 
-        data = self._generate_samples(len(self.config_columns), self.sample_rate)
+        data, data_len = self._generate_samples(len(self.config_columns), self.sample_rate)
 
         self.streaming = True
 
-        while self.streaming:
-            sample_data, index = self._pack_data(
-                data, self.byteSize, self.samples_per_packet, index
-            )
-            self.buffer.update_buffer(sample_data)
+        start = time.time()
 
-            time.sleep(0.1)
+        sleep_time = self.source_samples_per_packet / float(self.sample_rate)
+
+        cycle = time.time()
+
+        while self.streaming:
+            incycle = time.time()
+            sample_data, index = self._pack_data(data, data_len, len(self.config_columns), self.source_samples_per_packet, index)
+            pack_time = time.time() - incycle
+            buffer_time = time.time()
+            self.buffer.update_buffer(sample_data)
+            buffer_time =  time.time() - buffer_time
+            buffer_size += self.source_samples_per_packet
+            counter += 1
+            incycle = time.time() - incycle
+
+            time.sleep(sleep_time-incycle)
+
+            if time.time() - start > 1:
+                start = time.time()
+                counter = 0
+                buffer_size = 0
+
+            """
+            print(
+                "total",
+                start - time.time(),
+                "cycle",
+                cycle - time.time(),
+                "incycle",
+                incycle,
+                "buffer",
+                buffer_time,
+                'pack',
+                pack_time,
+                "timer",
+                sleep_time,
+                counter,
+                buffer_size,
+                len(sample_data),
+            )
+            """
+
+            cycle = time.time()
 
 
 class TestResultReader(BaseReader):

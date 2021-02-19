@@ -125,6 +125,7 @@ class BLEReader(BaseReader):
 
         print(source_config)
 
+
         return self._validate_config(
             json.loads(source_config.decode("ascii").rstrip("\x00"))
         )
@@ -155,12 +156,14 @@ class BLEReader(BaseReader):
         print("BLE SET CONFIG")
 
         source_config = self.read_config()
+        self.source_samples_per_packet = source_config["samples_per_packet"]
 
         if not source_config:
             raise Exception("Invalid Source Configuration")
 
         self.data_width = len(source_config["column_location"])
 
+        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["CONFIG_COLUMNS"] = source_config["column_location"]
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "BLE"

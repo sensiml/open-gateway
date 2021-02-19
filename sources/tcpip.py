@@ -49,19 +49,41 @@ class TCPIPReader(BaseReader):
 
         self.streaming = True
 
+
+        start = time.time()
+        buffer_size=0
+        counter=0
         with s.get(url, headers=None, stream=True) as resp:
-            for line in resp.iter_content():
+            for line in resp.iter_content(chunk_size=None):
+
+                incycle = time.time()
 
                 if not self.streaming:
                     return
 
                 self.buffer.update_buffer(line)
 
+                buffer_size += len(line)
+                counter+=1
+                incycle = time.time()-incycle
+
+
+                #print("time",  time.time() - start, "incycle", incycle,
+                #    'counter',counter,'buffer_size', buffer_size)
+
+                if time.time() - start > 1:
+                    start = time.time()
+                    counter = 0
+                    buffer_size = 0
+
+
+
     def set_config(self, config):
 
         source_config = self.read_config()
 
         self.data_width = len(source_config["column_location"])
+        self.source_samples_per_packet = source_config["samples_per_packet"]
 
         if not source_config:
             raise Exception("No configuration received from edge device.")
@@ -69,6 +91,7 @@ class TCPIPReader(BaseReader):
         config["CONFIG_COLUMNS"] = source_config["column_location"]
         config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
         config["DATA_SOURCE"] = "TCPIP"
+        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["TCPIP"] = self.device_id
 
 
