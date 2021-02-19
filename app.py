@@ -28,7 +28,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config["SECRET_KEY"] = "any secret string"
 app.config["CONFIG_SAMPLE_RATE"] = None
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 480
+app.config["CONFIG_SAMPLES_PER_PACKET"] = 32
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []

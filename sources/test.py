@@ -153,6 +153,7 @@ class TestReader(BaseReader):
                 counter = 0
                 buffer_size = 0
 
+            """
             print(
                 "total",
                 start - time.time(),
@@ -161,15 +162,16 @@ class TestReader(BaseReader):
                 "incycle",
                 incycle,
                 "buffer",
-                buffer,
+                buffer_time,
                 'pack',
-                pack_time
+                pack_time,
                 "timer",
                 sleep_time,
                 counter,
                 buffer_size,
                 len(sample_data),
             )
+            "'"
 
             cycle = time.time()
 
