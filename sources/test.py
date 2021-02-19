@@ -92,7 +92,7 @@ class TestReader(BaseReader):
             }
             config["CONFIG_SAMPLE_RATE"] = 16000
             config["DATA_SOURCE"] = "TEST"
-            config["SOURCE_SAMPLES_PER_PACKET"] = 240
+            config["SOURCE_SAMPLES_PER_PACKET"] = 480
 
         else:
             raise Exception("Invalid Device ID")
@@ -113,20 +113,35 @@ class TestReader(BaseReader):
 
     def _read_source(self):
         index = 0
+        counter = 0
+        buffer_size = 0
 
         data = self._generate_samples(len(self.config_columns), self.sample_rate)
 
         self.streaming = True
 
         start = time.time()
+        sleep_time = self.source_samples_per_packet/float(self.sample_rate)
+        cycle = time.time()
         while self.streaming:
+            incycle = time.time()
+            
             sample_data, index = self._pack_data(
                 data, self.byteSize, self.source_samples_per_packet, index
             )
             self.buffer.update_buffer(sample_data)
-
-            time.sleep(self.source_samples_per_packet/float(self.sample_rate))            
-            print(start - time.time())
+            buffer_size += self.source_samples_per_packet
+            counter += 1
+            incycle = time.time() - incycle   
+            time.sleep(sleep_time)                     
+            if time.time()- start > 1:
+                start = time.time()
+                counter=0
+                buffer_size=0
+            
+            print(start-time.time(), cycle - time.time(), incycle,  sleep_time, counter, buffer_size, len(sample_data))
+            cycle = time.time()
+            
 
 
 class TestResultReader(BaseReader):
