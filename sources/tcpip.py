@@ -72,8 +72,8 @@ class TCPIPReader(BaseReader):
 
 
 
-                print("time",  time.time() - start, "incycle", incycle,
-                    'counter',counter,'buffer_size', buffer_size)
+                #print("time",  time.time() - start, "incycle", incycle,
+                #    'counter',counter,'buffer_size', buffer_size)
 
                 if time.time() - start > 1:
                     start = time.time()
