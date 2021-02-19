@@ -2,7 +2,7 @@ import copy
 
 
 class CircularBufferQueue(object):
-    def __init__(self, lock, num_buffers=128, buffer_size=128):
+    def __init__(self, lock, num_buffers=256, buffer_size=128):
         self._lock = lock
         self._data = [self.get_empty() for _ in range(num_buffers)]
         self._index = 0

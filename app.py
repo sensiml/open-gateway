@@ -22,12 +22,12 @@ from flask_cors import CORS
 from errors import errors
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-#app.register_blueprint(errors)
+app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 400
+app.config["CONFIG_SAMPLES_PER_PACKET"] = 32
 app.config["SECRET_KEY"] = "any secret string"
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
