@@ -49,13 +49,38 @@ class TCPIPReader(BaseReader):
 
         self.streaming = True
 
+
+        start = time.time()
+        buffer_size=0
+        counter=0
+        buff = b""
         with s.get(url, headers=None, stream=True) as resp:
-            for line in resp.iter_content():
+            for line in resp.iter_content(chunk_size=None):
+
+                incycle = time.time()
 
                 if not self.streaming:
                     return
 
                 self.buffer.update_buffer(line)
+
+                buffer_size += len(line)
+                counter+=1
+                incycle = time.time()-incycle
+
+                buff = b""
+
+
+
+                print("time",  time.time() - start, "incycle", incycle,
+                    'counter',counter,'buffer_size', buffer_size)
+
+                if time.time() - start > 1:
+                    start = time.time()
+                    counter = 0
+                    buffer_size = 0
+
+
 
     def set_config(self, config):
 
@@ -72,7 +97,7 @@ class TCPIPReader(BaseReader):
         config["DATA_SOURCE"] = "TCPIP"
         config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["TCPIP"] = self.device_id
-        
+
 
 class TCPIPResultReader(TCPIPReader):
     def set_config(self, config):

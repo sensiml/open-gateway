@@ -40,7 +40,7 @@ class BaseReader(object):
     @property
     def source_buffer_size(self):
         self.source_samples_per_packet * self.data_width * SHORT
-        
+
 
     def _validate_config(self, config):
 
@@ -128,7 +128,8 @@ class BaseReader(object):
                 if data:
                     yield data
 
-            time.sleep(0.1)
+            else:
+                time.sleep(0.001)
 
         print("stream ended")
 

@@ -171,7 +171,7 @@ class TestReader(BaseReader):
                 buffer_size,
                 len(sample_data),
             )
-            "'"
+            """
 
             cycle = time.time()
 
