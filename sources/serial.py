@@ -37,7 +37,7 @@ class SerialReader(BaseReader):
             return None
 
     def _read_serial_buffer(self, buffer_size):
-        with serial.Serial(self.port, self.baud_rate, timeout=4) as ser:
+        with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
             return ser.read(buffer_size)
 
     def _flush_buffer(self):
@@ -45,6 +45,9 @@ class SerialReader(BaseReader):
             return ser.reset_input_buffer()
 
     def read_config(self):
+
+        return {"sample_rate":16000, "samples_per_packet":240, "column_location":{"Microphone":0}}
+
         config = json.loads(self._read_line())
         if self._validate_config(config):
             return config
@@ -68,13 +71,37 @@ class SerialReader(BaseReader):
 
     def _read_source(self):
 
-        self._flush_buffer()
 
-        self.streaming = True
-        while self.streaming:
+        with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
 
-            data = self._read_serial_buffer(self.source_buffer_size)
-            self.buffer.update_buffer(data)
+            self.streaming = True
+            ser.reset_input_buffer()
+
+            """
+            start = time.time()
+            buffer_size=0
+            counter=0
+            """
+
+            while self.streaming:
+                #incycle = time.time()
+                data = ser.read(self.source_buffer_size)
+                #print('time to read buffer: ', time.time()-incycle)
+                self.buffer.update_buffer(data)
+                """
+                incycle = time.time()-incycle
+                
+                buffer_size+=len(data)
+                counter+=1
+
+                if time.time() - start > 1:
+                    start = time.time()
+                    counter = 0
+                    buffer_size = 0
+
+                print("time",  time.time() - start, "incycle", incycle,
+                    'counter',counter,'buffer_size', buffer_size, 'source_buffer', self.source_buffer_size)
+                """
 
     def set_config(self, config):
 
