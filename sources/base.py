@@ -39,7 +39,7 @@ class BaseReader(object):
 
     @property
     def source_buffer_size(self):
-        self.source_samples_per_packet * self.data_width * SHORT
+        return self.source_samples_per_packet * self.data_width * SHORT
 
 
     def _validate_config(self, config):
