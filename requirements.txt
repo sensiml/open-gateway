@@ -3,4 +3,7 @@ flask-wtf
 wtforms
 flask-cors
 pyserial>=2.6
+opencv-python
+mss
+numpy
 bluepy

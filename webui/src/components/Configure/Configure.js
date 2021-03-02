@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import axios from "axios";
 import { Grid } from "@material-ui/core";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormLabel from "@material-ui/core/FormLabel";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import { DataGrid } from "@material-ui/data-grid";
-import HorizontalLabelPositionBelowStepper from "./Stepper";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import FormLabel from "@material-ui/core/FormLabel";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import { DataGrid } from "@material-ui/data-grid";
+import axios from "axios";
+import React from "react";
+import HorizontalLabelPositionBelowStepper from "./Stepper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,26 +24,26 @@ const useStyles = makeStyles((theme) => ({
 const Configure = (props) => {
   const classes = useStyles();
   const [source, setSource] = React.useState(props.streamingSource);
-  const [modeUrl, setModeUrl] = React.useState(
-    props.streamingMode === "results" ? "config-results" : "config"
+  const [mode, setMode] = React.useState(
+    props.streamingMode === "recognition" ? "RECOGNITION" : "DATA_CAPTURE"
   );
   const [deviceID, setDeviceID] = React.useState(props.deviceID);
   const [error, setError] = React.useState(false);
   const [scanHelperText, setScanHelperText] = React.useState("");
   const [helperText, setHelperText] = React.useState("");
   const [deviceRows, setDeviceRows] = React.useState([]);
-  const [deviceColumns, setDeviceColumns] = React.useState([
+  let deviceColumns = [
     { field: "id", headerName: "ID", width: 0 },
     { field: "device_id", headerName: "Device ID", width: 240 },
     { field: "name", headerName: "Name", width: 240 },
-  ]);
+  ];
 
   const handleRadioChange = (event) => {
     setSource(event.target.value);
   };
 
   const handleModeChange = (event) => {
-    setModeUrl(event.target.value);
+    setMode(event.target.value);
   };
 
   const handleDeviceIDChange = (event) => {
@@ -66,9 +66,10 @@ const Configure = (props) => {
     console.log(source);
     console.log(deviceID);
     axios
-      .post(`${process.env.REACT_APP_API_URL}` + modeUrl, {
+      .post(`${process.env.REACT_APP_API_URL}config`, {
         device_id: deviceID,
         source: source.toLowerCase(),
+        mode: mode,
       })
       .then((response) => {
         console.log(response.data);
@@ -128,9 +129,9 @@ const Configure = (props) => {
   return (
     <Card>
       <CardContent>
-        <Grid xs={12} container rows spacing={6}>
+        <Grid container rows spacing={6}>
           <HorizontalLabelPositionBelowStepper />
-          <Grid item columns xs={6} alignItems="center">
+          <Grid item columns xs={6} container alignItems="center">
             <Card>
               <CardContent>
                 <form onSubmit={handleDeviceScan}>
@@ -193,7 +194,7 @@ const Configure = (props) => {
                           color="secondary"
                           fullWidth={true}
                         >
-                          Scan
+                          Scan For Devices
                         </Button>
                       </Grid>
 
@@ -214,7 +215,7 @@ const Configure = (props) => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item columns xs={6} alignItems="center">
+          <Grid item columns xs={6} container>
             <Card>
               <CardContent>
                 <form onSubmit={handleSubmit}>
@@ -233,17 +234,17 @@ const Configure = (props) => {
                             <RadioGroup
                               aria-label="mode"
                               name="Streaming Source"
-                              value={modeUrl}
+                              value={mode}
                               onChange={handleModeChange}
                               row
                             >
                               <FormControlLabel
-                                value="config"
+                                value="DATA_CAPTURE"
                                 control={<Radio />}
-                                label="Data Collection"
+                                label="Data Capture"
                               />
                               <FormControlLabel
-                                value="config-results"
+                                value="RECOGNITION"
                                 control={<Radio />}
                                 label="Recognition"
                               />

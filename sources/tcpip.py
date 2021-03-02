@@ -6,7 +6,7 @@ import random
 import requests
 import threading
 import copy
-from sources.base import BaseReader
+from sources.base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 
 WIFI_PORT = ":80"
 
@@ -35,71 +35,48 @@ class TCPIPReader(BaseReader):
     def port(self):
         return self._port
 
-    def read_config(self):
+    def read_device_config(self):
 
         r = requests.get("{}/config".format(self.address))
 
         return self._validate_config(r.json())
 
+
+class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
     def _read_source(self):
 
-        url = "{}/{}".format(self.address, "stream")
+        try:
+            url = "{}/{}".format(self.address, "stream")
 
-        s = requests.Session()
+            s = requests.Session()
 
-        self.streaming = True
+            self.streaming = True
 
+            with s.get(url, headers=None, stream=True) as resp:
+                for line in resp.iter_content(chunk_size=None):
 
-        start = time.time()
-        buffer_size=0
-        counter=0
-        with s.get(url, headers=None, stream=True) as resp:
-            for line in resp.iter_content(chunk_size=None):
+                    if not self.streaming:
+                        return
 
-                incycle = time.time()
+                    self.buffer.update_buffer(line)
 
-                if not self.streaming:
-                    return
+        except Exception as e:
+            print(e)
+            self.disconnect()
+            raise e
 
-                self.buffer.update_buffer(line)
-
-                buffer_size += len(line)
-                counter+=1
-                incycle = time.time()-incycle
-
-
-                #print("time",  time.time() - start, "incycle", incycle,
-                #    'counter',counter,'buffer_size', buffer_size)
-
-                if time.time() - start > 1:
-                    start = time.time()
-                    counter = 0
-                    buffer_size = 0
-
-
-
-    def set_config(self, config):
-
-        source_config = self.read_config()
-
-        self.data_width = len(source_config["column_location"])
-        self.source_samples_per_packet = source_config["samples_per_packet"]
-
-        if not source_config:
-            raise Exception("No configuration received from edge device.")
-
-        config["CONFIG_COLUMNS"] = source_config["column_location"]
-        config["CONFIG_SAMPLE_RATE"] = source_config["sample_rate"]
+    def set_app_config(self, config):
         config["DATA_SOURCE"] = "TCPIP"
+        config["CONFIG_COLUMNS"] = self.config_columns
+        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
         config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["TCPIP"] = self.device_id
+        config["DEVICE_ID"] = self.device_id
 
 
-class TCPIPResultReader(TCPIPReader):
-    def set_config(self, config):
+class TCPIPResultReader(TCPIPReader, BaseResultReaderMixin):
+    def set_app_config(self, config):
         config["DATA_SOURCE"] = "TCPIP"
-        config["TCPIP"] = self.device_id
-        print("config set")
+        config["DEVICE_ID"] = self.device_id
 
     def _read_source(self):
 

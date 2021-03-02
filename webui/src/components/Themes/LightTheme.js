@@ -1,10 +1,6 @@
 import React from "react";
-import { lightBlue, deepOrange, red, blueGrey } from "@material-ui/core/colors";
-import {
-  useTheme,
-  createMuiTheme,
-  MuiThemeProvider,
-} from "@material-ui/core/styles";
+import { blueGrey, deepOrange, lightBlue, red } from "@material-ui/core/colors";
+import { createMuiTheme, MuiThemeProvider, useTheme, } from "@material-ui/core/styles";
 
 const LightTheme = (props) => {
   const theme = useTheme();
@@ -28,6 +24,12 @@ const LightTheme = (props) => {
         main: lightBlue[700],
         dark: lightBlue[800],
         contrastText: theme.palette.getContrastText(lightBlue[600]),
+      },
+      secondaryRed: {
+        light: red[600],
+        main: red[700],
+        dark: red[800],
+        contrastText: theme.palette.getContrastText(red[600]),
       },
       notSelected: {
         light: blueGrey[500],

@@ -15,7 +15,7 @@ const useStyles = () =>
     content: {
       flexGrow: 1,
       width: "100%",
-      padding: theme.spacing(5, 40),
+      padding: theme.spacing(5, 5, 5, 35),
       justifyContent: "flex-end",
     },
   }))();

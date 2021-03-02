@@ -1,19 +1,18 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { Grid } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 import Drawer from "@material-ui/core/Drawer";
-import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import { makeStyles } from "@material-ui/core/styles";
+import Toolbar from "@material-ui/core/Toolbar";
+import AssessmentIcon from "@material-ui/icons/Assessment";
+import InfoIcon from "@material-ui/icons/Info";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import SettingsIcon from "@material-ui/icons/Settings";
-import InfoIcon from "@material-ui/icons/Info";
-import AssessmentIcon from "@material-ui/icons/Assessment";
-import AssignmentIcon from "@material-ui/icons/Assignment";
-import { Grid } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-
+import React from "react";
+import Divider from "@material-ui/core/Divider";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -37,16 +36,22 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+
+  section1: {
+    margin: theme.spacing(2, 1),
+  },
 }));
 
-const IconSelector = (props) => {
+const InconSelector = (props) => {
   switch (props.index) {
     case 0:
       return <InfoIcon />;
     case 1:
       return <AssessmentIcon />;
-    case 2:
+    case 3:
       return <SettingsIcon />;
+    case 4:
+      return <InboxIcon />;
     default:
       return <InboxIcon />;
   }
@@ -56,14 +61,14 @@ const Connected = (props) => {
   return (
     <Grid>
       {props.isConnected ? (
-        <Button color="green" variant="contained" aria-label="disconnect">
-          Connected
+        <Button color="primary" variant="contained" aria-label="connected">
+          {props.text}: Connected
         </Button>
       ) : (
-          <Button color="red" variant="contained" aria-label="disconnect">
-            Disconnected
-          </Button>
-        )}
+        <Button variant="contained" aria-label="disconnect" disabled={true}>
+          {props.text}: Disconnected
+        </Button>
+      )}
     </Grid>
   );
 };
@@ -86,18 +91,28 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Device Info", "Test Stream", "Configure Gateway"].map(
-            (text, index) => (
-              <ListItem button key={text} onClick={handleMenu(index)}>
-                <ListItemIcon>
-                  <IconSelector index={index}> </IconSelector>
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            )
-          )}
+          {["Gateway Status", "Test Mode", "Configure"].map((text, index) => (
+            <ListItem button key={text} onClick={handleMenu(index)}>
+              <ListItemIcon>
+                <InconSelector index={index}> </InconSelector>
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItem>
+          ))}
+          <div className={classes.section1}>
+            <Divider></Divider>
+          </div>
           <ListItem>
-            <Connected isConnected={props.isConnected}></Connected>
+            <Connected
+              text="Device"
+              isConnected={props.isConnected}
+            ></Connected>
+          </ListItem>
+          <ListItem>
+            <Connected
+              text="Video"
+              isConnected={props.isCameraConnected}
+            ></Connected>
           </ListItem>
         </List>
       </div>
