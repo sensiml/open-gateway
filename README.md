@@ -1,4 +1,4 @@
-**NOTE** This is currently in alpha, we expect stable operation for streaming for BLE, TCPIP, and Serial. However, you may run into issues with the errors not being propogated to the UI. If you see issues please open a ticket. Additionally, some the API's may still change in the future.
+**NOTE** This is currently in alpha, we expect stable operation for streaming for BLE, TCPIP, and Serial. However, you may run into issues with the errors not being propagated to the UI. If you see issues please open a ticket. Additionally, some of the APIs may still change in the future.
 
 # SensiML Simple Streaming Gateway
 
