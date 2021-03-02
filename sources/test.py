@@ -85,7 +85,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
         config["DATA_SOURCE"] = "TEST"
         config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.samples_per_packet
+        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
         config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["DEVICE_ID"] = self.device_id
 
@@ -99,7 +99,11 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
         self.streaming = True
 
+        sleep_time = self.source_samples_per_packet / float(self.sample_rate)
+        print("sleep time", sleep_time)
         while self.streaming:
+            incycle = time.time()
+
             try:
                 sample_data, index = self._pack_data(
                     data,
@@ -115,6 +119,11 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                 self.disconnect()
                 raise e
 
+
+            incycle = time.time() - incycle
+            print(sleep_time-incycle)
+
+            time.sleep(sleep_time-incycle)
 
 class TestResultReader(BaseReader, BaseResultReaderMixin):
     def set_app_config(self, config):
