@@ -1,26 +1,34 @@
 **NOTE** This is currently in alpha, we expect stable operation for streaming for BLE, TCPIP, and Serial. However, you may run into issues with the errors not being propagated to the UI. If you see issues please open a ticket. Additionally, some of the APIs may still change in the future.
 
-# SensiML Simple Streaming Gateway
+# SensiML Streaming Gateway
 
-This SensiML Streaming Gateway implements the Simple Streaming Service Wi-Fi protocol to enable forwarding data to the SensiML Data Capture Lab. The Simple Streaming Gateway supports connecting to sensors sources over a Serial, BLE, and TCP/IP connections. It also supports recording video and sensor data locally to the gateway.
+This SensiML Streaming Gateway implements the [Simple Streaming Service protocol](https://sensiml.com/documentation/simple-streaming-specification/introduction.html) to enable forwarding data to the SensiML Data Capture Lab for recording and annotation. The Gateway supports connecting to sensors sources over a Serial, BLE, and TCP/IP connections. It also supports recording video and sensor data locally to the gateway.
 
 ## Usage
 
-The Gateway must first be configured to record data from your target sensor. It does that by fetching a configuration json from the device. You can scan for devices connected over Serial and BLE. The gateway does not support scanning for TCP/IP devices, these addresses must be entered manually into the device id field.
+The Gateway must first be configured to record data from your target sensor. It does that by fetching a configuration json from the source device. You can scan for devices connected over Serial and BLE. The gateway does not support scanning for TCP/IP devices, these addresses must be entered manually into the device id field as <address:port>.
 
 ![Configure Gateway](img/configure.png)
 
-After fetching the configuration your gateway is ready to stream out data. You can then use the SensiML Data Capture lab to connect and record live sensor data.
+After fetching the configuration your gateway will connect to the device. When connected you will see a Device: Connected status on the left navigation bar. When connected, the Gateway is able to forward sensor data from the source device to the SensiML Data Capture Lab which is used to record and annotate sensor data.
 
-You can also use the Gateway to view the live sensor data streams
+## Data Capture and Recognition Mode
+
+The Gateway currently must be configured for either Data Capture or Recognition. Data Capture is for capturing raw sensor data, Recognition is for viewing classification results from machine learning models.
+
+### Data Capture
 
 ![View Sensor Data](img/stream.png)
 
-As well as the results stream
+### Recognition
+
+As well as the recognition results stream whcih shows the classification and model ID.
 
 ![View Results](img/results.png)
 
-In the status screen you can start and stop a video source. If you start the video source, it will be stored when you record sensor data to the gateway.
+### Recording Video
+
+In the Gateway Status screen you can start and stop a video source. If you start the video source, it will be recorded along with sensor data when you click the Record Button in the Record to Gateway Widget in Test Mode. You can then download the file to your local machine by hitting the Download Button.
 
 ![Configure Gateway](img/status.png)
 

@@ -119,11 +119,11 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                 self.disconnect()
                 raise e
 
-
             incycle = time.time() - incycle
-            print(sleep_time-incycle)
+            print(sleep_time - incycle)
 
-            time.sleep(sleep_time-incycle)
+            time.sleep(sleep_time - incycle)
+
 
 class TestResultReader(BaseReader, BaseResultReaderMixin):
     def set_app_config(self, config):

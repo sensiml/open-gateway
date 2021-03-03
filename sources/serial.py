@@ -32,9 +32,10 @@ class SerialReader(BaseReader):
     def _read_line(self):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
             value = ser.readline()
-            if value:
+            try:
                 return value.decode("ascii")
-            return None
+            except:
+                return None
 
     def _read_serial_buffer(self, buffer_size):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
