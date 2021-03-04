@@ -213,8 +213,9 @@ class BaseStreamReaderMixin(object):
 
         with open(filename + ".csv", "w", newline="") as csvfile:
             datawriter = csv.writer(csvfile, delimiter=",")
+            print("Starting to Record .csv")
 
-            datawriter.writerow(self.config_columns)
+            datawriter.writerow([x[0] for x in sorted(self.config_columns.items(), key=lambda item: item[1])])
             struct_info = "h" * self.data_width
 
             data_reader = self.read_data()
@@ -233,7 +234,7 @@ class BaseStreamReaderMixin(object):
                             )
                         )
 
-        print("recording thread finished")
+        print("CSV recording thread finished")
 
 
 class BaseResultReaderMixin(object):

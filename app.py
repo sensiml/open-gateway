@@ -540,17 +540,16 @@ def download_filename(filename):
 
 def get_file_dcli(filename):
 
-    video_path = os.path.join("./video", os.path.basename(filename)[:-4] + ".mp4")
-    file_path = os.path.join("./data", filename)
+    video_path = '\\'.join(["video", os.path.basename(filename)[:-4] + ".mp4"])
+    file_path = '\\'.join(["data", filename])
 
-    return [
-        {
+    return      {
             "file_name": file_path,
             "metadata": [],
             "sessions": [],
             "videos": [{"path": video_path}],
         }
-    ]
+    
 
 
 @app.route("/download", methods=["GET", "POST"])
