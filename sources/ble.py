@@ -189,6 +189,12 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
             self.peripheral = btle.Peripheral(self.device_id)
             self.peripheral.setDelegate(self.delegate)
 
+
+
+    def read_device_config(self):
+
+        return {"samples_per_packet":1}
+
     def set_app_config(self, config):
         config["DATA_SOURCE"] = "BLE"
         config["DEVICE_ID"] = self.device_id
@@ -220,6 +226,7 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
                 continue
             if self.delegate.data is not None:
                 if len(self.delegate.data) > 4:
+                    print("ERROR HERE FOR SOME REASON")
                     raise Exception(
                         "Length of Delegeate data larger than a signle packet {}".format(
                             len(self.delegate.data)
@@ -228,6 +235,7 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
 
                 tmp = struct.unpack("h" * 2, self.delegate.data)
                 self.delegate.data = None
+                print("recieved classification", tmp)
                 self.rbuffer.update_buffer(
                     [json.dumps({"ModelNumber": tmp[0], "Classification": tmp[1]})]
                 )
@@ -239,6 +247,7 @@ if __name__ == "__main__":
         "DATA_SOURCE": "BLE",
         "CONFIG_SAMPLE_RATE": 119,
         "CONFIG_SAMPLES_PER_PACKET": 10,
+        "SOURCE_SAMPLES_PER_PACKET": 1,
         "DEVICE_ID": "dd:6c:dc:c1:99:fb",
         "CONFIG_COLUMNS": {
             "GyroscopeZ": 5,
@@ -254,6 +263,7 @@ if __name__ == "__main__":
 
     device_id = "dd:6c:dc:c1:99:fb"
     device_id = "e0:17:52:fd:15:ab"
+
     """
     ble = BLEReader(config, device_id=device_id)
     ble.set_app_config(config)
@@ -261,6 +271,7 @@ if __name__ == "__main__":
 
     ble._read_source()
     """
+
     config["CONFIG_SAMPLES_PER_PACKET"] = 1
 
     ble = BLEResultReader(config, device_id=device_id)
