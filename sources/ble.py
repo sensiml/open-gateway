@@ -8,7 +8,7 @@ import copy
 try:
     from sources.base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 except:
-    from base import BaseReader, BaseResultReaderMixin
+    from base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 import time
 
 uuidOfConfigChar = "16480001-0525-4ad5-b4fb-6dd83f49546b"
@@ -248,9 +248,12 @@ if __name__ == "__main__":
             "AccelerometerZ": 2,
             "GyroscopeY": 4,
         },
+        "CLASS_MAP":{}
+
     }
 
     device_id = "dd:6c:dc:c1:99:fb"
+    device_id = "e0:17:52:fd:15:ab"
     """
     ble = BLEReader(config, device_id=device_id)
     ble.set_app_config(config)
@@ -261,7 +264,6 @@ if __name__ == "__main__":
     config["CONFIG_SAMPLES_PER_PACKET"] = 1
 
     ble = BLEResultReader(config, device_id=device_id)
-    ble.set_app_config(config)
-    ble._send_subscribe()
-
-    ble._read_source()
+    ble.update_config(config)
+    ble.connect()
+    ble.read_data()
