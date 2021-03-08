@@ -33,7 +33,7 @@ app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 4
+app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
 app.config["SECRET_KEY"] = "any secret string"
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
@@ -43,7 +43,8 @@ app.config["DEVICE_ID"] = None
 app.config["DEVICE_SOURCE"] = None
 app.config["MODE"] = ""
 app.config["BAUD_RATE"] = 460800
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
+app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown",
+        1:"Cross",2:"Hook",3:"Jab",4:"Overhand",5:"Unknown",6:"Uppercut"}
 app.config["VIDEO_SOURCE"] = None
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
@@ -549,7 +550,7 @@ def get_file_dcli(filename):
             "sessions": [],
             "videos": [{"path": video_path}],
         }
-    
+
 
 
 @app.route("/download", methods=["GET", "POST"])

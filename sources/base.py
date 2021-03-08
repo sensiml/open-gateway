@@ -17,9 +17,10 @@ SHORT = 2
 class BaseReader(object):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
-    def __init__(self, config, device_id=None, **kwargs):
+    def __init__(self, config, device_id=None, name=None, **kwargs):
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.class_map = config["CLASS_MAP"]
+        self.name = name
         self.source_samples_per_packet = None
         self.sample_rate = None
         self.config_columns = None
@@ -45,6 +46,8 @@ class BaseReader(object):
 
     @property
     def source_buffer_size(self):
+        if self.source_samples_per_packet is None:
+            return 2
         return self.source_samples_per_packet * self.data_width * SHORT
 
     @staticmethod
@@ -238,7 +241,9 @@ class BaseStreamReaderMixin(object):
 
 
 class BaseResultReaderMixin(object):
+
     def read_device_config(self):
+        print("here")
         return {"samples_per_packet": 1}
 
     def _map_classification(self, results):

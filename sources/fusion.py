@@ -18,11 +18,12 @@ SHORT = 2
 class BaseFusionReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
-    def __init__(self, sources, device_id):
+    def __init__(self,config, sources, device_id):
+        self.class_map = config["CLASS_MAP"]
+        self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.sources = sources
-        self.bindex = [False for _ in range(len(self.sources))]
         self.device_id = device_id
-        self.samples_per_packet = 1
+        self.source_samples_per_packet = 1
         self.recording = False
         self._record_thread = None
 
@@ -56,7 +57,36 @@ class BaseFusionReader(BaseReader):
         return self._check_streaming()
 
 
+    def is_data_ready(self, data_ready):
+        for data in data_ready:
+            if not data:
+                return False
+
+        return True
+
+
+    def _check_is_stream_source_ready(self, bindex):
+        for index, source in enumerate(self.sources):
+            bindex[index] = source.buffer.get_latest_buffer()
+            if bindex[index] is None:
+                return False
+
+        return True
+
+
+
+    def _check_is_result_source_ready(self, bindex):
+        for index, source in enumerate(self.sources):
+            bindex[index] = source.rbuffer.get_latest_buffer()
+            if bindex[index] is None:
+                return False
+
+        return True
+
+
 class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
+
+
     def read_config(self):
 
         for source in self.sources:
@@ -106,21 +136,35 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
         config["CONFIG_SAMPLE_RATE"] = self.sample_rate
         config["DEVICE_ID"] = self.device_id
 
-    def _check_is_ready(self):
-        for index, source in enumerate(self.sources):
-            self.bindex[index] = source.buffer.get_latest_buffer()
-            if self.bindex[index] is None:
-                return False
-
-        return True
 
     def read_data(self):
 
+
+
+        def inerleave_buffers(data_buffers):
+
+            packet_buffer = b""
+
+            getting_packets = True
+
+            while getting_packets:
+                for index, packet in enumerate(data_buffers):
+
+                    tmp = next(packet)
+
+                    if tmp:
+                        packet_buffer += tmp
+                    else:
+                        getting_packets = False
+
+            return packet_buffer
+
+        bindex = [False for _ in range(len(self.sources))]
         data = [[] for _ in range(self.num_sources)]
         data_ready = [False] * self.num_sources
 
         while self.is_streaming():
-            if self._check_is_ready():
+            if self._check_is_stream_source_ready(bindex):
                 break
             time.sleep(0.01)
 
@@ -128,17 +172,17 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
 
             for index, source in enumerate(self.sources):
                 if not data_ready[index] and source.buffer.is_buffer_full(
-                    self.bindex[index]
+                    bindex[index]
                 ):
                     data[index] = source.buffer.get_buffer_iterator(
                         self.bindex[index], source.data_width
                     )
                     data_ready[index] = True
-                    self.bindex[index] = source.buffer.get_next_index(
-                        self.bindex[index]
+                    bindex[index] = source.buffer.get_next_index(
+                        bindex[index]
                     )
 
-                if is_data_ready(data_ready):
+                if self.is_data_ready(data_ready):
                     yield inerleave_buffers(data)
                     data_ready = [False] * self.num_sources
 
@@ -148,32 +192,58 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
         yield None
 
 
-def inerleave_buffers(data_buffers):
-
-    packet_buffer = b""
-
-    getting_packets = True
-
-    while getting_packets:
-        for index, packet in enumerate(data_buffers):
-
-            tmp = next(packet)
-
-            if tmp:
-                packet_buffer += tmp
-            else:
-                getting_packets = False
-
-    return packet_buffer
 
 
-def is_data_ready(data_ready):
-    for data in data_ready:
-        if not data:
-            return False
+class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
 
-    return True
 
+    def set_app_config(self, config):
+
+        config["SOURCE_SAMPLES_PER_PACKET"] = self.samples_per_packet
+        config["DEVICE_ID"] = self.device_id
+
+
+    def read_data(self):
+
+
+        bindex = [False for _ in range(len(self.sources))]
+        data = [[] for _ in range(self.num_sources)]
+        data_ready = [False] * self.num_sources
+
+        while self.is_streaming():
+
+            if self._check_is_result_source_ready(bindex):
+                break
+            time.sleep(0.01)
+
+        while self.is_streaming():
+
+            for index, source in enumerate(self.sources):
+                if source.rbuffer.is_buffer_full(
+                    bindex[index]
+                ):
+
+                    data[index] = source.rbuffer.read_buffer(bindex[index])
+                    bindex[index] = source.rbuffer.get_next_index(bindex[index])
+                    data_ready[index] = True
+
+
+            for index, is_datain_ready in enumerate(data_ready):
+                if is_datain_ready:
+                    for result in data[index]:
+                        if self._validate_results_data(result):
+                            result = self._map_classification(json.loads(result))
+                            result["timestap"] = time.time()
+                            result['source'] = source.device_id
+                            result['name'] = source.name
+                            yield json.dumps(result) + "\n"
+                    data_ready[index] = False
+
+
+            time.sleep(0.001)
+
+        print("stream ended")
+        yield None
 
 if __name__ == "__main__":
 

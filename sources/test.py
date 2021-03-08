@@ -145,7 +145,7 @@ class TestResultReader(BaseReader, BaseResultReaderMixin):
                     )
                 ]
             )
-            time.sleep(0.1)
+            time.sleep(2)
 
 
 def get_test_device_configs(device_id):
