@@ -105,6 +105,7 @@ const Results = (props) => {
   const [reader, setReader] = React.useState();
   let deviceColumns = [
     { field: "id", headerName: "ID", width: 70 },
+    { field: "source", headerName: "Device ID", width: 240 },
     { field: "ModelNumber", headerName: "Model ID", width: 240 },
     { field: "Classification", headerName: "Classification", width: 240 },
   ];
