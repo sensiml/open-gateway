@@ -232,10 +232,10 @@ class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
                 if is_datain_ready:
                     for result in data[index]:
                         if self._validate_results_data(result):
-                            result = self._map_classification(json.loads(result))
+                            result = self.sources[index]._map_classification(json.loads(result))
                             result["timestap"] = time.time()
-                            result['source'] = source.device_id
-                            result['name'] = source.name
+                            result['source'] = self.sources[index].device_id
+                            result['name'] = self.sources[index].name
                             yield json.dumps(result) + "\n"
                     data_ready[index] = False
 
