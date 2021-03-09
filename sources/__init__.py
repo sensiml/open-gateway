@@ -2,7 +2,7 @@ import sys
 from sources.test import TestStreamReader, TestResultReader
 from sources.serial import SerialStreamReader, SerialResultReader
 from sources.tcpip import TCPIPStreamReader, TCPIPResultReader
-from sources.fusion import FusionStreamReader
+from sources.fusion import FusionStreamReader, FusionResultReader
 
 if sys.platform not in ["win32", "darwin"]:
     from sources.ble import BLEStreamReader, BLEResultReader
@@ -14,19 +14,19 @@ def get_fusion_source(
     config, data_source, device_ids, source_type="DATA_CAPUTRE", **kwargs
 ):
     """ Allows you to combine multiple sources into a single synced stream for Data Capture"""
+    sources = []
+    for index, device_id in enumerate(device_ids.split(",")):
+
+        sources.append(
+            get_source(
+                config, data_source, device_id, source_type=source_type, **kwargs
+            )
+        )
 
     if source_type == "DATA_CAPTURE":
-        sources = []
-        for device_id in device_ids.split(","):
-            sources.append(
-                get_source(
-                    config, data_source, device_id, source_type=source_type, **kwargs
-                )
-            )
-
-        return FusionStreamReader(sources, device_ids)
+        return FusionStreamReader(config, sources, device_ids)
     else:
-        raise Exception("Result Fustion Reader Not Yet Supported")
+        return FusionResultReader(config, sources, device_ids)
 
 
 def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwargs):
