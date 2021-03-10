@@ -81,7 +81,7 @@ const Configure = (props) => {
       .catch(function (error) {
         if (error.response) {
           // Request made and server responded
-          setHelperText(error.response.data.error.detail.join(", "));
+        setHelperText(error.response.data.detail.join(", "));
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
@@ -109,7 +109,7 @@ const Configure = (props) => {
       .catch(function (error) {
         if (error.response) {
           // Request made and server responded
-          setScanHelperText(error.response.data.error.detail.join(", "));
+          setScanHelperText(error.response.data.detail.join(", "));
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
