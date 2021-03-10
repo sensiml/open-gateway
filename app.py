@@ -29,7 +29,7 @@ from video_sources import get_video_source, get_camera_indexes
 import zipfile
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-# app.register_blueprint(errors)
+app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 
@@ -43,8 +43,16 @@ app.config["DEVICE_ID"] = None
 app.config["DEVICE_SOURCE"] = None
 app.config["MODE"] = ""
 app.config["BAUD_RATE"] = 460800
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown",
-        1:"Cross",2:"Hook",3:"Jab",4:"Overhand",5:"Unknown",6:"Uppercut"}
+app.config["CLASS_MAP"] = {
+    65534: "Classification Limit Reached",
+    0: "Unknown",
+    1: "Cross",
+    2: "Hook",
+    3: "Jab",
+    4: "Overhand",
+    5: "Unknown",
+    6: "Uppercut",
+}
 app.config["VIDEO_SOURCE"] = None
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
@@ -541,16 +549,15 @@ def download_filename(filename):
 
 def get_file_dcli(filename):
 
-    video_path = '\\'.join(["video", os.path.basename(filename)[:-4] + ".mp4"])
-    file_path = '\\'.join(["data", filename])
+    video_path = "\\".join(["video", os.path.basename(filename)[:-4] + ".mp4"])
+    file_path = "\\".join(["data", filename])
 
-    return      {
-            "file_name": file_path,
-            "metadata": [],
-            "sessions": [],
-            "videos": [{"path": video_path}],
-        }
-
+    return {
+        "file_name": file_path,
+        "metadata": [],
+        "sessions": [],
+        "videos": [{"path": video_path}],
+    }
 
 
 @app.route("/download", methods=["GET", "POST"])
