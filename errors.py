@@ -12,10 +12,6 @@ def handle_error(error):
     detail = [str(x) for x in error.args]
     status_code = 500
     success = False
-    response = {
-        "success": success,
-        "error": {"type": error.__class__.__name__, "detail": detail},
-    }
-    logger.error(error)
+    logger.error({"error": {"type": error.__class__.__name__, "detail": detail}})
 
-    return jsonify(response), status_code
+    return jsonify(detail=detail), status_code
