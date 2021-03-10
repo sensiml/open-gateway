@@ -25,12 +25,12 @@ class StreamReader {
     } catch (error) {
       console.log(error);
       throw new BaseStreamHttpError(404, {
-        message: "Failed to fetch API service",
+        detail: "Failed to fetch API service",
       });
     }
     if (!response.ok) {
       throw new BaseStreamHttpError(response.status, {
-        message: response.statusText,
+        detail: response.statusText,
       });
     }
     console.log("getting reader");
