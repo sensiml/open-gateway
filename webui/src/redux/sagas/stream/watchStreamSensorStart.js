@@ -22,7 +22,7 @@ function* workerStreamStart(action) {
   } catch (e) {
     console.debug(e);
     if (e instanceof BaseStreamHttpError) {
-      yield put({ type: FETCH_DATA_ERROR_MSG, payload: e.message });
+      yield put({ type: FETCH_DATA_ERROR_MSG, payload: e.detail });
     } else {
       yield put({
         type: FETCH_DATA_ERROR_MSG,
