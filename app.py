@@ -43,16 +43,7 @@ app.config["DEVICE_ID"] = None
 app.config["DEVICE_SOURCE"] = None
 app.config["MODE"] = ""
 app.config["BAUD_RATE"] = 460800
-app.config["CLASS_MAP"] = {
-    65534: "Classification Limit Reached",
-    0: "Unknown",
-    1: "Cross",
-    2: "Hook",
-    3: "Jab",
-    4: "Overhand",
-    5: "Unknown",
-    6: "Uppercut",
-}
+app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
 app.config["VIDEO_SOURCE"] = None
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
