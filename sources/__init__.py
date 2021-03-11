@@ -7,7 +7,7 @@ from sources.fusion import FusionStreamReader, FusionResultReader
 if sys.platform not in ["win32", "darwin"]:
     from sources.ble import BLEStreamReader, BLEResultReader
 else:
-    print("BLE is not supported on Windows!")
+    from sources.ble_bleak import BLEStreamReader
 
 
 def get_fusion_source(
