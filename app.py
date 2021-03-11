@@ -8,6 +8,11 @@ import os
 import json
 import shutil
 from json import dumps
+import asyncio
+import nest_asyncio
+
+nest_asyncio.apply()
+
 from flask import (
     render_template,
     Flask,
@@ -28,10 +33,12 @@ from errors import errors
 from video_sources import get_video_source, get_camera_indexes
 import zipfile
 
+
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
 # app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
-
+loop = asyncio.get_event_loop()
+loop.run_forever()
 
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
 app.config["SECRET_KEY"] = "any secret string"
@@ -45,6 +52,7 @@ app.config["MODE"] = ""
 app.config["BAUD_RATE"] = 460800
 app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
 app.config["VIDEO_SOURCE"] = None
+app.config["LOOP"] = loop
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
@@ -605,3 +613,7 @@ if __name__ == "__main__":
         app.config.update(json.load(open("./.config.cache", "r")))
 
     app.run(HOST, 5555, debug=True)
+    loop.close()
+
+loop.close()
+
