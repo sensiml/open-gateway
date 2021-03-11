@@ -38,7 +38,6 @@ app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
 # app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
-loop.run_forever()
 
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
 app.config["SECRET_KEY"] = "any secret string"
@@ -533,6 +532,7 @@ def download_filename(filename):
             zfile.write(datafile_path)
 
         if os.path.exists(video_path):
+            print("video path found")
             zfile.write(video_path)
 
         json.dump(dcli, open("{}.dcli".format(filename), "w"))

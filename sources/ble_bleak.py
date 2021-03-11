@@ -45,22 +45,21 @@ class BLEReader(BaseReader):
         devices = await BleakScanner.discover()
         return devices
 
-    async def connect_to_device(self, address, charUUID):
+    async def connect_to_device(self, address):
         async with BleakClient(address, timeout=1.0) as client:
             print("connect to", address)
             self.streaming = True
             try:
-                await client.start_notify(charUUID, self.handleNotification)
+                await client.start_notify(self.charUUID, self.handleNotification)
                 while self.streaming:
-                    print(self.streaming)
                     await asyncio.sleep(0.25)
             except Exception as e:
                 print(e)
                 self.streaming = False
-                await client.stop_notify(charUUID)
+                await client.stop_notify(self.charUUID)
 
             self.streaming = False
-            await client.stop_notify(charUUID)
+            await client.stop_notify(self.charUUID)
 
         print("disconnect from", address)
 
@@ -103,25 +102,26 @@ class BLEReader(BaseReader):
             json.loads(source_config.decode("ascii").rstrip("\x00"))
         )
 
-
-class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
-    def handleNotification(self, cHandle: int, value: bytearray):
-        self.buffer.update_buffer(value)
-
     def _read_source(self):
 
         self.streaming = True
 
         try:
-            self.loop.run_until_complete(
-                self.connect_to_device(self.device_id, uuidOfDataChar)
-            )
+            self.loop.run_until_complete(self.connect_to_device(self.device_id))
         except Exception as e:
             print(e)
             self.disconnect()
             raise e
 
         print("streaming source stopped")
+
+
+class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
+
+    charUUID = uuidOfDataChar
+
+    def handleNotification(self, cHandle: int, value: bytearray):
+        self.buffer.update_buffer(value)
 
     def set_app_config(self, config):
 
@@ -130,6 +130,27 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
         config["CONFIG_SAMPLE_RATE"] = self.sample_rate
         config["DATA_SOURCE"] = "BLE"
         config["DEVICE_ID"] = self.device_id
+
+
+class BLEResultReader(BLEReader, BaseResultReaderMixin):
+    """ Base Reader Object, describes the methods that must be implemented for each data source"""
+
+    charUUID = RecognitionClassUUID
+
+    def read_device_config(self):
+
+        return {"samples_per_packet": 1}
+
+    def set_app_config(self, config):
+        config["DATA_SOURCE"] = "BLE"
+        config["DEVICE_ID"] = self.device_id
+
+    def handleNotification(self, cHandle: int, value: bytearray):
+        tmp = struct.unpack("h" * 2, value)
+        print("recieved classification", tmp)
+        self.rbuffer.update_buffer(
+            [json.dumps({"ModelNumber": tmp[0], "Classification": tmp[1]})]
+        )
 
 
 if __name__ == "__main__":
