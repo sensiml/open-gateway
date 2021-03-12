@@ -6,10 +6,12 @@ It contains the definition of routes and views for the application.
 
 import os
 import json
+import sys
 import shutil
 from json import dumps
 import asyncio
 import nest_asyncio
+import time
 
 nest_asyncio.apply()
 
@@ -612,8 +614,17 @@ if __name__ == "__main__":
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
 
-    app.run(HOST, 5555, debug=True)
-    loop.close()
-
-loop.close()
+    try:
+        app.run(HOST, 5555)
+    except KeyboardInterrupt:
+        print("Keyboard Interupt Detected. Shutting down server!")
+    finally:
+        print("Disconnecting from all devices!")
+        if app.config["DEVICE_SOURCE"] is not None:
+            app.config["DEVICE_SOURCE"].disconnect()
+            for i in range(5):
+                print(".")
+                time.sleep(1)
+        print("Shutting down server!")
+        sys.exit()
 
