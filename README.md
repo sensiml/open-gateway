@@ -49,7 +49,7 @@ python3 app.py
 
 ## Installation (Windows, Mac)
 
-Currently the application uses bluepy for BLE connections, which is not supported on windows or Mac. You can still use the gateway application for TCP/IP and Serial connections, but you need to modify the requirements.txt file to not install bluepy. You can do that by removing bluepy as a dependency in requirements.txt. We are looking into adding BLE to Mac/Windows and welcome pull request which add support.
+Currently the application uses bluepy for BLE connections on linux, which is not supported on windows or Mac. We have experimental support for BLE on windows/OSx using bleak. If you are installing for windows, remove bluepy as a dependency in requirements.txt.
 
 ## Data Collection over Serial Source
 
@@ -74,6 +74,8 @@ Currently the application uses bluepy for BLE connections, which is not supporte
     3. Enter the Device ID (which is the port) into the Text Field and Click Configure
     4. The Simple Streaming Gateway is now configured to Stream Data from your Device over Wi-Fi
 
+## BLE Troubleshooting on Linux
+
 **NOTE** To use Bluethooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
 
 ```bash
@@ -81,8 +83,6 @@ find ~/ -name bluepy-helper
 cd <PATH>
 sudo setcap 'cap_net_raw,cap_net_admin+eip' bluepy-helper
 ```
-
-## BLE Troubleshooting
 
 ### Cycle Bloothooth on Linux
 

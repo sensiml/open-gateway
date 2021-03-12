@@ -6,4 +6,6 @@ pyserial>=2.6
 opencv-python
 mss
 numpy
+bleak
+nest_asyncio
 bluepy

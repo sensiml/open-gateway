@@ -32,6 +32,8 @@ const Configure = (props) => {
   const [scanHelperText, setScanHelperText] = React.useState("");
   const [helperText, setHelperText] = React.useState("");
   const [deviceRows, setDeviceRows] = React.useState([]);
+  const [configuring, setIsConfiguring] = React.useState(false);
+  const [scanning, setIsScanning] = React.useState(false);
   let deviceColumns = [
     { field: "id", headerName: "ID", width: 0 },
     { field: "device_id", headerName: "Device ID", width: 240 },
@@ -58,6 +60,7 @@ const Configure = (props) => {
   };
 
   const handleSubmit = (event) => {
+    setIsConfiguring(true);
     event.preventDefault();
     if (deviceID === "") {
       setHelperText("Must Set DeviceID");
@@ -77,11 +80,13 @@ const Configure = (props) => {
         props.setStreamingMode(response.data.mode);
         props.setIsConnected(true);
         setHelperText("Gateway Connected to device, now ready to stream.");
+        setIsConfiguring(false);
       })
       .catch(function (error) {
+        setIsConfiguring(false);
         if (error.response) {
           // Request made and server responded
-        setHelperText(error.response.data.detail.join(", "));
+          setHelperText(error.response.data.detail.join(", "));
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
@@ -97,6 +102,7 @@ const Configure = (props) => {
 
   const handleDeviceScan = (event) => {
     console.log(event);
+    setIsScanning(true);
     event.preventDefault();
     axios
       .post(`${process.env.REACT_APP_API_URL}scan`, {
@@ -104,10 +110,13 @@ const Configure = (props) => {
       })
       .then((response) => {
         console.log(response.data);
+        setIsScanning(false);
         setDeviceRows(response.data);
       })
       .catch(function (error) {
+        setIsScanning(false);
         if (error.response) {
+          
           // Request made and server responded
           setScanHelperText(error.response.data.detail.join(", "));
           console.log(error.response.data);
@@ -193,6 +202,7 @@ const Configure = (props) => {
                           variant="contained"
                           color="secondary"
                           fullWidth={true}
+                          disabled={scanning}
                         >
                           Scan For Devices
                         </Button>
@@ -258,6 +268,7 @@ const Configure = (props) => {
                           variant="contained"
                           color="primary"
                           fullWidth={true}
+                          disabled={configuring}
                         >
                           Configure Gateway
                         </Button>

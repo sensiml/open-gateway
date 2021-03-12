@@ -39,64 +39,67 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const handleRecordRequest = (event, url, setRecording, filename) => {
-  console.log(event);
-
-  if (filename === "") {
-    filename = "test";
-  }
-  console.log(filename);
-  axios
-    .post(`${process.env.REACT_APP_API_URL}` + url, {
-      filename: filename,
-      event_type: event,
-    })
-    .then((response) => {
-      console.log(response.data);
-      if (event == "record-start") {
-        setRecording(true);
-        console.log(event);
-      }
-      if (event == "record-stop") {
-        setRecording(false);
-        console.log(event);
-      }
-    });
-};
-
-const handleDownloadRequest = (event, filename) => {
-  console.log(`${process.env.REACT_APP_API_URL}download/` + filename);
-  fetch(`${process.env.REACT_APP_API_URL}download/` + filename, {
-    method: "GET",
-    headers: { "Content-Type": "application/zip" },
-  })
-    .then((response) => response.blob())
-    .then((blob) => {
-      // Create blob link to download
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filename + ".zip");
-
-      // Append to html link element page
-      document.body.appendChild(link);
-
-      // Start download
-      link.click();
-
-      // Clean up and remove the link
-      link.parentNode.removeChild(link);
-    });
-};
-
 const Record = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const [recording, setRecording] = React.useState(props.isRecording);
   const [filename, setFilename] = React.useState("capture_name");
+  const [recordDistabled, setRecordDistabled] = React.useState(false);
   console.log("Connected Camera");
   console.log(props.isCameraConnected);
 
+
+  const handleRecordRequest = (event, url, setRecording, filename) => {
+    setRecordDistabled(true);
+    console.log(event);
+  
+    if (filename === "") {
+      filename = "test";
+    }
+    console.log(filename);
+    axios
+      .post(`${process.env.REACT_APP_API_URL}` + url, {
+        filename: filename,
+        event_type: event,
+      })
+      .then((response) => {
+        console.log(response.data);
+        if (event == "record-start") {
+          setRecording(true);
+          console.log(event);
+        }
+        if (event == "record-stop") {
+          setRecording(false);
+          console.log(event);
+        }
+        setRecordDistabled(false);
+      });
+  };
+  
+  const handleDownloadRequest = (event, filename) => {
+    console.log(`${process.env.REACT_APP_API_URL}download/` + filename);
+    fetch(`${process.env.REACT_APP_API_URL}download/` + filename, {
+      method: "GET",
+      headers: { "Content-Type": "application/zip" },
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        // Create blob link to download
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", filename + ".zip");
+  
+        // Append to html link element page
+        document.body.appendChild(link);
+  
+        // Start download
+        link.click();
+  
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      });
+  };
   const handleFileNameChange = (event) => {
     setFilename(event.target.value);
   };
@@ -138,6 +141,7 @@ const Record = (props) => {
                       aria-label="Record"
                       variant="contained"
                       fullWidth={true}
+                      disabled={recordDistabled}
                       onClick={() => {
                         handleRecordRequest(
                           "record-start",
@@ -155,6 +159,7 @@ const Record = (props) => {
                     aria-label="Stop "
                     variant="contained"
                     fullWidth={true}
+                    disabled={recordDistabled}
                     onClick={() => {
                       handleRecordRequest(
                         "record-stop",

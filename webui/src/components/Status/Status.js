@@ -32,6 +32,7 @@ const Status = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   let [config, setConfig] = useState([]);
+  let [deviceDisabled, setDeviceDisabled] = useState(false);
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}config`).then((res) => {
@@ -40,15 +41,19 @@ const Status = (props) => {
   }, []);
 
   const handleDisconnectRequest = (event, setConfig) => {
+    setDeviceDisabled(true);
     axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
       console.log(res.data);
       setConfig(mapdata(res.data));
+      setDeviceDisabled(false);
     });
   };
 
   const handleConnectRequest = (event, setConfig) => {
+    setDeviceDisabled(true);
     axios.get(`${process.env.REACT_APP_API_URL}connect`).then((res) => {
       setConfig(mapdata(res.data));
+      setDeviceDisabled(false);
     });
   };
 
@@ -123,6 +128,7 @@ const Status = (props) => {
                         variant="contained"
                         aria-label="disconnect"
                         fullWidth={true}
+                        disabled={deviceDisabled}
                         onClick={() => {
                           handleDisconnectRequest("clicked", setConfig);
                         }}
@@ -135,6 +141,7 @@ const Status = (props) => {
                         variant="contained"
                         aria-label="connect"
                         fullWidth={true}
+                        disabled={deviceDisabled}
                         onClick={() => {
                           handleConnectRequest("clicked", setConfig);
                         }}
