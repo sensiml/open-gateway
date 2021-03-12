@@ -19,6 +19,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  formControl: {
+    margin: theme.spacing(3),
+    minWidth: 600,
+  },
+  button: {
+    margin: theme.spacing(1, 1, 0, 0),
+  },
 }));
 
 const Configure = (props) => {
@@ -41,14 +48,17 @@ const Configure = (props) => {
   ];
 
   const handleRadioChange = (event) => {
+    console.log("handle radio");
     setSource(event.target.value);
   };
 
   const handleModeChange = (event) => {
+    console.log("handle mode");
     setMode(event.target.value);
   };
 
   const handleDeviceIDChange = (event) => {
+    console.log("handle device id");
     setDeviceID(event.target.value);
     setHelperText(" ");
     setError(false);
@@ -64,6 +74,7 @@ const Configure = (props) => {
     event.preventDefault();
     if (deviceID === "") {
       setHelperText("Must Set DeviceID");
+      setIsConfiguring(false);
       return;
     }
     console.log(source);
@@ -85,7 +96,6 @@ const Configure = (props) => {
       .catch(function (error) {
         setIsConfiguring(false);
         if (error.response) {
-          // Request made and server responded
           setHelperText(error.response.data.detail.join(", "));
           console.log(error.response.data);
           console.log(error.response.status);
@@ -116,7 +126,7 @@ const Configure = (props) => {
       .catch(function (error) {
         setIsScanning(false);
         if (error.response) {
-          
+
           // Request made and server responded
           setScanHelperText(error.response.data.detail.join(", "));
           console.log(error.response.data);
@@ -132,157 +142,131 @@ const Configure = (props) => {
       });
   };
 
-  // "Configure the gateway to  use a Serial Connection to  connect to the remote  node." />
-  // "Configure the gateway to  use a BLE Connection to connect to remote node."
-  // "Configure the gateway to mock a node sending test data."
   return (
-    <Card>
-      <CardContent>
-        <Grid container rows spacing={6}>
+    <div>
+      
+      <Grid container rows spacing={4}>
+        <Grid item>
+          <Card>
           <HorizontalLabelPositionBelowStepper />
-          <Grid item columns xs={6} container alignItems="center">
-            <Card>
-              <CardContent>
-                <form onSubmit={handleDeviceScan}>
-                  <FormControl component="fieldset" error={error}>
-                    <Grid container columns spacing={2}>
-                      <Grid item xs={12}>
-                        <Card>
-                          <CardContent>
-                            <FormLabel>Connection Type</FormLabel>
-                            <RadioGroup
-                              aria-label="source"
-                              value={source}
-                              onChange={handleRadioChange}
-                              row
-                            >
-                              <FormControlLabel
-                                value="SERIAL"
-                                control={<Radio />}
-                                label="Serial"
-                              />
-                              <FormControlLabel
-                                value="BLE"
-                                control={<Radio />}
-                                label="BLE"
-                              />
-                              <FormControlLabel
-                                value="TCPIP"
-                                control={<Radio />}
-                                label="TCP/IP"
-                              />
-                              <FormControlLabel
-                                value="TEST"
-                                control={<Radio />}
-                                label="Test"
-                              />
-                            </RadioGroup>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Card>
-                          <CardContent>
-                            <FormLabel component="legend">Device ID:</FormLabel>
-                            <TextField
-                              id="outlined-basic"
-                              variant="outlined"
-                              value={deviceID}
-                              onChange={handleDeviceIDChange}
-                              fullWidth={true}
-                            />
-                          </CardContent>
-                        </Card>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          color="secondary"
-                          fullWidth={true}
-                          disabled={scanning}
-                        >
-                          Scan For Devices
-                        </Button>
-                      </Grid>
-
-                      <FormHelperText>{scanHelperText}</FormHelperText>
-                      <Grid item xs={12}>
-                        <div style={{ height: 350, width: "100%" }}>
-                          <DataGrid
-                            rows={deviceRows}
-                            columns={deviceColumns}
-                            onRowSelected={handleRowSelection}
-                            pageSize={4}
-                          />
-                        </div>
-                      </Grid>
-                    </Grid>
-                  </FormControl>
-                </form>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item columns xs={6} container>
-            <Card>
-              <CardContent>
-                <form onSubmit={handleSubmit}>
-                  <FormControl
-                    component="fieldset"
-                    error={error}
-                    className={classes.formControl}
-                  >
-                    <Grid container columns spacing={2}>
-                      <Grid item xs={12}>
-                        <Card>
-                          <CardContent>
-                            <FormLabel component="legend">
-                              Device Mode:
+            <CardContent>            
+              <form onSubmit={handleSubmit}>
+                <FormControl component="fieldset" disabled={configuring} error={error} className={classes.formControl}>
+                  <div>
+                    <FormLabel>Connection Type</FormLabel>
+                    <RadioGroup
+                      aria-label="source"
+                      value={source}
+                      onChange={handleRadioChange}
+                      row
+                    >
+                      <FormControlLabel
+                        value="SERIAL"
+                        control={<Radio />}
+                        label="Serial"
+                      />
+                      <FormControlLabel
+                        value="BLE"
+                        control={<Radio />}
+                        label="BLE"
+                      />
+                      <FormControlLabel
+                        value="TCPIP"
+                        control={<Radio />}
+                        label="TCP/IP"
+                      />
+                      <FormControlLabel
+                        value="TEST"
+                        control={<Radio />}
+                        label="Test"
+                      />
+                    </RadioGroup>
+                  </div>
+                  <div>
+                    <FormLabel component="legend">
+                      Device Mode:
                             </FormLabel>
-                            <RadioGroup
-                              aria-label="mode"
-                              name="Streaming Source"
-                              value={mode}
-                              onChange={handleModeChange}
-                              row
-                            >
-                              <FormControlLabel
-                                value="DATA_CAPTURE"
-                                control={<Radio />}
-                                label="Data Capture"
-                              />
-                              <FormControlLabel
-                                value="RECOGNITION"
-                                control={<Radio />}
-                                label="Recognition"
-                              />
-                            </RadioGroup>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          color="primary"
-                          fullWidth={true}
-                          disabled={configuring}
-                        >
-                          Configure Gateway
-                        </Button>
-                      </Grid>
-                      <FormHelperText>{helperText}</FormHelperText>
-                    </Grid>
-                  </FormControl>
-                </form>
-              </CardContent>
-            </Card>
-          </Grid>
+                    <RadioGroup
+                      aria-label="mode"
+                      name="Streaming Source"
+                      value={mode}
+                      onChange={handleModeChange}
+                      row
+                    >
+                      <FormControlLabel
+                        value="DATA_CAPTURE"
+                        control={<Radio />}
+                        label="Data Capture"
+                      />
+                      <FormControlLabel
+                        value="RECOGNITION"
+                        control={<Radio />}
+                        label="Recognition"
+                      />
+                    </RadioGroup>
+                  </div>
+                  <div>
+                    <FormLabel component="legend">Device ID:</FormLabel>
+                    <TextField
+                      id="outlined-basic"
+                      variant="outlined"
+                      value={deviceID}
+                      onChange={handleDeviceIDChange}
+                      fullWidth={true}
+                    />
+                  </div>
+                  <div>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      disabled={configuring}
+                      fullWidth={true}
+                      className={classes.button}
+                    >
+                      Configure Gateway
+                    </Button>
+                  </div>
+                </FormControl>
+              </form>
+            </CardContent>
+          </Card>
         </Grid>
-      </CardContent>
-    </Card>
+        <Grid item>
+          <Card>
+            <CardContent>
+              <form onSubmit={handleDeviceScan}>
+                <FormControl
+                  component="fieldset"
+                  error={error}
+                  className={classes.formControl}
+                >
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                    fullWidth={true}
+                    disabled={scanning}
+                  >
+                    Scan For {source} Devices
+                        </Button>
+                  <div style={{ height: 600, width: 600 }}>
+                    <DataGrid
+                      rows={deviceRows}
+                      columns={deviceColumns}
+                      onRowSelected={handleRowSelection}
+                      pageSize={10}
+                    />
+                  </div>
+                  <FormHelperText>{scanHelperText}</FormHelperText>
+                </FormControl>
+              </form>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+    </div>
   );
 };
 
