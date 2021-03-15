@@ -502,17 +502,17 @@ def record():
 
 def get_file_dcli(filename):
 
-    video_path = os.path.join("./video", os.path.basename(filename)[:-4] + ".mp4")
-    file_path = os.path.join("./data", filename)
+    # video_path = os.path.join("video", os.path.basename(filename)[:-4] + ".mp4")
+    # file_path = os.path.join("data", filename)
 
-    return [
-        {
-            "file_name": file_path,
-            "metadata": [],
-            "sessions": [],
-            "videos": [{"path": video_path}],
-        }
-    ]
+    video_path = filename[:-4] + ".mp4"
+    file_path = filename
+    return {
+        "file_name": file_path,
+        "metadata": [],
+        "sessions": [],
+        "videos": [{"path": video_path}],
+    }
 
 
 @app.route("/download/<path:filename>", methods=["GET", "POST"])
@@ -531,11 +531,10 @@ def download_filename(filename):
         dcli.append(get_file_dcli(filename + ".csv"))
 
         if os.path.exists(datafile_path):
-            zfile.write(datafile_path)
+            zfile.write(datafile_path, filename + ".csv")
 
         if os.path.exists(video_path):
-            print("video path found")
-            zfile.write(video_path)
+            zfile.write(video_path, filename + ".mp4")
 
         json.dump(dcli, open("{}.dcli".format(filename), "w"))
         zfile.write("{}.dcli".format(filename))
@@ -546,19 +545,6 @@ def download_filename(filename):
         mimetype="application/zip",
         as_attachment=True,
     )
-
-
-def get_file_dcli(filename):
-
-    video_path = "\\".join(["video", os.path.basename(filename)[:-4] + ".mp4"])
-    file_path = "\\".join(["data", filename])
-
-    return {
-        "file_name": file_path,
-        "metadata": [],
-        "sessions": [],
-        "videos": [{"path": video_path}],
-    }
 
 
 @app.route("/download", methods=["GET", "POST"])
@@ -574,12 +560,12 @@ def download():
 
         for filename in os.listdir("./data"):
             datafile_path = os.path.join("./data", filename)
-            zfile.write(datafile_path)
+            zfile.write(datafile_path, filename)
             dcli.append(get_file_dcli(filename))
 
         for filename in os.listdir("./video"):
             datafile_path = os.path.join("./video", filename)
-            zfile.write(datafile_path)
+            zfile.write(datafile_path, filename)
 
         json.dump(dcli, open("data.dcli", "w"))
         zfile.write("data.dcli")
