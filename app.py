@@ -51,7 +51,14 @@ app.config["DEVICE_ID"] = None
 app.config["DEVICE_SOURCE"] = None
 app.config["MODE"] = ""
 app.config["BAUD_RATE"] = 460800
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
+app.config["CLASS_MAP"] = {
+    65534: "Classification Limit Reached",
+    0: "Unknown",
+    1: "Slope",
+    2: "Ring",
+    3: "Unknown",
+    4: "Wing",
+}
 app.config["VIDEO_SOURCE"] = None
 app.config["LOOP"] = loop
 

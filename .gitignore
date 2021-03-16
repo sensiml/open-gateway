@@ -133,4 +133,9 @@ dmypy.json
 
 .eslintcache
 
+# Cache
 .config.cache
+*.dcli
+data/*
+video/*
+cache/*

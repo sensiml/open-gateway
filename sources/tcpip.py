@@ -35,14 +35,14 @@ class TCPIPReader(BaseReader):
     def port(self):
         return self._port
 
+
+class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
     def read_device_config(self):
 
         r = requests.get("{}/config".format(self.address))
 
         return self._validate_config(r.json())
 
-
-class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
     def _read_source(self):
 
         try:
