@@ -51,10 +51,7 @@ app.config["DEVICE_ID"] = None
 app.config["DEVICE_SOURCE"] = None
 app.config["MODE"] = ""
 app.config["BAUD_RATE"] = 460800
-app.config["CLASS_MAP"] = {
-    65534: "Classification Limit Reached",
-    0: "Unknown",
-}
+app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
 app.config["VIDEO_SOURCE"] = None
 app.config["LOOP"] = loop
 
@@ -274,7 +271,7 @@ def config_video():
         if event_type == "camera-on":
 
             if app.config["VIDEO_SOURCE"]:
-                return make_response(jsonify(detail="Camera already on"), 400)
+                return make_response(jsonify(detail="Camera already on"), 200)
 
             app.config["VIDEO_SOURCE"] = get_video_source(camera_index)
             app.config["VIDEO_SOURCE"].start()
@@ -284,7 +281,7 @@ def config_video():
         if event_type == "camera-off":
 
             if app.config["VIDEO_SOURCE"] is None:
-                return make_response(jsonify(detail="Camera is already off"), 400)
+                return make_response(jsonify(detail="Camera is already off"), 200)
 
             print("Deleting video camera object")
             app.config["VIDEO_SOURCE"].off()
