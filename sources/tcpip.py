@@ -53,7 +53,7 @@ class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
             self.streaming = True
 
             with s.get(url, headers=None, stream=True) as resp:
-                for line in resp.iter_content(chunk_size=self.packet_buffer_size):
+                for line in resp.iter_content(chunk_size=self.source_buffer_size):
 
                     if not self.streaming:
                         return
