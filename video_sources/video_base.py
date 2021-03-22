@@ -3,6 +3,7 @@ import sys
 import threading
 import time
 import cv2
+from video_sources import get_video_source_name
 
 MAX_VIDEO_STREAMS = 1
 
@@ -15,6 +16,7 @@ class VideoBase(object):
         self.video_writer = None
         self.new_frame = False
         self.camera_index = camera_index
+        self.camera_name = get_video_source_name(camera_index)
         self.height = None
         self.width = None
         self.streaming_index = 0
@@ -26,6 +28,7 @@ class VideoBase(object):
             "camera_on": False,
             "camera_record": False,
             "camera_index": self.camera_index,
+            "camera_name": self.camera_name,
         }
 
         with self.lock:
