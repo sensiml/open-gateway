@@ -32,7 +32,7 @@ from flask_cors import CORS
 from forms import DeviceConfigureForm, DeviceScanForm, DeviceRecordForm, CameraForm
 from sources import get_source
 from errors import errors
-from video_sources import get_video_source, get_camera_indexes
+from video_sources import get_video_source, get_video_source_list
 import zipfile
 
 
@@ -123,7 +123,14 @@ def parse_current_config():
     if app.config["VIDEO_SOURCE"]:
         ret.update(app.config["VIDEO_SOURCE"].info())
     else:
-        ret.update({"camera_on": False, "camera_record": False, "camera_index": None})
+        ret.update(
+            {
+                "camera_on": False,
+                "camera_record": False,
+                "camera_index": None,
+                "camrea_name": None,
+            }
+        )
 
     return ret
 
@@ -242,11 +249,11 @@ def scan_video():
     returns a list of video sources available
 
     """
-    video_sources = [{"index": -1, "name": "Screen Capture"}]
-    video_sources.extend(get_camera_indexes())
+
+    video_source_list = get_video_source_list()
 
     return Response(
-        dumps({"video_sources": video_sources}), mimetype="application/json"
+        dumps({"video_sources": video_source_list}), mimetype="application/json"
     )
 
 
@@ -297,7 +304,12 @@ def config_video():
 
     if request.method == "GET":
 
-        resp = {"camera_on": False, "camera_record": False, "camera_index": None}
+        resp = {
+            "camera_on": False,
+            "camera_record": False,
+            "camera_index": None,
+            "camera_name": None,
+        }
 
         if app.config["VIDEO_SOURCE"]:
             resp = app.config["VIDEO_SOURCE"].info()
