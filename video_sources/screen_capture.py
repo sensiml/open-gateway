@@ -42,7 +42,7 @@ class ScreenCatpure(VideoBase):
                             self.video_writer.write(
                                 cv2.resize(frame, (monitor["width"], monitor["height"]))
                             )
-                        
+
                         start = time.time()
 
                         """
@@ -58,9 +58,7 @@ class ScreenCatpure(VideoBase):
                             )
                             frame_time = tracker
                             frame_counter = 0
-                        """"
-
-                        
+                        """
 
                 time.sleep(0.0001)
 
