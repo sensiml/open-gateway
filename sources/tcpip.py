@@ -59,6 +59,7 @@ class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
                         return
 
                     self.buffer.update_buffer(line)
+                    time.sleep(0.0001)
 
         except Exception as e:
             print(e)

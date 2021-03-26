@@ -100,7 +100,6 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
         self.streaming = True
 
         sleep_time = self.source_samples_per_packet / float(self.sample_rate)
-        print("sleep time", sleep_time)
         while self.streaming:
             incycle = time.time()
 
@@ -120,7 +119,6 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                 raise e
 
             incycle = time.time() - incycle
-            print(sleep_time - incycle)
 
             time.sleep(sleep_time - incycle)
 
