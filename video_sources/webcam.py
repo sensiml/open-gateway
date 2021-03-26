@@ -39,6 +39,7 @@ class WebCam(VideoBase):
 
                     start = time.time()
 
+                    """
                     frame_counter += 1
                     tmp = time.time()
                     # print((tmp - tracker))
@@ -47,6 +48,7 @@ class WebCam(VideoBase):
                         print("frames: ", frame_counter, "time:", tracker - frame_time)
                         frame_time = tracker
                         frame_counter = 0
+                    """
 
             time.sleep(0.0001)
 
