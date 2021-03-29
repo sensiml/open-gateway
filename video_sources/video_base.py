@@ -81,7 +81,8 @@ class VideoBase(object):
         counter = 0
         while self.streaming.get(key, None):
             if counter % 300 == 0:
-                print("Report: Video Streaming at ", key)
+                pass
+                # print("Report: Video Streaming at ", key)
             counter += 1
             # wait until the lock is acquired
             # start = time.time()
@@ -108,7 +109,7 @@ class VideoBase(object):
                 b"Content-Type: image/jpeg\r\n\r\n" + bytearray(encoded_image) + b"\r\n"
             )
 
-        print("Report: Ending Video Stream ", key)
+        # print("Report: Ending Video Stream ", key)
         del self.streaming[key]
 
     def record_start(self, filename):

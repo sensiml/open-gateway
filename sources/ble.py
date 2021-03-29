@@ -154,6 +154,7 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
                         self.delegate.data = b""
 
                     self.buffer.update_buffer(tmp)
+                    time.sleep(0.00001)
 
         except Exception as e:
             print(e)
@@ -189,11 +190,9 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
             self.peripheral = btle.Peripheral(self.device_id)
             self.peripheral.setDelegate(self.delegate)
 
-
-
     def read_device_config(self):
 
-        return {"samples_per_packet":1}
+        return {"samples_per_packet": 1}
 
     def set_app_config(self, config):
         config["DATA_SOURCE"] = "BLE"
@@ -257,8 +256,7 @@ if __name__ == "__main__":
             "AccelerometerZ": 2,
             "GyroscopeY": 4,
         },
-        "CLASS_MAP":{}
-
+        "CLASS_MAP": {},
     }
 
     device_id = "dd:6c:dc:c1:99:fb"

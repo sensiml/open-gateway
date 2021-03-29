@@ -7,6 +7,10 @@ import cv2
 import threading
 
 
+SAMPLES_PER_FRAME = 24.0
+SAMPLE_RATE = 1.0 / SAMPLES_PER_FRAME - 0.005
+
+
 class ScreenCatpure(VideoBase):
     def _start_screen_capture(self):
 
@@ -15,24 +19,48 @@ class ScreenCatpure(VideoBase):
             # Part of the screen to capture
             monitor = {"top": 0, "left": 0, "width": self.width, "height": self.height}
 
-            print(monitor)
+            print("Screen Capture Dimensions", monitor)
+
+            frame_counter = 0
+            start = time.time()
+            frame_time = start
+            tracker = start
+
             while self.vs:
 
-                time.sleep(0.001)
                 with self.lock:
-                    time.sleep(0.001)
+                    if (time.time() - start) < SAMPLE_RATE:
+                        pass
+                    else:
+                        start_grab = time.time()
+                        img = np.array(sct.grab(monitor))
+                        frame = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+                        self.new_frame = True
+                        self.output_frame = frame.copy()
 
-                    img = np.array(sct.grab(monitor))
-                    frame = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+                        if self.video_writer:
+                            self.video_writer.write(
+                                cv2.resize(frame, (monitor["width"], monitor["height"]))
+                            )
 
-                    self.new_frame = True
+                        start = time.time()
 
-                    if self.video_writer:
-                        self.video_writer.write(
-                            cv2.resize(frame, (monitor["width"], monitor["height"]))
-                        )
+                        """
+                        print("screen garb took: ", time.time() - start_grab)
 
-                    self.output_frame = frame.copy()
+                        frame_counter += 1
+                        tmp = time.time()
+                        print((tmp - tracker))
+                        tracker = tmp
+                        if frame_counter == SAMPLES_PER_FRAME:
+                            print(
+                                "frames: ", frame_counter, "time:", tracker - frame_time
+                            )
+                            frame_time = tracker
+                            frame_counter = 0
+                        """
+
+                time.sleep(0.0001)
 
     def start(self):
 

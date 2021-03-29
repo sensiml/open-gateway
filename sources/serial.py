@@ -83,6 +83,8 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
 
                     self.buffer.update_buffer(data)
 
+                    time.sleep(0.00001)
+
         except Exception as e:
             print(e)
             self.disconnect()
