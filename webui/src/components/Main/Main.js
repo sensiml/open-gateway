@@ -22,6 +22,7 @@ const Main = () => {
   const [isConnected, setIsConnected] = React.useState(false);
   const [isCameraConnected, setIsCameraConnected] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
+  const [config, setConfig] = React.useState({});
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { isStreamingSensor } = useSelector((state) => state.stream);
@@ -35,13 +36,27 @@ const Main = () => {
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
-      setIsCameraConnected(response.data.camera_on);
-      setIsConnected(response.data.streaming);
-      setIsRecording(response.data.recording);
-
+      mapdata(response.data);
       //console.log(response.data);
     });
   });
+
+  function mapdata(data) {
+    if (data.mode) {
+      setStreamingMode(data.mode);
+    }
+    setIsConnected(data.streaming);
+    setColumns(Object.keys(data.column_location).sort());
+    setStreamingSource(data.source);
+    setDeviceID(data.device_id);
+    setIsCameraConnected(data.camera_on);
+    data.column_location =
+      "column_location" in data
+        ? Object.keys(data.column_location).sort().join(", ")
+        : [];
+
+    setConfig(data);
+  }
 
   const alertUser = (e) => {
     if (isStreamingSensor) {
@@ -105,6 +120,8 @@ const Main = () => {
               isConnected={isConnected}
               setIsCameraConnected={setIsCameraConnected}
               isCameraConnected={isCameraConnected}
+              config={config}
+              setConfig={setConfig}
             />
           ) : null}
           {activeView === 2 ? (

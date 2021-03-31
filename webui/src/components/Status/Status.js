@@ -31,28 +31,21 @@ const useStyles = makeStyles((theme) => ({
 const Status = (props) => {
   const classes = useStyles();
   const theme = useTheme();
-  let [config, setConfig] = useState([]);
   let [deviceDisabled, setDeviceDisabled] = useState(false);
 
-  useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}config`).then((res) => {
-      setConfig(mapdata(res.data));
-    });
-  }, []);
-
-  const handleDisconnectRequest = (event, setConfig) => {
+  const handleDisconnectRequest = (event) => {
     setDeviceDisabled(true);
     axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
       console.log(res.data);
-      setConfig(mapdata(res.data));
-      setDeviceDisabled(false);
+      mapdata(res.data);
+      props.setDeviceDisabled(false);
     });
   };
 
-  const handleConnectRequest = (event, setConfig) => {
+  const handleConnectRequest = (event) => {
     setDeviceDisabled(true);
     axios.get(`${process.env.REACT_APP_API_URL}connect`).then((res) => {
-      setConfig(mapdata(res.data));
+      mapdata(res.data);
       setDeviceDisabled(false);
     });
   };
@@ -71,7 +64,7 @@ const Status = (props) => {
         ? Object.keys(data.column_location).sort().join(", ")
         : [];
 
-    return data;
+    props.setConfig(data);
   }
   return (
     <div class={classes.root}>
@@ -89,33 +82,33 @@ const Status = (props) => {
                   <SimpleCard
                     name="Mode"
                     xs="6"
-                    value={config.mode}
+                    value={props.config.mode}
                   ></SimpleCard>
                   <SimpleCard
                     name="Source"
                     xs="6"
-                    value={config.source}
+                    value={props.config.source}
                   ></SimpleCard>
                 </Grid>
                 <Grid item xs={12} container rows spacing={2}>
                   <SimpleCard
                     name="Device ID"
                     xs={6}
-                    value={config.device_id}
+                    value={props.config.device_id}
                   ></SimpleCard>
-                  {config.mode === "data_capture" ? (
+                  {props.config.mode === "data_capture" ? (
                     <SimpleCard
                       xs="6"
                       name="Sample Rate"
-                      value={config.sample_rate}
+                      value={props.config.sample_rate}
                     ></SimpleCard>
                   ) : null}
                 </Grid>
                 <Grid item xs={12}>
-                  {config.mode === "data_capture" ? (
+                  {props.config.mode === "data_capture" ? (
                     <SimpleCard
                       name="Sensor Columns"
-                      value={config.column_location}
+                      value={props.config.column_location}
                       list={true}
                     ></SimpleCard>
                   ) : null}
@@ -130,7 +123,7 @@ const Status = (props) => {
                         fullWidth={true}
                         disabled={deviceDisabled}
                         onClick={() => {
-                          handleDisconnectRequest("clicked", setConfig);
+                          handleDisconnectRequest("clicked");
                         }}
                       >
                         Disconnect From Device
@@ -143,7 +136,7 @@ const Status = (props) => {
                         fullWidth={true}
                         disabled={deviceDisabled}
                         onClick={() => {
-                          handleConnectRequest("clicked", setConfig);
+                          handleConnectRequest("clicked");
                         }}
                       >
                         Connect To Device
