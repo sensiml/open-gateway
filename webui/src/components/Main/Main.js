@@ -87,6 +87,15 @@ const Main = () => {
         />
         <main className={classes.content}>
           {activeView === 0 ? (
+            <Configure
+              setStreamingMode={setStreamingMode}
+              streamingSource={streamingSource}
+              streamingMode={streamingMode}
+              deviceID={deviceID}
+              setIsConnected={setIsConnected}
+            />
+          ) : null}
+          {activeView === 1 ? (
             <Status
               setStreamingMode={setStreamingMode}
               setColumns={setColumns}
@@ -98,21 +107,12 @@ const Main = () => {
               isCameraConnected={isCameraConnected}
             />
           ) : null}
-          {activeView === 1 ? (
+          {activeView === 2 ? (
             <TestMode
               columns={columns}
               streamingMode={streamingMode}
               isRecording={isRecording}
               isCameraConnected={isCameraConnected}
-            />
-          ) : null}
-          {activeView === 2 ? (
-            <Configure
-              setStreamingMode={setStreamingMode}
-              streamingSource={streamingSource}
-              streamingMode={streamingMode}
-              deviceID={deviceID}
-              setIsConnected={setIsConnected}
             />
           ) : null}
         </main>

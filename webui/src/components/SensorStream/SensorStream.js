@@ -168,14 +168,6 @@ const SensorStream = (props) => {
             >
               {isStreamingSensor ? "Stop" : "View"}
             </Button>
-            <Button
-              variant="outlined"
-              disabled={!isStreamingSensor}
-              className={classes.button}
-              onClick={() => switchRecording()}
-            >
-              {isStreamingSensorRecording ? "Stop Recording" : "Record"}
-            </Button>
           </Box>
           <Box>
             {countRecordedData ? (
