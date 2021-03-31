@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   SET_STREAM_SENSOR_DATA_RESET,
@@ -90,6 +90,14 @@ const SensorStream = (props) => {
       startSensorStreaming();
     }
   };
+
+  useEffect(() => {
+    if (!props.isConnected && isStreamingSensor){
+        stopSensorStreaming();
+        setClearStream();      
+      } 
+
+  }, []);
 
   return (
     <Card>

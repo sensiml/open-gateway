@@ -33,7 +33,7 @@ const TestMode = (props) => {
     <Grid container rows spacing={6}>
       {props.streamingMode != "recognition" ? (
         <Grid item xs={8}>
-          <SensorStream columns={props.columns} />
+          <SensorStream columns={props.columns}  isConnected={props.isConnected} />
         </Grid>
       ) : (
         <Grid item xs={8}>

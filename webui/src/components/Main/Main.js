@@ -111,6 +111,7 @@ const Main = () => {
             <TestMode
               columns={columns}
               streamingMode={streamingMode}
+              isConnected={isConnected}
               isRecording={isRecording}
               isCameraConnected={isCameraConnected}
             />
