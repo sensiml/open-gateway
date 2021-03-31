@@ -91,7 +91,7 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Configure Gateway", "Gateway Status", "Test Mode"].map(
+          {["Configure Gateway", "Gateway Info", "Test Mode"].map(
             (text, index) => (
               <ListItem button key={text} onClick={handleMenu(index)}>
                 <ListItemIcon>
