@@ -34,13 +34,6 @@ const Main = () => {
     }
   }
 
-  useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
-      mapdata(response.data);
-      //console.log(response.data);
-    });
-  });
-
   function mapdata(data) {
     if (data.mode) {
       setStreamingMode(data.mode);
@@ -88,6 +81,15 @@ const Main = () => {
       enqueueSnackbar(errorDataMsg, { variant: "warning" });
     }
   }, [errorDataMsg]);
+
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
+      mapdata(response.data);
+      console.log('here');
+      //console.log(response.data);
+    });
+  }, [activeView]);
 
   const classes = useStyles();
   return (

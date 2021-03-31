@@ -38,7 +38,7 @@ const Status = (props) => {
     axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
       console.log(res.data);
       mapdata(res.data);
-      props.setDeviceDisabled(false);
+      setDeviceDisabled(false);
     });
   };
 
