@@ -23,9 +23,9 @@ const useStyles = makeStyles((theme) => ({
 function getSteps() {
   return [
     "Select Connection Type",
-    "Scan and Select Device ID",
-    "Select Mode",
-    "Click Configure Gateway",
+    "Select Device Mode",
+    "Click Scan and Select Device ID",
+    "Click Connect to Device",
   ];
 }
 

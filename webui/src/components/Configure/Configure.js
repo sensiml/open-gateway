@@ -26,11 +26,14 @@ const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1, 1, 0, 0),
   },
+  section1: {
+    margin: theme.spacing(1, 1),
+  },
 }));
 
 const Configure = (props) => {
   const classes = useStyles();
-  const [source, setSource] = React.useState(props.streamingSource);
+  const [source, setSource] = React.useState(props.streamingSource ? props.streamingSource : 'SERIAL' );
   const [mode, setMode] = React.useState(
     props.streamingMode === "recognition" ? "RECOGNITION" : "DATA_CAPTURE"
   );
@@ -143,8 +146,7 @@ const Configure = (props) => {
   };
 
   return (
-    <div>
-      
+    <div>      
       <Grid container rows spacing={4}>
         <Grid item>
           <Card>
@@ -182,6 +184,7 @@ const Configure = (props) => {
                       />
                     </RadioGroup>
                   </div>
+                  <div className={classes.section1}></div>
                   <div>
                     <FormLabel component="legend">
                       Device Mode:
@@ -205,6 +208,7 @@ const Configure = (props) => {
                       />
                     </RadioGroup>
                   </div>
+                  <div className={classes.section1}></div>
                   <div>
                     <FormLabel component="legend">Device ID:</FormLabel>
                     <TextField
@@ -215,6 +219,7 @@ const Configure = (props) => {
                       fullWidth={true}
                     />
                   </div>
+                  <div className={classes.section1}></div>
                   <div>
                     <Button
                       type="submit"
@@ -224,7 +229,7 @@ const Configure = (props) => {
                       fullWidth={true}
                       className={classes.button}
                     >
-                      Configure Gateway
+                      Connect to Device
                     </Button>
                   </div>
                 </FormControl>
@@ -250,6 +255,7 @@ const Configure = (props) => {
                   >
                     Scan For {source} Devices
                         </Button>
+                      <div className={classes.section1}></div>
                   <div style={{ height: 600, width: 600 }}>
                     <DataGrid
                       rows={deviceRows}
@@ -265,7 +271,6 @@ const Configure = (props) => {
           </Card>
         </Grid>
       </Grid>
-
     </div>
   );
 };
