@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { SensorStream } from "../SensorStream";
 import { Results } from "../Results";
 import { Record } from "../Record";
+import { WebCamera } from "../WebCamera";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,16 +37,27 @@ const TestMode = (props) => {
           <SensorStream columns={props.columns}  isConnected={props.isConnected} />
         </Grid>
       ) : (
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <Results />
         </Grid>
       )}
       <Grid item xs={4}>
+      <Grid container  rows>
+      <Grid item xs={12}>
+      <WebCamera
+            setIsCameraConnected={props.setIsCameraConnected}
+            isCameraConnected={props.isCameraConnected}
+          />
+          </Grid>
+                <Grid item xs={12}>
         <Record
           isCameraConnected={props.isCameraConnected}
           isRecording={props.isRecording}
         />
       </Grid>
+      </Grid>
+      </Grid>
+
     </Grid>
   );
 };

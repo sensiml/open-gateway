@@ -40,7 +40,7 @@ const Main = () => {
     }
     setIsConnected(data.streaming);
     setColumns(Object.keys(data.column_location).sort());
-    setStreamingSource(data.source);
+    setStreamingSource(data.source.toUpperCase());
     setDeviceID(data.device_id);
     setIsCameraConnected(data.camera_on);
     data.column_location =
@@ -87,6 +87,7 @@ const Main = () => {
     axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
       mapdata(response.data);
       console.log('here');
+      
       //console.log(response.data);
     });
   }, [activeView]);
@@ -105,15 +106,8 @@ const Main = () => {
         <main className={classes.content}>
           {activeView === 0 ? (
             <Configure
-              setStreamingMode={setStreamingMode}
-              streamingSource={streamingSource}
               streamingMode={streamingMode}
               deviceID={deviceID}
-              setIsConnected={setIsConnected}
-            />
-          ) : null}
-          {activeView === 1 ? (
-            <Status
               setStreamingMode={setStreamingMode}
               setColumns={setColumns}
               setStreamingSource={setStreamingSource}
@@ -124,15 +118,17 @@ const Main = () => {
               isCameraConnected={isCameraConnected}
               config={config}
               setConfig={setConfig}
+              streamingSource={streamingSource}
             />
-          ) : null}
-          {activeView === 2 ? (
+          ) : null}        
+          {activeView === 1 ? (
             <TestMode
               columns={columns}
               streamingMode={streamingMode}
               isConnected={isConnected}
               isRecording={isRecording}
               isCameraConnected={isCameraConnected}
+              setIsCameraConnected={setIsCameraConnected}
             />
           ) : null}
         </main>
