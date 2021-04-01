@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1, 1, 0, 0),
   },
   section1: {
-    margin: theme.spacing(1, 1),
+    margin: theme.spacing(2, 0, 3, 0),
   },
 }));
 

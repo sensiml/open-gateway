@@ -19,9 +19,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
   },
-
   section1: {
-    margin: theme.spacing(3, 2),
+    margin: theme.spacing(2, 0, 2, 0),
   },
 }));
 
@@ -30,7 +29,7 @@ const Status = (props) => {
   const theme = useTheme();
 
   return (
-    <Grid container rows>
+    <Grid container rows spacing={4}>
       <Grid item xs={12} container rows spacing={2}>
         <SimpleCard name="Mode" xs="6" value={props.config.mode}></SimpleCard>
         <SimpleCard
