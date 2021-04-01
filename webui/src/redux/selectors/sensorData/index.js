@@ -1,5 +1,7 @@
 export const sensorDataForChart = column => (state) => {
   const { sensorSimpleData } = state.sensorData;
+  console.log("HEREE");
+  console.log(sensorSimpleData);
   // generate chart zero array
   const result = column.map(name => {
     return {
@@ -16,18 +18,4 @@ export const sensorDataForChart = column => (state) => {
     result[i % column.length].y.push(el);
   });
   return result;
-};
-
-export const sensorRecordedDataToCsv = column => (state) => {
-  const { sensorRecordedData } = state.sensorData;
-  // generate chart zero array
-  let result = column.map(name => {
-    return [name];
-  });
-  result.unshift(['column']);
-  // fill result array
-  sensorRecordedData.forEach((el, i) => {
-    result[i % column.length + 1].push(el);
-  });
-  return [result, sensorRecordedData.length];
 };

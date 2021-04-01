@@ -129,6 +129,7 @@ const Main = () => {
               isRecording={isRecording}
               isCameraConnected={isCameraConnected}
               setIsCameraConnected={setIsCameraConnected}
+              samplerate={config.samplerate}
             />
           ) : null}
         </main>

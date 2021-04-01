@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import HorizontalLabelPositionBelowStepper from "./Stepper";
 import { Status } from "../Status";
 import Scan from "./Scan";
+import { WebCamera } from "../WebCamera";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,8 +28,9 @@ const useStyles = makeStyles((theme) => ({
   },
   divWrapper: {
     margin: theme.spacing(3),
-    padding: theme.spacing(2,2,2,2),
+    padding: theme.spacing(2, 2, 2, 2),
     maxWidth: 800,
+    minHeight: 800,
   },
   button: {
     margin: theme.spacing(1, 1, 0, 0),
@@ -150,40 +152,36 @@ const Configure = (props) => {
   }
 
   return (
-    <div>
-      {props.isConnected ? (
-        <Card className={classes.divWrapper}>
-          <CardContent>
-        <Status
-          setStreamingMode={props.setStreamingMode}
-          setColumns={props.setColumns}
-          setStreamingSource={props.setStreamingSource}
-          setDeviceID={props.setDeviceID}
-          setIsConnected={props.setIsConnected}
-          isConnected={props.isConnected}
-          setIsCameraConnected={props.setIsCameraConnected}
-          isCameraConnected={props.isCameraConnected}
-          config={props.config}
-        />
-        <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    disabled={configuring}
-                    fullWidth={true}
-                    className={classes.button}   
-                    onClick={handleDisconnectRequest}                 
-                  >
-                    Disconnect from Device
-                  </Button>
-                  </CardContent>
-                  </Card>
-                    
-        )
-        
-        :
-        (
-
+    <Grid container columns>
+      <Grid item>
+        {props.isConnected ? (
+          <Card className={classes.divWrapper}>
+            <CardContent>
+              <Status
+                setStreamingMode={props.setStreamingMode}
+                setColumns={props.setColumns}
+                setStreamingSource={props.setStreamingSource}
+                setDeviceID={props.setDeviceID}
+                setIsConnected={props.setIsConnected}
+                isConnected={props.isConnected}
+                setIsCameraConnected={props.setIsCameraConnected}
+                isCameraConnected={props.isCameraConnected}
+                config={props.config}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={configuring}
+                fullWidth={true}
+                className={classes.button}
+                onClick={handleDisconnectRequest}
+              >
+                Disconnect from Device
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
           <Card className={classes.divWrapper}>
             <HorizontalLabelPositionBelowStepper />
             <CardContent>
@@ -248,42 +246,38 @@ const Configure = (props) => {
                   </div>
 
                   <div className={classes.section1}></div>
-                  
+
                   <div>
-                  
                     <FormLabel component="legend">Device ID:</FormLabel>
                     <TextField
-                        id="outlined-basic"
-                        variant="outlined"
-                        value={deviceID}
-                        onChange={handleDeviceIDChange}
-                        fullWidth={true}
-                      />
-                  
+                      id="outlined-basic"
+                      variant="outlined"
+                      value={deviceID}
+                      onChange={handleDeviceIDChange}
+                      fullWidth={true}
+                    />
                   </div>
                   <div className={classes.section1}></div>
                   <div>
-                    
-                  <Grid container columns spacing={2}>
-                    <Grid item xs={6}>
-                  <Scan
+                    <Grid container columns spacing={2}>
+                      <Grid item xs={6}>
+                        <Scan
                           source={source}
-                          handleRowSelection={handleRowSelection}                          
+                          handleRowSelection={handleRowSelection}
                         />
                       </Grid>
                       <Grid item xs={6}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      disabled={configuring}
-                      fullWidth={true}
-                      className={classes.button}
-                    >
-                      Connect to Device
-                    </Button>
-                   
-                    </Grid>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          color="primary"
+                          disabled={configuring}
+                          fullWidth={true}
+                          className={classes.button}
+                        >
+                          Connect to Device
+                        </Button>
+                      </Grid>
                     </Grid>
                   </div>
                 </FormControl>
@@ -291,8 +285,18 @@ const Configure = (props) => {
             </CardContent>
           </Card>
         )}
-
-    </div>
+      </Grid>
+      <Grid item>
+        <Card className={classes.divWrapper}>
+          <CardContent>
+            <WebCamera
+              setIsCameraConnected={props.setIsCameraConnected}
+              isCameraConnected={props.isCameraConnected}
+            />
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 

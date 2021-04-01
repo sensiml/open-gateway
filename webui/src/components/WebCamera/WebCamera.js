@@ -28,6 +28,12 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2),
     textAlign: "center",
   },
+  divWrapper: {
+    margin: theme.spacing(3),
+    padding: theme.spacing(2,2,2,2),
+    maxWidth: 800,
+    minHeight: 800,
+  },
 }));
 
 const handleCameraRequest = (
@@ -79,18 +85,20 @@ const WebCamera = (props) => {
 */
 
   return (
-    <Card>
-      <CardContent>
+  <div>
         <div className={classes.section1}>
           <Typography component="h3" variant="h3" color="secondary">
             Video Source
           </Typography>
         </div>
+        <div className={classes.section1}>
+            <Divider variant="middle" />
+        </div>
+
         <Camera
           cameraKey={cameraKey}
           cameraView={props.isCameraConnected}
         ></Camera>
-        <Divider variant="middle" />
         <div className={classes.section2}>
           <Typography variant="subtitle1" color="textSecondary"></Typography>
         </div>
@@ -136,8 +144,8 @@ const WebCamera = (props) => {
             </Grid>
           </Grid>
         </div>
-      </CardContent>
-    </Card>
+        </div>
+
   );
 };
 

@@ -101,7 +101,7 @@ const handleDeviceScan = () => {
         <DialogContent>
          <DialogContentText>Scanning for {props.source} Devices.... </DialogContentText>
 
-              <div style={{ height: 600, width: 800 }}>
+              <div style={{ height: 600, width: "100%" }}>
                 <DataGrid
                   rows={deviceRows}
                   columns={deviceColumns}

@@ -34,7 +34,10 @@ const TestMode = (props) => {
     <Grid container rows spacing={6}>
       {props.streamingMode != "recognition" ? (
         <Grid item xs={8}>
-          <SensorStream columns={props.columns}  isConnected={props.isConnected} />
+          <SensorStream
+            columns={props.columns}
+            isConnected={props.isConnected}
+          />
         </Grid>
       ) : (
         <Grid item xs={6}>
@@ -42,22 +45,12 @@ const TestMode = (props) => {
         </Grid>
       )}
       <Grid item xs={4}>
-      <Grid container  rows>
-      <Grid item xs={12}>
-      <WebCamera
-            setIsCameraConnected={props.setIsCameraConnected}
-            isCameraConnected={props.isCameraConnected}
-          />
-          </Grid>
-                <Grid item xs={12}>
-        <Record
-          isCameraConnected={props.isCameraConnected}
-          isRecording={props.isRecording}
-        />
+     
+            <Record
+              isCameraConnected={props.isCameraConnected}
+              isRecording={props.isRecording}
+            />
       </Grid>
-      </Grid>
-      </Grid>
-
     </Grid>
   );
 };

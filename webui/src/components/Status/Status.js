@@ -5,6 +5,7 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { SimpleCard } from "../SimpleCard";
+import Divider from "@material-ui/core/Divider";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,6 +42,9 @@ const Status = (props) => {
             </Typography>
           </div>
         </Grid>
+        <div className={classes.section1}>
+            <Divider variant="middle" />
+        </div>
         <Grid item xs={12} container rows spacing={2}>
           <SimpleCard name="Mode" xs="6" value={props.config.mode}></SimpleCard>
           <SimpleCard

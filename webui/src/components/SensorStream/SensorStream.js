@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SensorStream = (props) => {
-  const COUNT_SAMPLES = 16000;
+  const COUNT_SAMPLES = 1000;
   const { columns } = props;
   const classes = useStyles();
   const dispatch = useDispatch();
