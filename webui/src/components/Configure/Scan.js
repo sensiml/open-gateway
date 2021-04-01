@@ -12,26 +12,24 @@ import { makeStyles } from "@material-ui/core/styles";
 import { DialogContentText } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-      display: "flex",
-    },
-    formControl: {
-      margin: theme.spacing(3),
-      minWidth: 600,
-    },
-    button: {
-      margin: theme.spacing(1, 1, 0, 0),
-    },
-    section1: {
-      margin: theme.spacing(1, 1),
-    },
-  }));
-
-
+  root: {
+    display: "flex",
+  },
+  formControl: {
+    margin: theme.spacing(3),
+    minWidth: 600,
+  },
+  button: {
+    margin: theme.spacing(1, 1, 0, 0),
+  },
+  section1: {
+    margin: theme.spacing(1, 1),
+  },
+}));
 
 export default function AlertDialog(props) {
   const [open, setOpen] = React.useState(false);
-  const [scanning, setIsScanning] = React.useState(false);   
+  const [scanning, setIsScanning] = React.useState(false);
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [scanHelperText, setScanHelperText] = React.useState("");
   const [error, setError] = React.useState(false);
@@ -54,7 +52,7 @@ export default function AlertDialog(props) {
     setOpen(false);
   };
 
-const handleDeviceScan = () => {
+  const handleDeviceScan = () => {
     setIsScanning(true);
     axios
       .post(`${process.env.REACT_APP_API_URL}scan`, {
@@ -68,7 +66,6 @@ const handleDeviceScan = () => {
       .catch(function (error) {
         setIsScanning(false);
         if (error.response) {
-
           // Request made and server responded
           setScanHelperText(error.response.data.detail.join(", "));
           console.log(error.response.data);
@@ -84,32 +81,31 @@ const handleDeviceScan = () => {
       });
   };
 
-
-
   return (
     <div>
-      <Button variant="outlined" color="primary" fullWidth={true} onClick={handleClickOpen} className={classes.button}>
+      <Button
+        variant="outlined"
+        color="primary"
+        fullWidth={true}
+        onClick={handleClickOpen}
+        className={classes.button}
+      >
         Scan
       </Button>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        fullWidth="md"
-        maxWidth="md"
-      >
-
+      <Dialog open={open} onClose={handleClose} fullWidth="sm" maxWidth="sm">
         <DialogContent>
-         <DialogContentText>Scanning for {props.source} Devices.... </DialogContentText>
+          <DialogContentText>
+            Scanning for {props.source} Devices....{" "}
+          </DialogContentText>
 
-              <div style={{ height: 600, width: "100%" }}>
-                <DataGrid
-                  rows={deviceRows}
-                  columns={deviceColumns}
-                  onRowSelected={props.handleRowSelection}
-                  pageSize={10}
-                />
-              </div>
-
+          <div style={{ height: 600, width: "100%" }}>
+            <DataGrid
+              rows={deviceRows}
+              columns={deviceColumns}
+              onRowSelected={props.handleRowSelection}
+              pageSize={10}
+            />
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary" autoFocus>

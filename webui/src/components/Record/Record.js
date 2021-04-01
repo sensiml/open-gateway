@@ -43,7 +43,7 @@ const Record = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const [recording, setRecording] = React.useState(props.isRecording);
-  const [filename, setFilename] = React.useState("capture_name");
+  const [filename, setFilename] = React.useState("filename");
   const [recordDistabled, setRecordDistabled] = React.useState(false);
   console.log("Connected Camera");
   console.log(props.isCameraConnected);
