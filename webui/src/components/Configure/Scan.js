@@ -34,6 +34,7 @@ export default function AlertDialog(props) {
   const [scanHelperText, setScanHelperText] = React.useState("");
   const [error, setError] = React.useState(false);
   const classes = useStyles();
+  const [scanningText, setScanningText] = React.useState("Scanning");
 
   let deviceColumns = [
     { field: "id", headerName: "ID", width: 0 },
@@ -53,6 +54,7 @@ export default function AlertDialog(props) {
   };
 
   const handleDeviceScan = () => {
+    setScanningText("Scanning for " + props.source + " Devices....");
     setIsScanning(true);
     axios
       .post(`${process.env.REACT_APP_API_URL}scan`, {
@@ -62,6 +64,7 @@ export default function AlertDialog(props) {
         console.log(response.data);
         setIsScanning(false);
         setDeviceRows(response.data);
+        setScanningText("Scanning complete");
       })
       .catch(function (error) {
         setIsScanning(false);
@@ -90,13 +93,11 @@ export default function AlertDialog(props) {
         onClick={handleClickOpen}
         className={classes.button}
       >
-        Scan
+        Scan for {props.source} Devices
       </Button>
       <Dialog open={open} onClose={handleClose} fullWidth="sm" maxWidth="sm">
         <DialogContent>
-          <DialogContentText>
-            Scanning for {props.source} Devices....{" "}
-          </DialogContentText>
+          <DialogContentText>{scanningText}</DialogContentText>
 
           <div style={{ height: 600, width: "100%" }}>
             <DataGrid
