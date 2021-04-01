@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(1),
   },
   section1: {
-    margin: theme.spacing(3, 2),
+    margin: theme.spacing(1, 1),
   },
   section2: {
     margin: theme.spacing(2),
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
   divWrapper: {
     margin: theme.spacing(3),
-    padding: theme.spacing(2,2,2,2),
+    padding: theme.spacing(2, 2, 2, 2),
     maxWidth: 800,
     minHeight: 800,
   },
@@ -69,7 +69,6 @@ const handleCameraRequest = (
 
 const WebCamera = (props) => {
   const classes = useStyles();
-  const theme = useTheme();
   const [cameraView, setCameraView] = React.useState(false);
   const [cameraKey, setCameraKey] = React.useState("");
 
@@ -85,67 +84,66 @@ const WebCamera = (props) => {
 */
 
   return (
-  <div>
-        <div className={classes.section1}>
-          <Typography component="h3" variant="h3" color="secondary">
-            Video Source
-          </Typography>
-        </div>
-        <div className={classes.section1}>
-            <Divider variant="middle" />
-        </div>
+    <div>
+      <div className={classes.section1}>
+        <Typography component="h3" variant="h3" color="secondary">
+          Video Source
+        </Typography>
+      </div>
+      <div className={classes.section1}>
+        <Divider variant="middle" />
+      </div>
 
-        <Camera
-          cameraKey={cameraKey}
-          cameraView={props.isCameraConnected}
-        ></Camera>
-        <div className={classes.section2}>
-          <Typography variant="subtitle1" color="textSecondary"></Typography>
-        </div>
+      <Camera
+        cameraKey={cameraKey}
+        cameraView={props.isCameraConnected}
+      ></Camera>
+      <div className={classes.section2}>
+        <Typography variant="subtitle1" color="textSecondary"></Typography>
+      </div>
 
-        <div className={classes.details}>
-          <Grid container rows spacing={2}>
-            <Grid item xs={12}>
-              {props.isCameraConnected === false ? (
-                <Button
-                  aria-label="Start Camera"
-                  variant="contained"
-                  color="secondary"
-                  fullWidth={true}
-                  onClick={() => {
-                    handleCameraRequest(
-                      "camera-on",
-                      setCameraView,
-                      props.setIsCameraConnected,
-                      setCameraKey
-                    );
-                  }}
-                >
-                  Start Camera
-                </Button>
-              ) : (
-                <Button
-                  aria-label="Stop Camera"
-                  color="secondary"
-                  variant="contained"
-                  fullWidth={true}
-                  onClick={() => {
-                    handleCameraRequest(
-                      "camera-off",
-                      setCameraView,
-                      props.setIsCameraConnected,
-                      setCameraKey
-                    );
-                  }}
-                >
-                  Stop Camera
-                </Button>
-              )}
-            </Grid>
+      <div className={classes.details}>
+        <Grid container rows spacing={2}>
+          <Grid item xs={12}>
+            {props.isCameraConnected === false ? (
+              <Button
+                aria-label="Start Camera"
+                variant="contained"
+                color="secondary"
+                fullWidth={true}
+                onClick={() => {
+                  handleCameraRequest(
+                    "camera-on",
+                    setCameraView,
+                    props.setIsCameraConnected,
+                    setCameraKey
+                  );
+                }}
+              >
+                Start Camera
+              </Button>
+            ) : (
+              <Button
+                aria-label="Stop Camera"
+                color="secondary"
+                variant="contained"
+                fullWidth={true}
+                onClick={() => {
+                  handleCameraRequest(
+                    "camera-off",
+                    setCameraView,
+                    props.setIsCameraConnected,
+                    setCameraKey
+                  );
+                }}
+              >
+                Stop Camera
+              </Button>
+            )}
           </Grid>
-        </div>
-        </div>
-
+        </Grid>
+      </div>
+    </div>
   );
 };
 

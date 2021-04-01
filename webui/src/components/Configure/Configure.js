@@ -1,4 +1,4 @@
-import { Grid, Paper } from "@material-ui/core";
+import { Grid, Paper, Typography, Divider } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
   divWrapper: {
     margin: theme.spacing(3),
     padding: theme.spacing(2, 2, 2, 2),
-    maxWidth: 800,
-    minHeight: 800,
+    maxWidth: 700,
+    minWidth: 700,
   },
   button: {
     margin: theme.spacing(1, 1, 0, 0),
@@ -154,137 +154,145 @@ const Configure = (props) => {
   return (
     <Grid container columns>
       <Grid item>
-        {props.isConnected ? (
-          <Card className={classes.divWrapper}>
-            <CardContent>
-              <Status
-                setStreamingMode={props.setStreamingMode}
-                setColumns={props.setColumns}
-                setStreamingSource={props.setStreamingSource}
-                setDeviceID={props.setDeviceID}
-                setIsConnected={props.setIsConnected}
-                isConnected={props.isConnected}
-                setIsCameraConnected={props.setIsCameraConnected}
-                isCameraConnected={props.isCameraConnected}
-                config={props.config}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={configuring}
-                fullWidth={true}
-                className={classes.button}
-                onClick={handleDisconnectRequest}
-              >
-                Disconnect from Device
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className={classes.divWrapper}>
-            <HorizontalLabelPositionBelowStepper />
-            <CardContent>
-              <form onSubmit={handleSubmit}>
-                <FormControl
-                  component="fieldset"
-                  disabled={configuring || props.isConnected}
-                  error={error}
-                  className={classes.formControl}
+        <Card className={classes.divWrapper}>
+          <CardContent>
+            <div className={classes.section1}>
+              <Typography component="h3" variant="h3" color="secondary">
+                Device Source
+              </Typography>
+            </div>
+
+            <div className={classes.section1}>
+              <Divider variant="middle" />
+            </div>
+            {props.isConnected ? (
+              <React.Fragment>
+                <Status
+                  setStreamingMode={props.setStreamingMode}
+                  setColumns={props.setColumns}
+                  setStreamingSource={props.setStreamingSource}
+                  setDeviceID={props.setDeviceID}
+                  setIsConnected={props.setIsConnected}
+                  isConnected={props.isConnected}
+                  setIsCameraConnected={props.setIsCameraConnected}
+                  isCameraConnected={props.isCameraConnected}
+                  config={props.config}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={configuring}
+                  fullWidth={true}
+                  className={classes.button}
+                  onClick={handleDisconnectRequest}
                 >
-                  <div>
-                    <FormLabel>Connection Type</FormLabel>
-                    <RadioGroup
-                      aria-label="source"
-                      value={source}
-                      onChange={handleRadioChange}
-                      row
-                    >
-                      <FormControlLabel
-                        value="SERIAL"
-                        control={<Radio />}
-                        label="Serial"
-                      />
-                      <FormControlLabel
-                        value="BLE"
-                        control={<Radio />}
-                        label="BLE"
-                      />
-                      <FormControlLabel
-                        value="TCPIP"
-                        control={<Radio />}
-                        label="TCP/IP"
-                      />
-                      <FormControlLabel
-                        value="TEST"
-                        control={<Radio />}
-                        label="Test"
-                      />
-                    </RadioGroup>
-                  </div>
-                  <div className={classes.section1}></div>
-                  <div>
-                    <FormLabel component="legend">Device Mode:</FormLabel>
-                    <RadioGroup
-                      aria-label="mode"
-                      name="Streaming Source"
-                      value={mode}
-                      onChange={handleModeChange}
-                      row
-                    >
-                      <FormControlLabel
-                        value="DATA_CAPTURE"
-                        control={<Radio />}
-                        label="Data Capture"
-                      />
-                      <FormControlLabel
-                        value="RECOGNITION"
-                        control={<Radio />}
-                        label="Recognition"
-                      />
-                    </RadioGroup>
-                  </div>
-
-                  <div className={classes.section1}></div>
-
-                  <div>
-                    <FormLabel component="legend">Device ID:</FormLabel>
-                    <TextField
-                      id="outlined-basic"
-                      variant="outlined"
-                      value={deviceID}
-                      onChange={handleDeviceIDChange}
-                      fullWidth={true}
-                    />
-                  </div>
-                  <div className={classes.section1}></div>
-                  <div>
-                    <Grid container columns spacing={2}>
-                      <Grid item xs={6}>
-                        <Scan
-                          source={source}
-                          handleRowSelection={handleRowSelection}
+                  Disconnect from Device
+                </Button>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <form onSubmit={handleSubmit}>
+                  <FormControl
+                    component="fieldset"
+                    disabled={configuring || props.isConnected}
+                    error={error}
+                    className={classes.formControl}
+                  >
+                    <div>
+                      <FormLabel>Connection Type</FormLabel>
+                      <RadioGroup
+                        aria-label="source"
+                        value={source}
+                        onChange={handleRadioChange}
+                        row
+                      >
+                        <FormControlLabel
+                          value="SERIAL"
+                          control={<Radio />}
+                          label="Serial"
                         />
+                        <FormControlLabel
+                          value="BLE"
+                          control={<Radio />}
+                          label="BLE"
+                        />
+                        <FormControlLabel
+                          value="TCPIP"
+                          control={<Radio />}
+                          label="TCP/IP"
+                        />
+                        <FormControlLabel
+                          value="TEST"
+                          control={<Radio />}
+                          label="Test"
+                        />
+                      </RadioGroup>
+                    </div>
+                    <div className={classes.section1}></div>
+                    <div>
+                      <FormLabel component="legend">Device Mode:</FormLabel>
+                      <RadioGroup
+                        aria-label="mode"
+                        name="Streaming Source"
+                        value={mode}
+                        onChange={handleModeChange}
+                        row
+                      >
+                        <FormControlLabel
+                          value="DATA_CAPTURE"
+                          control={<Radio />}
+                          label="Data Capture"
+                        />
+                        <FormControlLabel
+                          value="RECOGNITION"
+                          control={<Radio />}
+                          label="Recognition"
+                        />
+                      </RadioGroup>
+                    </div>
+
+                    <div className={classes.section1}></div>
+
+                    <div>
+                      <FormLabel component="legend">Device ID:</FormLabel>
+                      <TextField
+                        id="outlined-basic"
+                        variant="outlined"
+                        value={deviceID}
+                        onChange={handleDeviceIDChange}
+                        fullWidth={true}
+                      />
+                    </div>
+                    <div className={classes.section1}></div>
+                    <div>
+                      <Grid container columns spacing={2}>
+                        <Grid item xs={6}>
+                          <Scan
+                            source={source}
+                            handleRowSelection={handleRowSelection}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            disabled={configuring}
+                            fullWidth={true}
+                            className={classes.button}
+                          >
+                            Connect to Device
+                          </Button>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          color="primary"
-                          disabled={configuring}
-                          fullWidth={true}
-                          className={classes.button}
-                        >
-                          Connect to Device
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </div>
-                </FormControl>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+                    </div>
+                  </FormControl>
+                </form>
+              </React.Fragment>
+            )}
+          </CardContent>
+        </Card>
       </Grid>
       <Grid item>
         <Card className={classes.divWrapper}>

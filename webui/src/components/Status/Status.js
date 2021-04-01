@@ -8,9 +8,6 @@ import { SimpleCard } from "../SimpleCard";
 import Divider from "@material-ui/core/Divider";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-  },
   details: {
     display: "flex",
     flexDirection: "column",
@@ -33,51 +30,39 @@ const Status = (props) => {
   const theme = useTheme();
 
   return (
-    <div class={classes.root}>
-      <Grid container columns spacing={4}>
-        <Grid item xs={12} container rows spacing={2}>
-          <div className={classes.section1}>
-            <Typography component="h3" variant="h3" color="secondary">
-              Device Source
-            </Typography>
-          </div>
-        </Grid>
-        <div className={classes.section1}>
-            <Divider variant="middle" />
-        </div>
-        <Grid item xs={12} container rows spacing={2}>
-          <SimpleCard name="Mode" xs="6" value={props.config.mode}></SimpleCard>
-          <SimpleCard
-            name="Source"
-            xs="6"
-            value={props.config.source}
-          ></SimpleCard>
-        </Grid>
-        <Grid item xs={12} container rows spacing={2}>
-          <SimpleCard
-            name="Device ID"
-            xs={6}
-            value={props.config.device_id}
-          ></SimpleCard>
-          {props.config.mode === "data_capture" ? (
-            <SimpleCard
-              xs="6"
-              name="Sample Rate"
-              value={props.config.sample_rate}
-            ></SimpleCard>
-          ) : null}
-        </Grid>
-        <Grid item xs={12}>
-          {props.config.mode === "data_capture" ? (
-            <SimpleCard
-              name="Sensor Columns"
-              value={props.config.column_location}
-              list={true}
-            ></SimpleCard>
-          ) : null}
-        </Grid>
+    <Grid container rows>
+      <Grid item xs={12} container rows spacing={2}>
+        <SimpleCard name="Mode" xs="6" value={props.config.mode}></SimpleCard>
+        <SimpleCard
+          name="Source"
+          xs="6"
+          value={props.config.source}
+        ></SimpleCard>
       </Grid>
-    </div>
+      <Grid item xs={12} container rows spacing={2}>
+        <SimpleCard
+          name="Device ID"
+          xs={6}
+          value={props.config.device_id}
+        ></SimpleCard>
+        {props.config.mode === "data_capture" ? (
+          <SimpleCard
+            xs="6"
+            name="Sample Rate"
+            value={props.config.sample_rate}
+          ></SimpleCard>
+        ) : null}
+      </Grid>
+      <Grid item xs={12}>
+        {props.config.mode === "data_capture" ? (
+          <SimpleCard
+            name="Sensor Columns"
+            value={props.config.column_location}
+            list={true}
+          ></SimpleCard>
+        ) : null}
+      </Grid>
+    </Grid>
   );
 };
 
