@@ -1,6 +1,6 @@
 {
-  "short_name": "Simple Gateway",
-  "name": "Simple Streaming Gateway Admin",
+  "short_name": "SensiML Gateway",
+  "name": "SensiML Gateway Admin",
   "icons": [
     {
       "src": "favicon.png",

@@ -33,7 +33,7 @@ const Header = () => {
   return (
     <AppBar position="static" className={classes.appBar}>
       <Toolbar>
-        <Typography variant="h6">SensiML Streaming Gateway</Typography>
+        <Typography variant="h6">SensiML Gateway</Typography>
       </Toolbar>
     </AppBar>
   );

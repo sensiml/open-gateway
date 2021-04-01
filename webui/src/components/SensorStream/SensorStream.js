@@ -8,12 +8,10 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  SET_IS_STREAMING_SENSOR_RECORDING,
   SET_STREAM_SENSOR_DATA_RESET,
-  SET_STREAM_SENSOR_RECORD_DATA,
   START_STREAM_SENSOR_SAGA,
   STOP_STREAM_SENSOR_SAGA,
 } from "../../redux/actions/actionTypes";
@@ -21,7 +19,6 @@ import {
   sensorDataForChart,
   sensorRecordedDataToCsv,
 } from "../../redux/selectors/sensorData";
-import LinkExportToCSV from "../BaseData/LinkExportToCSV";
 import SensorDataChart from "./SensorDataChart";
 
 const useStyles = makeStyles((theme) => ({
@@ -48,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SensorStream = (props) => {
-  const COUNT_SAMPLES = 16000;
+  const COUNT_SAMPLES = 1000;
   const { columns } = props;
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -57,9 +54,6 @@ const SensorStream = (props) => {
     (state) => state.stream
   );
   const sensorData = useSelector(sensorDataForChart(columns));
-  const [exportCsvRecordedData, countRecordedData] = useSelector(
-    sensorRecordedDataToCsv(columns)
-  );
 
   const startSensorStreaming = useCallback(
     // max array is COUNT_SAMPLES * count of data types
@@ -78,21 +72,6 @@ const SensorStream = (props) => {
     [dispatch]
   );
 
-  const setRecording = useCallback(
-    (isRecording) =>
-      dispatch({
-        type: SET_IS_STREAMING_SENSOR_RECORDING,
-        payload: isRecording,
-      }),
-    [dispatch]
-  );
-
-  const setClearRecording = useCallback(
-    (isRecording) =>
-      dispatch({ type: SET_STREAM_SENSOR_RECORD_DATA, payload: [] }),
-    [dispatch]
-  );
-
   const setClearStream = useCallback(
     () => dispatch({ type: SET_STREAM_SENSOR_DATA_RESET, payload: [] }),
     [dispatch]
@@ -105,7 +84,6 @@ const SensorStream = (props) => {
   const manageStream = () => {
     console.log("streaming", isStreamingSensor);
     if (isStreamingSensor) {
-      setRecording(false);
       stopSensorStreaming();
     } else {
       setClearStream();
@@ -113,18 +91,13 @@ const SensorStream = (props) => {
     }
   };
 
-  const switchRecording = () => {
-    if (!isStreamingSensorRecording) {
-      {
-        setClearRecording();
-      }
-    }
-    setRecording(!isStreamingSensorRecording);
-  };
+  useEffect(() => {
+    if (!props.isConnected && isStreamingSensor){
+        stopSensorStreaming();
+        setClearStream();      
+      } 
 
-  const deleteRecording = () => {
-    setClearRecording();
-  };
+  }, []);
 
   return (
     <Card>
@@ -168,23 +141,6 @@ const SensorStream = (props) => {
             >
               {isStreamingSensor ? "Stop" : "View"}
             </Button>
-            <Button
-              variant="outlined"
-              disabled={!isStreamingSensor}
-              className={classes.button}
-              onClick={() => switchRecording()}
-            >
-              {isStreamingSensorRecording ? "Stop Recording" : "Record"}
-            </Button>
-          </Box>
-          <Box>
-            {countRecordedData ? (
-              <LinkExportToCSV
-                data={exportCsvRecordedData}
-                title={`Export Recorded items ${countRecordedData} to CSV`}
-                deleteFile={deleteRecording}
-              />
-            ) : null}
           </Box>
         </Box>
       </CardContent>

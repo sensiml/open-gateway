@@ -16,12 +16,13 @@ const Main = () => {
   const dispatch = useDispatch();
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState(0);
-  const [streamingSource, setStreamingSource] = React.useState(0);
+  const [streamingSource, setStreamingSource] = React.useState(null);
   const [columns, setColumns] = React.useState([]);
   const [deviceID, setDeviceID] = React.useState([]);
   const [isConnected, setIsConnected] = React.useState(false);
   const [isCameraConnected, setIsCameraConnected] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
+  const [config, setConfig] = React.useState({});
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { isStreamingSensor } = useSelector((state) => state.stream);
@@ -33,15 +34,22 @@ const Main = () => {
     }
   }
 
-  useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
-      setIsCameraConnected(response.data.camera_on);
-      setIsConnected(response.data.streaming);
-      setIsRecording(response.data.recording);
+  function mapdata(data) {
+    if (data.mode) {
+      setStreamingMode(data.mode);
+    }
+    setIsConnected(data.streaming);
+    setColumns(Object.keys(data.column_location).sort());
+    setStreamingSource(data.source.toUpperCase());
+    setDeviceID(data.device_id);
+    setIsCameraConnected(data.camera_on);
+    data.column_location =
+      "column_location" in data
+        ? Object.keys(data.column_location).sort().join(", ")
+        : [];
 
-      //console.log(response.data);
-    });
-  });
+    setConfig(data);
+  }
 
   const alertUser = (e) => {
     if (isStreamingSensor) {
@@ -74,6 +82,16 @@ const Main = () => {
     }
   }, [errorDataMsg]);
 
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
+      mapdata(response.data);
+      console.log('here');
+      
+      //console.log(response.data);
+    });
+  }, [activeView]);
+
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -87,7 +105,9 @@ const Main = () => {
         />
         <main className={classes.content}>
           {activeView === 0 ? (
-            <Status
+            <Configure
+              streamingMode={streamingMode}
+              deviceID={deviceID}
               setStreamingMode={setStreamingMode}
               setColumns={setColumns}
               setStreamingSource={setStreamingSource}
@@ -96,23 +116,20 @@ const Main = () => {
               isConnected={isConnected}
               setIsCameraConnected={setIsCameraConnected}
               isCameraConnected={isCameraConnected}
+              config={config}
+              setConfig={setConfig}
+              streamingSource={streamingSource}
             />
-          ) : null}
+          ) : null}        
           {activeView === 1 ? (
             <TestMode
               columns={columns}
               streamingMode={streamingMode}
+              isConnected={isConnected}
               isRecording={isRecording}
               isCameraConnected={isCameraConnected}
-            />
-          ) : null}
-          {activeView === 2 ? (
-            <Configure
-              setStreamingMode={setStreamingMode}
-              streamingSource={streamingSource}
-              streamingMode={streamingMode}
-              deviceID={deviceID}
-              setIsConnected={setIsConnected}
+              setIsCameraConnected={setIsCameraConnected}
+              samplerate={config.samplerate}
             />
           ) : null}
         </main>

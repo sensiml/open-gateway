@@ -45,13 +45,9 @@ const useStyles = makeStyles((theme) => ({
 const InconSelector = (props) => {
   switch (props.index) {
     case 0:
-      return <InfoIcon />;
+      return <SettingsIcon />;
     case 1:
       return <AssessmentIcon />;
-    case 3:
-      return <SettingsIcon />;
-    case 4:
-      return <InboxIcon />;
     default:
       return <InboxIcon />;
   }
@@ -91,14 +87,16 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Gateway Status", "Test Mode", "Configure"].map((text, index) => (
-            <ListItem button key={text} onClick={handleMenu(index)}>
-              <ListItemIcon>
-                <InconSelector index={index}> </InconSelector>
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+          {["Settings", "Test Mode"].map(
+            (text, index) => (
+              <ListItem button key={text} onClick={handleMenu(index)}>
+                <ListItemIcon>
+                  <InconSelector index={index}> </InconSelector>
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            )
+          )}
           <div className={classes.section1}>
             <Divider></Divider>
           </div>

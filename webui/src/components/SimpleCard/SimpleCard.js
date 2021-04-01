@@ -29,36 +29,28 @@ const SimpleCard = (props) => {
   const classes = useStyles();
   return (
     <Grid item xs={props.xs}>
-      <Card className={classes.root}>
-        <CardContent>
-          <Typography
-            align="center"
-            className={classes.title}
-            color="textPrimary"
-          >
-            {props.name}
-          </Typography>
-          {props.list ? (
-            <div className={classes.bullet}>
-              <List dense={true}>
-                {props.value.split(",").map((value) => (
-                  <ListItem>
-                    <ListItemText align="center" primary={value} />
-                  </ListItem>
-                ))}
-              </List>
-            </div>
-          ) : (
-            <Typography
-              align="center"
-              className={classes.pos}
-              color="textSecondary"
-            >
-              {props.value}
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
+      <Typography align="center" className={classes.title} color="textPrimary">
+        {props.name}
+      </Typography>
+      {props.list ? (
+        <div className={classes.bullet}>
+          <List dense={true}>
+            {props.value.split(",").map((value) => (
+              <ListItem>
+                <ListItemText align="center" primary={value} />
+              </ListItem>
+            ))}
+          </List>
+        </div>
+      ) : (
+        <Typography
+          align="center"
+          className={classes.pos}
+          color="textSecondary"
+        >
+          {props.value}
+        </Typography>
+      )}
     </Grid>
   );
 };

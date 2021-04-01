@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid, Paper, Typography, Divider } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -12,8 +12,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { DataGrid } from "@material-ui/data-grid";
 import axios from "axios";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HorizontalLabelPositionBelowStepper from "./Stepper";
+import { Status } from "../Status";
+import Scan from "./Scan";
+import { WebCamera } from "../WebCamera";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,29 +26,36 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3),
     minWidth: 600,
   },
+  divWrapper: {
+    margin: theme.spacing(3),
+    padding: theme.spacing(2, 2, 2, 2),
+    maxWidth: 700,
+    minWidth: 700,
+  },
   button: {
     margin: theme.spacing(1, 1, 0, 0),
+  },
+  section1: {
+    margin: theme.spacing(2, 0, 3, 0),
   },
 }));
 
 const Configure = (props) => {
   const classes = useStyles();
-  const [source, setSource] = React.useState(props.streamingSource);
+  const [source, setSource] = React.useState(
+    props.streamingSource ? props.streamingSource : "SERIAL"
+  );
   const [mode, setMode] = React.useState(
     props.streamingMode === "recognition" ? "RECOGNITION" : "DATA_CAPTURE"
   );
   const [deviceID, setDeviceID] = React.useState(props.deviceID);
   const [error, setError] = React.useState(false);
-  const [scanHelperText, setScanHelperText] = React.useState("");
+
   const [helperText, setHelperText] = React.useState("");
-  const [deviceRows, setDeviceRows] = React.useState([]);
+
   const [configuring, setIsConfiguring] = React.useState(false);
-  const [scanning, setIsScanning] = React.useState(false);
-  let deviceColumns = [
-    { field: "id", headerName: "ID", width: 0 },
-    { field: "device_id", headerName: "Device ID", width: 240 },
-    { field: "name", headerName: "Name", width: 240 },
-  ];
+
+  let [deviceDisabled, setDeviceDisabled] = useState(false);
 
   const handleRadioChange = (event) => {
     console.log("handle radio");
@@ -86,10 +96,7 @@ const Configure = (props) => {
         mode: mode,
       })
       .then((response) => {
-        console.log(response.data);
-        console.log(props);
-        props.setStreamingMode(response.data.mode);
-        props.setIsConnected(true);
+        mapdata(response.data);
         setHelperText("Gateway Connected to device, now ready to stream.");
         setIsConfiguring(false);
       })
@@ -110,163 +117,194 @@ const Configure = (props) => {
       });
   };
 
-  const handleDeviceScan = (event) => {
-    console.log(event);
-    setIsScanning(true);
-    event.preventDefault();
-    axios
-      .post(`${process.env.REACT_APP_API_URL}scan`, {
-        source: source.toLowerCase(),
-      })
-      .then((response) => {
-        console.log(response.data);
-        setIsScanning(false);
-        setDeviceRows(response.data);
-      })
-      .catch(function (error) {
-        setIsScanning(false);
-        if (error.response) {
-
-          // Request made and server responded
-          setScanHelperText(error.response.data.detail.join(", "));
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log("Error", error.detail);
-        }
-      });
+  const handleDisconnectRequest = (event) => {
+    setDeviceDisabled(true);
+    axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
+      console.log(res.data);
+      mapdata(res.data);
+      setDeviceDisabled(false);
+    });
   };
 
-  return (
-    <div>
-      
-      <Grid container rows spacing={4}>
-        <Grid item>
-          <Card>
-          <HorizontalLabelPositionBelowStepper />
-            <CardContent>            
-              <form onSubmit={handleSubmit}>
-                <FormControl component="fieldset" disabled={configuring} error={error} className={classes.formControl}>
-                  <div>
-                    <FormLabel>Connection Type</FormLabel>
-                    <RadioGroup
-                      aria-label="source"
-                      value={source}
-                      onChange={handleRadioChange}
-                      row
-                    >
-                      <FormControlLabel
-                        value="SERIAL"
-                        control={<Radio />}
-                        label="Serial"
-                      />
-                      <FormControlLabel
-                        value="BLE"
-                        control={<Radio />}
-                        label="BLE"
-                      />
-                      <FormControlLabel
-                        value="TCPIP"
-                        control={<Radio />}
-                        label="TCP/IP"
-                      />
-                      <FormControlLabel
-                        value="TEST"
-                        control={<Radio />}
-                        label="Test"
-                      />
-                    </RadioGroup>
-                  </div>
-                  <div>
-                    <FormLabel component="legend">
-                      Device Mode:
-                            </FormLabel>
-                    <RadioGroup
-                      aria-label="mode"
-                      name="Streaming Source"
-                      value={mode}
-                      onChange={handleModeChange}
-                      row
-                    >
-                      <FormControlLabel
-                        value="DATA_CAPTURE"
-                        control={<Radio />}
-                        label="Data Capture"
-                      />
-                      <FormControlLabel
-                        value="RECOGNITION"
-                        control={<Radio />}
-                        label="Recognition"
-                      />
-                    </RadioGroup>
-                  </div>
-                  <div>
-                    <FormLabel component="legend">Device ID:</FormLabel>
-                    <TextField
-                      id="outlined-basic"
-                      variant="outlined"
-                      value={deviceID}
-                      onChange={handleDeviceIDChange}
-                      fullWidth={true}
-                    />
-                  </div>
-                  <div>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      disabled={configuring}
-                      fullWidth={true}
-                      className={classes.button}
-                    >
-                      Configure Gateway
-                    </Button>
-                  </div>
-                </FormControl>
-              </form>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item>
-          <Card>
-            <CardContent>
-              <form onSubmit={handleDeviceScan}>
-                <FormControl
-                  component="fieldset"
-                  error={error}
-                  className={classes.formControl}
-                >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                    fullWidth={true}
-                    disabled={scanning}
-                  >
-                    Scan For {source} Devices
-                        </Button>
-                  <div style={{ height: 600, width: 600 }}>
-                    <DataGrid
-                      rows={deviceRows}
-                      columns={deviceColumns}
-                      onRowSelected={handleRowSelection}
-                      pageSize={10}
-                    />
-                  </div>
-                  <FormHelperText>{scanHelperText}</FormHelperText>
-                </FormControl>
-              </form>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+  const handleConnectRequest = (event) => {
+    setDeviceDisabled(true);
+    axios.get(`${process.env.REACT_APP_API_URL}connect`).then((res) => {
+      mapdata(res.data);
+      setDeviceDisabled(false);
+    });
+  };
 
-    </div>
+  function mapdata(data) {
+    if (data.mode) {
+      props.setStreamingMode(data.mode);
+    }
+    props.setIsConnected(data.streaming);
+    props.setColumns(Object.keys(data.column_location).sort());
+    props.setStreamingSource(data.source);
+    props.setDeviceID(data.device_id);
+    props.setIsCameraConnected(data.camera_on);
+    data.column_location =
+      "column_location" in data
+        ? Object.keys(data.column_location).sort().join(", ")
+        : [];
+
+    props.setConfig(data);
+  }
+
+  return (
+    <Grid container columns>
+      <Grid item>
+        <Card className={classes.divWrapper}>
+          <CardContent>
+            <div className={classes.section1}>
+              <Typography component="h3" variant="h3" color="secondary">
+                Device Source
+              </Typography>
+            </div>
+
+            <div className={classes.section1}>
+              <Divider variant="middle" />
+            </div>
+            {props.isConnected ? (
+              <React.Fragment>
+                <Status
+                  setStreamingMode={props.setStreamingMode}
+                  setColumns={props.setColumns}
+                  setStreamingSource={props.setStreamingSource}
+                  setDeviceID={props.setDeviceID}
+                  setIsConnected={props.setIsConnected}
+                  isConnected={props.isConnected}
+                  setIsCameraConnected={props.setIsCameraConnected}
+                  isCameraConnected={props.isCameraConnected}
+                  config={props.config}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={configuring}
+                  fullWidth={true}
+                  className={classes.button}
+                  onClick={handleDisconnectRequest}
+                >
+                  Disconnect from Device
+                </Button>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <form onSubmit={handleSubmit}>
+                  <FormControl
+                    component="fieldset"
+                    disabled={configuring || props.isConnected}
+                    error={error}
+                    className={classes.formControl}
+                  >
+                    <div>
+                      <FormLabel>Connection Type</FormLabel>
+                      <RadioGroup
+                        aria-label="source"
+                        value={source}
+                        onChange={handleRadioChange}
+                        row
+                      >
+                        <FormControlLabel
+                          value="SERIAL"
+                          control={<Radio />}
+                          label="Serial"
+                        />
+                        <FormControlLabel
+                          value="BLE"
+                          control={<Radio />}
+                          label="BLE"
+                        />
+                        <FormControlLabel
+                          value="TCPIP"
+                          control={<Radio />}
+                          label="TCP/IP"
+                        />
+                        <FormControlLabel
+                          value="TEST"
+                          control={<Radio />}
+                          label="Test"
+                        />
+                      </RadioGroup>
+                    </div>
+                    <div className={classes.section1}></div>
+                    <div>
+                      <FormLabel component="legend">Device Mode:</FormLabel>
+                      <RadioGroup
+                        aria-label="mode"
+                        name="Streaming Source"
+                        value={mode}
+                        onChange={handleModeChange}
+                        row
+                      >
+                        <FormControlLabel
+                          value="DATA_CAPTURE"
+                          control={<Radio />}
+                          label="Data Capture"
+                        />
+                        <FormControlLabel
+                          value="RECOGNITION"
+                          control={<Radio />}
+                          label="Recognition"
+                        />
+                      </RadioGroup>
+                    </div>
+
+                    <div className={classes.section1}></div>
+
+                    <div>
+                      <FormLabel component="legend">Device ID:</FormLabel>
+                      <TextField
+                        id="outlined-basic"
+                        variant="outlined"
+                        value={deviceID}
+                        onChange={handleDeviceIDChange}
+                        fullWidth={true}
+                      />
+                    </div>
+                    <div className={classes.section1}></div>
+                    <div>
+                      <Grid container columns spacing={2}>
+                        <Grid item xs={6}>
+                          <Scan
+                            source={source}
+                            handleRowSelection={handleRowSelection}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            disabled={configuring}
+                            fullWidth={true}
+                            className={classes.button}
+                          >
+                            Connect to Device
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    </div>
+                  </FormControl>
+                </form>
+              </React.Fragment>
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid item>
+        <Card className={classes.divWrapper}>
+          <CardContent>
+            <WebCamera
+              setIsCameraConnected={props.setIsCameraConnected}
+              isCameraConnected={props.isCameraConnected}
+            />
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 
