@@ -47,11 +47,7 @@ const InconSelector = (props) => {
     case 0:
       return <SettingsIcon />;
     case 1:
-      return <InfoIcon />;
-    case 3:
       return <AssessmentIcon />;
-    case 4:
-      return <InboxIcon />;
     default:
       return <InboxIcon />;
   }
