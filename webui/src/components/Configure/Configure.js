@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1, 1, 0, 0),
   },
   section1: {
-    margin: theme.spacing(2, 0, 3, 0),
+    margin: theme.spacing(2, 0, 1, 0),
   },
 }));
 
@@ -196,6 +196,28 @@ const Configure = (props) => {
                     error={error}
                     className={classes.formControl}
                   >
+                      <div>
+                      <FormLabel component="legend">Device Mode:</FormLabel>
+                      <RadioGroup
+                        aria-label="mode"
+                        name="Streaming Source"
+                        value={mode}
+                        onChange={handleModeChange}
+                        row
+                      >
+                        <FormControlLabel
+                          value="DATA_CAPTURE"
+                          control={<Radio />}
+                          label="Data Capture"
+                        />
+                        <FormControlLabel
+                          value="RECOGNITION"
+                          control={<Radio />}
+                          label="Recognition"
+                        />
+                      </RadioGroup>
+                    </div>
+                    <div className={classes.section1}></div>
                     <div>
                       <FormLabel>Connection Type</FormLabel>
                       <RadioGroup
@@ -226,28 +248,12 @@ const Configure = (props) => {
                         />
                       </RadioGroup>
                     </div>
-                    <div className={classes.section1}></div>
-                    <div>
-                      <FormLabel component="legend">Device Mode:</FormLabel>
-                      <RadioGroup
-                        aria-label="mode"
-                        name="Streaming Source"
-                        value={mode}
-                        onChange={handleModeChange}
-                        row
-                      >
-                        <FormControlLabel
-                          value="DATA_CAPTURE"
-                          control={<Radio />}
-                          label="Data Capture"
-                        />
-                        <FormControlLabel
-                          value="RECOGNITION"
-                          control={<Radio />}
-                          label="Recognition"
-                        />
-                      </RadioGroup>
-                    </div>
+
+                    <Scan
+                            source={source}
+                            handleRowSelection={handleRowSelection}
+                            configuring={configuring}
+                          />
 
                     <div className={classes.section1}></div>
 
@@ -261,16 +267,13 @@ const Configure = (props) => {
                         fullWidth={true}
                       />
                     </div>
+                  
+
                     <div className={classes.section1}></div>
                     <div>
                       <Grid container columns spacing={2}>
-                        <Grid item xs={6}>
-                          <Scan
-                            source={source}
-                            handleRowSelection={handleRowSelection}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
+
+                        <Grid item xs={12}>
                           <Button
                             type="submit"
                             variant="contained"

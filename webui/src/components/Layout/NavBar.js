@@ -1,4 +1,5 @@
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
+import { green, red, grey } from '@material-ui/core/colors';
 import Button from "@material-ui/core/Button";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
@@ -13,6 +14,7 @@ import InboxIcon from "@material-ui/icons/MoveToInbox";
 import HomeIcon from "@material-ui/icons/Home";
 import React from "react";
 import Divider from "@material-ui/core/Divider";
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -57,13 +59,10 @@ const Connected = (props) => {
   return (
     <Grid>
       {props.isConnected ? (
-        <Button color="primary" variant="contained" aria-label="connected">
-          {props.text}: Connected
-        </Button>
+        <Typography> <FiberManualRecordIcon   style={{  fontSize: 16, color: green[500] }}></FiberManualRecordIcon> Connected  </Typography> 
+        
       ) : (
-        <Button variant="contained" aria-label="disconnect" disabled={true}>
-          {props.text}: Disconnected
-        </Button>
+        <Typography> <FiberManualRecordIcon   style={{  fontSize: 16, color: grey[500] }}> </FiberManualRecordIcon>  Not Connected </Typography>  
       )}
     </Grid>
   );
@@ -99,10 +98,16 @@ const NavBar = (props) => {
             <Divider></Divider>
           </div>
           <ListItem>
+            <Typography color='primary'>Device Status</Typography>
+          </ListItem>
+          <ListItem>
             <Connected
               text="Device"
               isConnected={props.isConnected}
             ></Connected>
+          </ListItem>
+          <ListItem>
+            <Typography color='primary'>Video Status</Typography>
           </ListItem>
           <ListItem>
             <Connected

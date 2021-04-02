@@ -109,7 +109,7 @@ const WebCamera = (props) => {
               <Button
                 aria-label="Start Camera"
                 variant="contained"
-                color="secondary"
+                color="primary"
                 fullWidth={true}
                 onClick={() => {
                   handleCameraRequest(
@@ -120,12 +120,12 @@ const WebCamera = (props) => {
                   );
                 }}
               >
-                Start Camera
+                Connect to Camera
               </Button>
             ) : (
               <Button
                 aria-label="Stop Camera"
-                color="secondary"
+                color="primary"
                 variant="contained"
                 fullWidth={true}
                 onClick={() => {
@@ -137,7 +137,7 @@ const WebCamera = (props) => {
                   );
                 }}
               >
-                Stop Camera
+                Disconnect From Camera
               </Button>
             )}
           </Grid>

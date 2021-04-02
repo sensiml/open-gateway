@@ -89,6 +89,7 @@ export default function AlertDialog(props) {
       <Button
         variant="outlined"
         color="primary"
+        disabled={props.configuring}
         fullWidth={true}
         onClick={handleClickOpen}
         className={classes.button}
