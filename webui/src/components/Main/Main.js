@@ -15,7 +15,7 @@ import axios from "axios";
 const Main = () => {
   const dispatch = useDispatch();
   const [activeView, setActiveView] = React.useState(0);
-  const [streamingMode, setStreamingMode] = React.useState(0);
+  const [streamingMode, setStreamingMode] = React.useState('DATA_CAPTURE');
   const [streamingSource, setStreamingSource] = React.useState(null);
   const [columns, setColumns] = React.useState([]);
   const [deviceID, setDeviceID] = React.useState([]);
