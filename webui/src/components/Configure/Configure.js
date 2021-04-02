@@ -123,13 +123,6 @@ const Configure = (props) => {
     });
   };
 
-  const handleConnectRequest = (event) => {
-    setDeviceDisabled(true);
-    axios.get(`${process.env.REACT_APP_API_URL}connect`).then((res) => {
-      mapdata(res.data);
-      setDeviceDisabled(false);
-    });
-  };
 
   function mapdata(data) {
     if (data.mode) {
@@ -147,6 +140,13 @@ const Configure = (props) => {
 
     props.setConfig(data);
   }
+  
+  
+  useEffect(()=>{
+    setDeviceID(props.deviceID);
+    setSource(props.streamingSource);
+    setMode(props.streamingMode.toUpperCase());
+  }, [props.deviceID, props.streamingMode])
 
   return (
     <Grid container columns>

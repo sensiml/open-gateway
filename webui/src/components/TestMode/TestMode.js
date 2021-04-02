@@ -1,12 +1,9 @@
-import { CardContent, Grid, Typography } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import Card from "@material-ui/core/Card";
+import { Grid } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
 import { SensorStream } from "../SensorStream";
 import { Results } from "../Results";
 import { Record } from "../Record";
-import { WebCamera } from "../WebCamera";
 
 const useStyles = makeStyles((theme) => ({
   root: {
