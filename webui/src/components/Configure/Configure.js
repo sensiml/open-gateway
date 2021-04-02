@@ -4,16 +4,13 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormLabel from "@material-ui/core/FormLabel";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import { DataGrid } from "@material-ui/data-grid";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import HorizontalLabelPositionBelowStepper from "./Stepper";
 import { Status } from "../Status";
 import Scan from "./Scan";
 import { WebCamera } from "../WebCamera";
@@ -30,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3),
     padding: theme.spacing(2, 2, 2, 2),
     maxWidth: 700,
-    minWidth: 700,
+    minWidth: 600,
   },
   button: {
     margin: theme.spacing(1, 1, 0, 0),

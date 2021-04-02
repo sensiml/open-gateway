@@ -45,11 +45,10 @@ const TestMode = (props) => {
         </Grid>
       )}
       <Grid item xs={4}>
-     
-            <Record
-              isCameraConnected={props.isCameraConnected}
-              isRecording={props.isRecording}
-            />
+        <Record
+          isCameraConnected={props.isCameraConnected}
+          isRecording={props.isRecording}
+        />
       </Grid>
     </Grid>
   );

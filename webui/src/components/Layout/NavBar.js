@@ -10,7 +10,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import AssessmentIcon from "@material-ui/icons/Assessment";
 import InfoIcon from "@material-ui/icons/Info";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
-import SettingsIcon from "@material-ui/icons/Settings";
+import HomeIcon from "@material-ui/icons/Home";
 import React from "react";
 import Divider from "@material-ui/core/Divider";
 const drawerWidth = 240;
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 const InconSelector = (props) => {
   switch (props.index) {
     case 0:
-      return <SettingsIcon />;
+      return <HomeIcon />;
     case 1:
       return <AssessmentIcon />;
     default:
@@ -87,16 +87,14 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Settings", "Test Mode"].map(
-            (text, index) => (
-              <ListItem button key={text} onClick={handleMenu(index)}>
-                <ListItemIcon>
-                  <InconSelector index={index}> </InconSelector>
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            )
-          )}
+          {["Home", "Test Mode"].map((text, index) => (
+            <ListItem button key={text} onClick={handleMenu(index)}>
+              <ListItemIcon>
+                <InconSelector index={index}> </InconSelector>
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItem>
+          ))}
           <div className={classes.section1}>
             <Divider></Divider>
           </div>

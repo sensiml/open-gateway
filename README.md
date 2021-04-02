@@ -76,7 +76,7 @@ In the Gateway Status screen you can start and stop a video source. If you start
 
 ## BLE Troubleshooting on Linux
 
-**NOTE** To use Bluethooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
+**NOTE** To use Bluetooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
 
 ```bash
 find ~/ -name bluepy-helper
