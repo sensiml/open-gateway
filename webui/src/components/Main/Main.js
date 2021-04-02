@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useLayoutEffect } from "react";
 
 import { Header, NavBar } from "../Layout";
 import useStyles from "./MainStyles";
@@ -23,6 +23,7 @@ const Main = () => {
   const [isCameraConnected, setIsCameraConnected] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
   const [config, setConfig] = React.useState({});
+  const [firstLoad, setFirstLoad] = React.useState(null);
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { isStreamingSensor } = useSelector((state) => state.stream);
@@ -86,11 +87,16 @@ const Main = () => {
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
       mapdata(response.data);
-      console.log('here');
-      
-      //console.log(response.data);
+      console.log(response.data)
     });
   }, [activeView]);
+
+  useLayoutEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
+      mapdata(response.data);
+    });
+  }, []);
+
 
   const classes = useStyles();
   return (
