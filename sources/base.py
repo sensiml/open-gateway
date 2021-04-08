@@ -11,7 +11,15 @@ try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
 except:
     from buffers import CircularBufferQueue, CircularResultsBufferQueue
+
 SHORT = 2
+INT16_BYTE_SIZE = 2
+FLOAT32_BYTE_SIZE = 4
+FLOAT_TYPE = "f"
+INT16_TYPE = "h"
+
+DATA_BYTE_SIZE = FLOAT32_BYTE_SIZE
+DATA_TYPE = FLOAT_TYPE
 
 
 class BaseReader(object):
@@ -42,14 +50,19 @@ class BaseReader(object):
         return len(self.config_columns)
 
     @property
+    def data_width_bytes(self):
+
+        return self.data_width * DATA_BYTE_SIZE
+
+    @property
     def packet_buffer_size(self):
         return self.samples_per_packet * self.source_buffer_size
 
     @property
     def source_buffer_size(self):
         if self.source_samples_per_packet is None:
-            return 2
-        return self.source_samples_per_packet * self.data_width * SHORT
+            return DATA_BYTE_SIZE
+        return self.source_samples_per_packet * self.data_width_bytes
 
     @staticmethod
     def _validate_config(config):
@@ -227,7 +240,7 @@ class BaseStreamReaderMixin(object):
                     )
                 ]
             )
-            struct_info = "h" * self.data_width
+            struct_info = DATA_TYPE * self.data_width
 
             data_reader = self.read_data()
 
@@ -236,12 +249,12 @@ class BaseStreamReaderMixin(object):
                 data = next(data_reader)
 
                 if data:
-                    for row_index in range(len(data) // (self.data_width * 2)):
-                        buff_index = row_index * self.data_width * 2
+                    for row_index in range(len(data) // (self.data_width_bytes)):
+                        buff_index = row_index * self.data_width_bytes
                         datawriter.writerow(
                             struct.unpack(
                                 struct_info,
-                                data[buff_index : buff_index + self.data_width * 2],
+                                data[buff_index : buff_index + self.data_width_bytes],
                             )
                         )
 

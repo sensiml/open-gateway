@@ -11,6 +11,9 @@ except:
 
 SHORT = 2
 INT16_BYTE_SIZE = 2
+FLOAT32_BYTE_SIZE = 4
+
+DATA_BYTE_SIZE = FLOAT32_BYTE_SIZE
 
 
 class TestReader(BaseReader):
@@ -24,7 +27,7 @@ class TestReader(BaseReader):
             return (
                 self.source_samples_per_packet
                 * len(self.config_columns)
-                * INT16_BYTE_SIZE
+                * DATA_BYTE_SIZE
             )
 
         return 0
@@ -38,13 +41,13 @@ class TestReader(BaseReader):
             [1000 * offset + xs - 32767 for xs in x] for offset in range(0, num_columns)
         ]
 
-        sample_data = bytearray(num_columns * len(x) * 2)
+        sample_data = bytearray(num_columns * len(x) * DATA_BYTE_SIZE)
         for index in x:
             for y in range(0, num_columns):
                 struct.pack_into(
                     "<h",
                     sample_data,
-                    (y + (index * num_columns)) * 2,
+                    (y + (index * num_columns)) * DATA_BYTE_SIZE,
                     int(data[y][index]),
                 )
 
@@ -52,17 +55,17 @@ class TestReader(BaseReader):
 
     def _pack_data(self, data, data_len, num_columns, samples_per_packet, start_index):
 
-        start = start_index * 2 * num_columns
+        start = start_index * DATA_BYTE_SIZE * num_columns
 
         if samples_per_packet + start_index > data_len:
             end_index = data_len - (start_index + samples_per_packet)
-            end = end_index * 2 * num_columns
+            end = end_index * DATA_BYTE_SIZE * num_columns
 
             return data[start:] + data[:end], end_index
 
         else:
             end_index = start_index + samples_per_packet
-            end = end_index * 2 * num_columns
+            end = end_index * DATA_BYTE_SIZE * num_columns
             return data[start:end], end_index
 
     def list_available_devices(self):

@@ -55,7 +55,7 @@ class StreamReader {
       if (done) break;
       store.dispatch({
         type: actionType,
-        payload: { chunk: new Int16Array(value.buffer), countSamples },
+        payload: { chunk: new Float32Array(value.buffer), countSamples },
       });
     }
   }
