@@ -63,6 +63,7 @@ class BLEReader(BaseReader):
         self.streaming = False
         self.subscribed = False
         self.peripheral = None
+        self.name = "BLE"
 
         if self.device_id and connect:
             self.peripheral = btle.Peripheral(self.device_id)
@@ -163,14 +164,6 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
 
         print("BLE: Streaming source stopped")
 
-    def set_app_config(self, config):
-
-        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
-        config["DATA_SOURCE"] = "BLE"
-        config["DEVICE_ID"] = self.device_id
-
 
 class BLEResultReader(BLEReader, BaseResultReaderMixin):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
@@ -185,6 +178,7 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
         self.streaming = False
         self.subscribed = False
         self.device_id = device_id
+        self.name = "BLE"
 
         if self.device_id and connect:
             self.peripheral = btle.Peripheral(self.device_id)
@@ -195,7 +189,7 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
         return {"samples_per_packet": 1}
 
     def set_app_config(self, config):
-        config["DATA_SOURCE"] = "BLE"
+        config["DATA_SOURCE"] = self.name
         config["DEVICE_ID"] = self.device_id
 
     def _send_subscribe(self):

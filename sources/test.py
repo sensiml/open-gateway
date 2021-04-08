@@ -9,11 +9,10 @@ try:
 except:
     from base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 
-SHORT = 2
-INT16_BYTE_SIZE = 2
-
 
 class TestReader(BaseReader):
+    name = "TEST"
+
     @property
     def delay(self):
         return 1.0 / self.sample_rate * self.samples_per_packet / 1.25
@@ -24,7 +23,7 @@ class TestReader(BaseReader):
             return (
                 self.source_samples_per_packet
                 * len(self.config_columns)
-                * INT16_BYTE_SIZE
+                * self.data_byte_size
             )
 
         return 0
@@ -38,37 +37,38 @@ class TestReader(BaseReader):
             [1000 * offset + xs - 32767 for xs in x] for offset in range(0, num_columns)
         ]
 
-        sample_data = bytearray(num_columns * len(x) * 2)
+        sample_data = bytearray(num_columns * len(x) * self.data_byte_size)
         for index in x:
             for y in range(0, num_columns):
                 struct.pack_into(
-                    "<h",
+                    "<" + self.data_type_str,
                     sample_data,
-                    (y + (index * num_columns)) * 2,
-                    int(data[y][index]),
+                    (y + (index * num_columns)) * self.data_byte_size,
+                    self.data_type_cast(data[y][index] + 0.5),
                 )
 
         return bytes(sample_data), len(x)
 
     def _pack_data(self, data, data_len, num_columns, samples_per_packet, start_index):
 
-        start = start_index * 2 * num_columns
+        start = start_index * self.data_byte_size * num_columns
 
         if samples_per_packet + start_index > data_len:
             end_index = data_len - (start_index + samples_per_packet)
-            end = end_index * 2 * num_columns
+            end = end_index * self.data_byte_size * num_columns
 
             return data[start:] + data[:end], end_index
 
         else:
             end_index = start_index + samples_per_packet
-            end = end_index * 2 * num_columns
+            end = end_index * self.data_byte_size * num_columns
             return data[start:end], end_index
 
     def list_available_devices(self):
         return [
             {"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
             {"id": 2, "name": "Test Data", "device_id": "Test Audio"},
+            {"id": 3, "name": "Test Data", "device_id": "Test IMU 6-axis Float"},
         ]
 
 
@@ -80,14 +80,6 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
         self._validate_config(config)
 
         return config
-
-    def set_app_config(self, config):
-
-        config["DATA_SOURCE"] = "TEST"
-        config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
-        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["DEVICE_ID"] = self.device_id
 
     def _read_source(self):
         print("Starting to read source test")
@@ -125,7 +117,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
 class TestResultReader(BaseReader, BaseResultReaderMixin):
     def set_app_config(self, config):
-        config["DATA_SOURCE"] = "TEST"
+        config["DATA_SOURCE"] = self.name
         config["DEVICE_ID"] = self.device_id
 
     def _read_source(self):
@@ -149,7 +141,8 @@ class TestResultReader(BaseReader, BaseResultReaderMixin):
 def get_test_device_configs(device_id):
 
     config = {}
-    if device_id == "Test IMU 6-axis":
+
+    if device_id == "Test IMU 6-axis Float":
         config["column_location"] = {
             "AccelerometerX": 0,
             "AccelerometerY": 1,
@@ -160,6 +153,20 @@ def get_test_device_configs(device_id):
         }
         config["sample_rate"] = 119
         config["samples_per_packet"] = 6
+        config["data_type"] = "float32"
+
+    elif device_id == "Test IMU 6-axis":
+        config["column_location"] = {
+            "AccelerometerX": 0,
+            "AccelerometerY": 1,
+            "AccelerometerZ": 2,
+            "GyroscopeX": 3,
+            "GyroscopeY": 4,
+            "GyroscopeZ": 5,
+        }
+        config["sample_rate"] = 119
+        config["samples_per_packet"] = 6
+        config["data_type"] = "int16"
 
     elif device_id == "Test Audio":
         config["column_location"] = {"Microphone": 0}

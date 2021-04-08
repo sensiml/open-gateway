@@ -39,7 +39,7 @@ import zipfile
 
 
 app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
-app.register_blueprint(errors)
+# app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
 
@@ -65,6 +65,7 @@ app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
 app.config["SECRET_KEY"] = "any secret string"
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
+app.config["DATA_TYPE"] = "int16"
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []
 app.config["DEVICE_ID"] = None
@@ -86,6 +87,7 @@ def cache_config(config):
         "DEVICE_ID": app.config["DEVICE_ID"],
         "MODE": app.config["MODE"],
         "SOURCE_SAMPLES_PER_PACKET": app.config["SOURCE_SAMPLES_PER_PACKET"],
+        "DATA_TYPE": app.config["DATA_TYPE"],
     }
     json.dump(tmp, open("./.config.cache", "w"))
 
@@ -133,6 +135,7 @@ def parse_current_config():
     ret["baud_rate"] = app.config["BAUD_RATE"]
     ret["mode"] = app.config["MODE"].lower()
     ret["recording"] = get_recording()
+    ret["data_type"] = app.config["DATA_TYPE"]
 
     if app.config["CONFIG_COLUMNS"]:
         ret["column_location"] = app.config["CONFIG_COLUMNS"]

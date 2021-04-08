@@ -24,6 +24,7 @@ const Main = () => {
   const [isRecording, setIsRecording] = React.useState(false);
   const [config, setConfig] = React.useState({});
   const [firstLoad, setFirstLoad] = React.useState(null);
+  const [dataType, setDataType] = React.useState('int16');
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { isStreamingSensor } = useSelector((state) => state.stream);
@@ -44,6 +45,21 @@ const Main = () => {
     setStreamingSource(data.source.toUpperCase());
     setDeviceID(data.device_id);
     setIsCameraConnected(data.camera_on);
+
+    console.log("SETTING DATA TYPE");
+
+    switch (data.data_type){
+      case('int16'):
+        setDataType('int16');
+        break;
+      case('float32'):
+        setDataType('float32');
+        console.log("SETTING DATA TYPE TO FLOAT32");
+        break;
+      default:
+        setDataType('int16');
+    }
+    
     data.column_location =
       "column_location" in data
         ? Object.keys(data.column_location).sort().join(", ")
@@ -136,6 +152,7 @@ const Main = () => {
               isCameraConnected={isCameraConnected}
               setIsCameraConnected={setIsCameraConnected}
               samplerate={config.samplerate}
+              dataType={dataType}
             />
           ) : null}
         </main>

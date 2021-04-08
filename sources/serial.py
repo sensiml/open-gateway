@@ -14,6 +14,7 @@ class SerialReader(BaseReader):
     def __init__(self, config, device_id, **kwargs):
         self._port = device_id
         self._baud_rate = config.get("BAUD_RATE", BAUD_RATE)
+        self.name = "SERIAL"
 
         super(SerialReader, self).__init__(config, device_id, **kwargs)
 
@@ -105,18 +106,10 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
             self.disconnect()
             raise e
 
-    def set_app_config(self, config):
-
-        config["DATA_SOURCE"] = "SERIAL"
-        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
-        config["DEVICE_ID"] = self.port
-
 
 class SerialResultReader(SerialReader, BaseResultReaderMixin):
     def set_app_config(self, config):
-        config["DATA_SOURCE"] = "SERIAL"
+        config["DATA_SOURCE"] = self.name
         config["DEVICE_ID"] = self.port
 
     def _read_source(self):

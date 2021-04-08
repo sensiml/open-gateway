@@ -12,7 +12,6 @@ try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
 except:
     from buffers import CircularBufferQueue, CircularResultsBufferQueue
-SHORT = 2
 
 
 class BaseReader(object):
@@ -23,8 +22,8 @@ class BaseReader(object):
         self.class_map = config["CLASS_MAP"]
         self.model_json = config["MODEL_JSON"]
         self.loop = config["LOOP"]
-        self.name = name
         self.source_samples_per_packet = None
+        self.data_type = config.get("data_type", "int16")
         self.sample_rate = None
         self.config_columns = None
         self.device_id = device_id
@@ -44,14 +43,50 @@ class BaseReader(object):
         return len(self.config_columns)
 
     @property
+    def data_byte_size(self):
+
+        INT16_BYTE_SIZE = 2
+        FLOAT32_BYTE_SIZE = 4
+
+        if self.data_type == "int16":
+            return INT16_BYTE_SIZE
+        elif self.data_type == "float32":
+            return FLOAT32_BYTE_SIZE
+
+        return INT16_BYTE_SIZE
+
+    @property
+    def data_type_str(self):
+        if self.data_type == "int16":
+            return "h"
+        elif self.data_type == "float32":
+            return "f"
+
+        return INT16_BYTE_SIZE
+
+    @property
+    def data_type_cast(self):
+        if self.data_type == "int16":
+            return int
+        elif self.data_type == "float32":
+            return float
+
+        return int
+
+    @property
+    def data_width_bytes(self):
+
+        return self.data_width * self.data_byte_size
+
+    @property
     def packet_buffer_size(self):
         return self.samples_per_packet * self.source_buffer_size
 
     @property
     def source_buffer_size(self):
         if self.source_samples_per_packet is None:
-            return 2
-        return self.source_samples_per_packet * self.data_width * SHORT
+            return self.data_byte_size
+        return self.source_samples_per_packet * self.data_width_bytes
 
     @staticmethod
     def _validate_config(config):
@@ -102,8 +137,17 @@ class BaseReader(object):
         self.source_samples_per_packet = config.get("samples_per_packet", None)
         self.sample_rate = config.get("sample_rate", None)
         self.config_columns = config.get("column_location", None)
+        self.data_type = config.get("data_type", "int16")
 
         return config
+
+    def set_app_config(self, config):
+        config["DATA_SOURCE"] = self.name
+        config["CONFIG_COLUMNS"] = self.config_columns
+        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
+        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
+        config["DEVICE_ID"] = self.device_id
+        config["DATA_TYPE"] = self.data_type
 
     def update_config(self, config):
         """ update the objects local config values from the app cache """
@@ -113,6 +157,7 @@ class BaseReader(object):
         self.sample_rate = config["CONFIG_SAMPLE_RATE"]
         self.config_columns = config.get("CONFIG_COLUMNS")
         self.class_map = config.get("CLASS_MAP")
+        self.data_type = config.get("DATA_TYPE", "int16")
 
     def connect(self):
 
@@ -234,7 +279,7 @@ class BaseStreamReaderMixin(object):
                     )
                 ]
             )
-            struct_info = "h" * self.data_width
+            struct_info = self.data_type_str * self.data_width
 
             data_reader = self.read_data()
 
@@ -243,12 +288,12 @@ class BaseStreamReaderMixin(object):
                 data = next(data_reader)
 
                 if data:
-                    for row_index in range(len(data) // (self.data_width * 2)):
-                        buff_index = row_index * self.data_width * 2
+                    for row_index in range(len(data) // (self.data_width_bytes)):
+                        buff_index = row_index * self.data_width_bytes
                         datawriter.writerow(
                             struct.unpack(
                                 struct_info,
-                                data[buff_index : buff_index + self.data_width * 2],
+                                data[buff_index : buff_index + self.data_width_bytes],
                             )
                         )
 

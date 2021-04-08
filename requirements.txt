@@ -8,4 +8,5 @@ mss
 numpy
 bleak>=0.11.0
 nest_asyncio
+requests
 #bluepy

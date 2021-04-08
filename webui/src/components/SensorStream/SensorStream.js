@@ -62,6 +62,7 @@ const SensorStream = (props) => {
         type: START_STREAM_SENSOR_SAGA,
         payload: {
           countSamples: COUNT_SAMPLES * ((columns && columns?.length) || 1),
+          dataType: props.dataType
         },
       }),
     [dispatch]
@@ -92,10 +93,10 @@ const SensorStream = (props) => {
   };
 
   useEffect(() => {
-    if (!props.isConnected && isStreamingSensor){
-        stopSensorStreaming();
-        setClearStream();      
-      } 
+    if (!props.isConnected && isStreamingSensor) {
+      stopSensorStreaming();
+      setClearStream();
+    }
 
   }, []);
 

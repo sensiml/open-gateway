@@ -15,6 +15,7 @@ class TCPIPReader(BaseReader):
     def __init__(self, config, device_id, **kwargs):
 
         self.device_id = device_id
+        self.name = "TCPIP"
 
         if kwargs.get("connect", True) is True:
 
@@ -66,17 +67,10 @@ class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
             self.disconnect()
             raise e
 
-    def set_app_config(self, config):
-        config["DATA_SOURCE"] = "TCPIP"
-        config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
-        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["DEVICE_ID"] = self.device_id
-
 
 class TCPIPResultReader(TCPIPReader, BaseResultReaderMixin):
     def set_app_config(self, config):
-        config["DATA_SOURCE"] = "TCPIP"
+        config["DATA_SOURCE"] = self.name
         config["DEVICE_ID"] = self.device_id
 
     def _read_source(self):

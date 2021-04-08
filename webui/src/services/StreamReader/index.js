@@ -44,18 +44,20 @@ class StreamReader {
     }
   }
 
-  async readStreamToRedux(actionType, countSamples = 0) {
+  async readStreamToRedux(actionType, countSamples = 0, dataType = 'int16') {
     /*
       read and write array by chunk to redux
       @param {string} actionType - redux action const name
       @param {number} maxLength - max length of redux streamed array
     * */
+    console.log('DATA TYPE IS ' + dataType);
+    const arrayType = dataType == 'float32'? Float32Array: Int16Array;
     while (true) {
       const { value, done } = await this.reader.read();
       if (done) break;
       store.dispatch({
         type: actionType,
-        payload: { chunk: new Int16Array(value.buffer), countSamples },
+        payload: { chunk: new arrayType(value.buffer), countSamples },
       });
     }
   }
