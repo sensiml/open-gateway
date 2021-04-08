@@ -55,7 +55,7 @@ class TestReader(BaseReader):
                     "<" + DATA_TYPE,
                     sample_data,
                     (y + (index * num_columns)) * DATA_BYTE_SIZE,
-                    DATA_TYPE_CAST(data[y][index]) + 0.5,
+                    DATA_TYPE_CAST(data[y][index] + 0.5),
                 )
 
         return bytes(sample_data), len(x)
