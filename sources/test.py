@@ -9,11 +9,18 @@ try:
 except:
     from base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 
-SHORT = 2
 INT16_BYTE_SIZE = 2
 FLOAT32_BYTE_SIZE = 4
+FLOAT_TYPE = "f"
+INT16_TYPE = "h"
 
+INT16 = int
 DATA_BYTE_SIZE = FLOAT32_BYTE_SIZE
+FLOAT = float
+
+DATA_TYPE = FLOAT_TYPE
+DATA_BYTE_SIZE = FLOAT32_BYTE_SIZE
+DATA_TYPE_CAST = FLOAT
 
 
 class TestReader(BaseReader):
@@ -45,10 +52,10 @@ class TestReader(BaseReader):
         for index in x:
             for y in range(0, num_columns):
                 struct.pack_into(
-                    "<h",
+                    "<" + DATA_TYPE,
                     sample_data,
                     (y + (index * num_columns)) * DATA_BYTE_SIZE,
-                    int(data[y][index]),
+                    DATA_TYPE_CAST(data[y][index]) + 0.5,
                 )
 
         return bytes(sample_data), len(x)

@@ -12,7 +12,6 @@ try:
 except:
     from buffers import CircularBufferQueue, CircularResultsBufferQueue
 
-SHORT = 2
 INT16_BYTE_SIZE = 2
 FLOAT32_BYTE_SIZE = 4
 FLOAT_TYPE = "f"
