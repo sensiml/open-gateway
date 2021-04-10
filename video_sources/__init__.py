@@ -78,7 +78,8 @@ def list_cameras_windows():
     for line in p.stdout.readlines():
         line = re.sub("\s\s+", "\t", line).split("\t")
         if len(line) > 1 and line[1] in ["Camera", "Image"]:
-            cameras.append({"name": line[2], "index": counter})
+            cameras.append({"name": "Camera {}".format(counter), "index": counter})
+            # TODO: make the windows names match up with the actual camera indexes, right now the names here in line[2] don't match opencv indexes
             counter += 1
 
     return cameras

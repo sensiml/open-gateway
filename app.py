@@ -12,6 +12,8 @@ from json import dumps
 import asyncio
 import nest_asyncio
 import time
+from threading import Timer
+import webbrowser
 
 nest_asyncio.apply()
 
@@ -613,7 +615,8 @@ if __name__ == "__main__":
         app.config.update(json.load(open("./.config.cache", "r")))
 
     try:
-        app.run(HOST, 5555)
+        Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
+        app.run(HOST, PORT)
     except KeyboardInterrupt:
         print("Keyboard Interupt Detected. Shutting down server!")
     finally:
