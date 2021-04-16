@@ -85,14 +85,14 @@ const Main = () => {
 
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
+    axios.get(`/config`, {}).then((response) => {
       mapdata(response.data);
       console.log(response.data)
     });
   }, [activeView]);
 
   useLayoutEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
+    axios.get(`/config`, {}).then((response) => {
       mapdata(response.data);
     });
   }, []);

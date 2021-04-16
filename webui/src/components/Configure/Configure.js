@@ -87,7 +87,7 @@ const Configure = (props) => {
     console.log(source);
     console.log(deviceID);
     axios
-      .post(`${process.env.REACT_APP_API_URL}config`, {
+      .post(`/config`, {
         device_id: deviceID,
         source: source.toLowerCase(),
         mode: mode,
@@ -116,7 +116,7 @@ const Configure = (props) => {
 
   const handleDisconnectRequest = (event) => {
     setDeviceDisabled(true);
-    axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
+    axios.get(`/disconnect`).then((res) => {
       console.log(res.data);
       mapdata(res.data);
       setDeviceDisabled(false);

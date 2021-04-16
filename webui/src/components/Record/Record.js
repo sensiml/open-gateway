@@ -57,7 +57,7 @@ const Record = (props) => {
     }
     console.log(filename);
     axios
-      .post(`${process.env.REACT_APP_API_URL}` + url, {
+      .post(`/` + url, {
         filename: filename,
         event_type: event,
       })
@@ -80,8 +80,8 @@ const Record = (props) => {
   };
 
   const handleDownloadRequest = (event, filename) => {
-    console.log(`${process.env.REACT_APP_API_URL}download/` + filename);
-    fetch(`${process.env.REACT_APP_API_URL}download/` + filename, {
+    console.log(`/download/` + filename);
+    fetch(`/download/` + filename, {
       method: "GET",
       headers: { "Content-Type": "application/zip" },
     })

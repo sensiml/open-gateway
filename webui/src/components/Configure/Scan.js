@@ -57,7 +57,7 @@ export default function AlertDialog(props) {
     setScanningText("Scanning for " + props.source + " Devices....");
     setIsScanning(true);
     axios
-      .post(`${process.env.REACT_APP_API_URL}scan`, {
+      .post(`/scan`, {
         source: props.source.toLowerCase(),
       })
       .then((response) => {

@@ -6,10 +6,6 @@ const ApiService = {
   interceptor_401: null,
   refreshUrl: '/auth/refresh',
 
-  init(baseURL) {
-    axios.defaults.baseURL = baseURL;
-  },
-
   mount401Interceptor() {
     this.interceptor_401 = axios.interceptors.response.use((response) => response,
       async (error) => {
