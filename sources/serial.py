@@ -29,7 +29,7 @@ class SerialReader(BaseReader):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
             ser.write(str.encode(command))
 
-    def _read_line(self, flush_buffer=Falses):
+    def _read_line(self, flush_buffer=False):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
 
             value = ser.readline()
