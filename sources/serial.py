@@ -64,6 +64,7 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
 
     def read_device_config(self):
 
+        config = self._read_line()  # flush buffer
         config = json.loads(self._read_line())
         if self._validate_config(config):
             return config
