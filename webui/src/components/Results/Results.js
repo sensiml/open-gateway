@@ -167,7 +167,7 @@ const Results = (props) => {
                   onClick={() => {
                     handleStreamRequest(
                       "clicked",
-                      `${process.env.REACT_APP_API_URL}results`,
+                      `/results`,
                       setDeviceRows,
                       setIsStreaming,
                       setReader

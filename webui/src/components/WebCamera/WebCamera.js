@@ -45,7 +45,7 @@ const handleCameraRequest = (
   console.log(event);
 
   axios
-    .post(`${process.env.REACT_APP_API_URL}config-video`, {
+    .post(`/config-video`, {
       camera_index: 0,
       event_type: event,
     })
