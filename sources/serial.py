@@ -29,9 +29,12 @@ class SerialReader(BaseReader):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
             ser.write(str.encode(command))
 
-    def _read_line(self):
+    def _read_line(self, flush_buffer=Falses):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
+
             value = ser.readline()
+            if flush_buffer:
+                value = ser.readline()
             try:
                 return value.decode("ascii")
             except:
@@ -64,8 +67,7 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
 
     def read_device_config(self):
 
-        config = self._read_line()  # flush buffer
-        config = json.loads(self._read_line())
+        config = json.loads(self._read_line(flush_buffer=True))
         if self._validate_config(config):
             return config
 
