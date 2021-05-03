@@ -54,7 +54,7 @@ class ScreenCatpure(VideoBase):
                         capture_time = time.time() - start_grab
 
                         """
-                        print("screen garb took: ", time.time() - start_grab)
+                        print("screen grab took: ", time.time() - start_grab)
                         frame_counter += 1
                         if frame_counter == self.target_sample_per_frame:
                             print(
