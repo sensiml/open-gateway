@@ -18,7 +18,7 @@ class ScreenCatpure(VideoBase):
 
     @property
     def target_sample_rate(self):
-        return 1.0 / self.target_sample_per_frame - 0.005
+        return 1.0 / self.target_sample_per_frame
 
     def _start_screen_capture(self):
 

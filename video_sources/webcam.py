@@ -18,7 +18,7 @@ class WebCam(VideoBase):
 
     @property
     def target_sample_rate(self):
-        return 1.0 / self.target_sample_per_frame - 0.003
+        return 1.0 / self.target_sample_per_frame
 
     def _start_webcam(self):
 
@@ -32,7 +32,7 @@ class WebCam(VideoBase):
                 if self.vs is None:
                     return
 
-                if (time.time() - start) < self.target_sample_rate - capture_time:
+                if (time.time() - start) < self.target_sample_rate - capture_time * 1.2:
                     pass
                 else:
                     start_grab = time.time()
@@ -46,11 +46,11 @@ class WebCam(VideoBase):
                         self.output_frame = frame.copy()
 
                     start = time.time()
-                    capture_time = time.time() - start_grab
+                    capture_time = start - start_grab
 
                     """
                     frame_counter += 1
-                    print("camera capture took: ", time.time() - start_grab)
+                    # print("camera capture took: ", time.time() - start_grab)
                     if frame_counter == self.target_sample_per_frame:
                         print("frames: ", frame_counter, "time:", start - frame_time)
                         frame_time = start
