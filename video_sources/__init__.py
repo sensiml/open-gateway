@@ -87,8 +87,6 @@ def list_cameras_windows():
 
 def get_video_source_list():
 
-    video_sources = [{"index": -1, "name": "Screen Capture"}]
-
     if sys.platform == "darwin":
         camera_list = list_cameras_darwin()
 
@@ -98,7 +96,9 @@ def get_video_source_list():
     if sys.platform == "linux":
         camera_list = list_cameras_linux()
 
-    video_sources.extend(camera_list)
+    video_sources = camera_list
+
+    video_sources.extend([{"index": -1, "name": "Screen Capture"}])
 
     return video_sources
 

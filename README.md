@@ -1,8 +1,8 @@
 **NOTE** This is currently in alpha, we expect stable operation for streaming for BLE, TCPIP, and Serial. However, you may run into issues with the errors not being propagated to the UI. If you see issues please open a ticket. Additionally, some of the APIs may still change in the future.
 
-# SensiML Gateway
+# SensiML Open Gateway
 
-This SensiML Gateway implements the [Simple Streaming Service protocol](https://sensiml.com/documentation/simple-streaming-specification/introduction.html) to enable forwarding data to the SensiML Data Capture Lab for recording and annotation. The Gateway supports connecting to sensors sources over a Serial, BLE, and TCP/IP connections. It also supports recording video and sensor data locally to the gateway.
+This Open Gateway implements the [Simple Streaming Service protocol](https://sensiml.com/documentation/simple-streaming-specification/introduction.html) to enable forwarding data to the SensiML Data Capture Lab for recording and annotation. The Gateway supports connecting to sensors sources over a Serial, BLE, and TCP/IP connections. It also supports recording video and sensor data locally to the gateway.
 
 ## Installation
 

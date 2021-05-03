@@ -129,7 +129,10 @@ class VideoBase(object):
                 filename = os.path.join("./video", os.path.basename(filename))
 
             self.video_writer = cv2.VideoWriter(
-                filename + ".mp4", fourcc, 24.0, (self.width, self.height)
+                filename + ".mp4",
+                fourcc,
+                self.target_sample_per_frame,
+                (self.width, self.height),
             )
 
     def record_stop(self):

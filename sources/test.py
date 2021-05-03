@@ -158,7 +158,7 @@ def get_test_device_configs(device_id):
             "GyroscopeY": 4,
             "GyroscopeZ": 5,
         }
-        config["sample_rate"] = 104
+        config["sample_rate"] = 119
         config["samples_per_packet"] = 6
 
     elif device_id == "Test Audio":
