@@ -71,7 +71,7 @@ class ScreenCatpure(VideoBase):
         if self.vs is not None:
             return
 
-        print("Starting Sreen Capture")
+        print("Starting Screen Capture")
         self.vs = "screen_capture"
 
         self.width, self.height = set_screen_resolution()
