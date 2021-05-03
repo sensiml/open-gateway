@@ -7,8 +7,7 @@ import cv2
 import threading
 
 
-SAMPLES_PER_FRAME = 24.0
-SAMPLE_RATE = 1.0 / SAMPLES_PER_FRAME - 0.005
+SAMPLES_PER_FRAME = 10.0
 
 
 class ScreenCatpure(VideoBase):
@@ -57,7 +56,7 @@ class ScreenCatpure(VideoBase):
                         """
                         print("screen garb took: ", time.time() - start_grab)
                         frame_counter += 1
-                        if frame_counter == self.target_sample_per_frame::
+                        if frame_counter == self.target_sample_per_frame:
                             print(
                                 "frames: ", frame_counter, "time:", start - frame_time
                             )
