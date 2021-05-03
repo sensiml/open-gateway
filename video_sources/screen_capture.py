@@ -12,6 +12,14 @@ SAMPLE_RATE = 1.0 / SAMPLES_PER_FRAME - 0.005
 
 
 class ScreenCatpure(VideoBase):
+    @property
+    def target_sample_per_frame(self):
+        return SAMPLES_PER_FRAME
+
+    @property
+    def target_sample_rate(self):
+        return 1.0 / self.target_sample_per_frame - 0.005
+
     def _start_screen_capture(self):
 
         with mss.mss() as sct:
@@ -22,14 +30,14 @@ class ScreenCatpure(VideoBase):
             print("Screen Capture Dimensions", monitor)
 
             frame_counter = 0
-            start = time.time()
-            frame_time = start
-            tracker = start
+            start = frame_time = time.time()
+            capture_time = 0
 
             while self.vs:
 
                 with self.lock:
-                    if (time.time() - start) < SAMPLE_RATE:
+
+                    if (time.time() - start) < self.target_sample_rate - capture_time:
                         pass
                     else:
                         start_grab = time.time()
@@ -44,19 +52,16 @@ class ScreenCatpure(VideoBase):
                             )
 
                         start = time.time()
+                        capture_time = time.time() - start_grab
 
                         """
                         print("screen garb took: ", time.time() - start_grab)
-
                         frame_counter += 1
-                        tmp = time.time()
-                        print((tmp - tracker))
-                        tracker = tmp
-                        if frame_counter == SAMPLES_PER_FRAME:
+                        if frame_counter == self.target_sample_per_frame::
                             print(
-                                "frames: ", frame_counter, "time:", tracker - frame_time
+                                "frames: ", frame_counter, "time:", start - frame_time
                             )
-                            frame_time = tracker
+                            frame_time = start
                             frame_counter = 0
                         """
 
@@ -67,6 +72,7 @@ class ScreenCatpure(VideoBase):
         if self.vs is not None:
             return
 
+        print("Starting Sreen Capture")
         self.vs = "screen_capture"
 
         self.width, self.height = set_screen_resolution()

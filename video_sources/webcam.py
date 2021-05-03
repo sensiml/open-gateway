@@ -9,25 +9,33 @@ import cv2
 from video_sources.video_base import VideoBase
 
 SAMPLES_PER_FRAME = 24.0
-SAMPLE_RATE = 1.0 / SAMPLES_PER_FRAME - 0.003
 
 
 class WebCam(VideoBase):
+    @property
+    def target_sample_per_frame(self):
+        return SAMPLES_PER_FRAME
+
+    @property
+    def target_sample_rate(self):
+        return 1.0 / self.target_sample_per_frame - 0.003
+
     def _start_webcam(self):
 
-        frame_counter = 0
         start = time.time()
+        capture_time = 0
         frame_time = start
-        tracker = start
+        frame_counter = 0
 
         while self.vs.isOpened():
             with self.lock:
                 if self.vs is None:
                     return
 
-                if (time.time() - start) < SAMPLE_RATE:
+                if (time.time() - start) < self.target_sample_rate - capture_time:
                     pass
                 else:
+                    start_grab = time.time()
 
                     self.new_frame, frame = self.vs.read()
 
@@ -38,15 +46,14 @@ class WebCam(VideoBase):
                         self.output_frame = frame.copy()
 
                     start = time.time()
+                    capture_time = time.time() - start_grab
 
                     """
                     frame_counter += 1
-                    tmp = time.time()
-                    # print((tmp - tracker))
-                    tracker = tmp
-                    if frame_counter == SAMPLES_PER_FRAME:
-                        print("frames: ", frame_counter, "time:", tracker - frame_time)
-                        frame_time = tracker
+                    print("camera capture took: ", time.time() - start_grab)
+                    if frame_counter == self.target_sample_per_frame:
+                        print("frames: ", frame_counter, "time:", start - frame_time)
+                        frame_time = start
                         frame_counter = 0
                     """
 
@@ -57,8 +64,7 @@ class WebCam(VideoBase):
         if self.vs is not None:
             return
 
-        print("Starting Camera")
-        print(self.camera_index)
+        print("Starting Camera: ", self.camera_index)
         self.vs = cv2.VideoCapture(self.camera_index)
 
         self.width = int(self.vs.get(cv2.CAP_PROP_FRAME_WIDTH) + 0.5)
