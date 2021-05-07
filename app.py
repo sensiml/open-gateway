@@ -611,6 +611,7 @@ if __name__ == "__main__":
     except ValueError:
         PORT = 5555
 
+    PORT = 5550
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
 
