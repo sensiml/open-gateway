@@ -121,11 +121,14 @@ class BaseReader(object):
             )
             self.rbuffer = CircularResultsBufferQueue(self._lock, buffer_size=1)
 
+            print("BLE: Sending Subscribe")
             self._send_subscribe()
 
             time.sleep(1)
 
             self.buffer.reset_buffer()
+
+            print("BLE: Read Source Starting")
 
             self._thread = threading.Thread(target=self._read_source)
             self._thread.start()
