@@ -64,6 +64,8 @@ class BaseReader(object):
         if config.get("samples_per_packet", None) is None:
             raise Exception("Invalid Configuration: no samples_per_packet")
 
+        print("Found configuration:", config)
+
         return config
 
     @staticmethod
