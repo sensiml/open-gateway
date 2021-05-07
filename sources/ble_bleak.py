@@ -36,7 +36,9 @@ class BLEReader(BaseReader):
     @staticmethod
     async def read_gatt(address, charUUID):
         async with BleakClient(address) as client:
-            x = await client.is_connected()
+            # while not client.is_connected:
+            #    print("BLE: waiting for gatt connection")
+            #    await asyncio.sleep(0.25)
             resp = await client.read_gatt_char(charUUID)
             return resp
 

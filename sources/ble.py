@@ -66,7 +66,7 @@ class BLEReader(BaseReader):
 
         if self.device_id and connect:
             self.peripheral = btle.Peripheral(self.device_id)
-            print("getting characteristics")
+            print("BLE: Getting characteristics")
             print(self.peripheral.getCharacteristics())
             self.peripheral.setDelegate(self.delegate)
 
@@ -105,7 +105,7 @@ class BLEReader(BaseReader):
 
     def read_device_config(self):
 
-        print("reading config")
+        print("BLE: Reading device config")
         if self.peripheral is None:
             raise Exception("BLE Device ID Not Configured.")
 
@@ -122,7 +122,7 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
     def _send_subscribe(self):
 
         if not self.subscribed:
-            print("subscrbing")
+            print("BLE: Subscrbing to stream reader")
             setup_data = b"\x01\x00"
             notify_handle = (
                 self.peripheral.getCharacteristics(uuid=uuidOfDataChar)[0].getHandle()
@@ -161,7 +161,7 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
             self.disconnect()
             raise e
 
-        print("streaming source stopped")
+        print("BLE: Streaming source stopped")
 
     def set_app_config(self, config):
 
