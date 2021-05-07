@@ -6,7 +6,7 @@ const ApiService = {
   interceptor_401: null,
   refreshUrl: '/auth/refresh',
 
-  
+
   init(baseURL) {
     axios.defaults.baseURL = baseURL;
   },

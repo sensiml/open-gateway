@@ -4,5 +4,5 @@ import { apiHosts } from "../../configs";
 export let streamSensorReader = undefined;
 
 export const initStreamSensorReader = () => {
-  streamSensorReader = new StreamReader(`${ apiHosts.baseHost }/stream`);
+  streamSensorReader = new StreamReader(`${apiHosts.baseHost}stream`);
 };
