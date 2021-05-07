@@ -212,10 +212,10 @@ def config():
 
         source.read_config()
 
-        print("MAIN: Configuring source reader")
+        print("App: Configuring source reader")
         source.set_app_config(app.config)
 
-        print("MAIN: Connecting to device")
+        print("App: Connecting to device")
         source.connect()
 
         app.config["MODE"] = form.data["mode"].upper()

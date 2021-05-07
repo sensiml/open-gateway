@@ -67,7 +67,13 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
 
     def read_device_config(self):
 
-        config = json.loads(self._read_line(flush_buffer=True))
+        try:
+            config = json.loads(self._read_line(flush_buffer=True))
+        except:
+            self._write("disconnect")
+            time.sleep(1.0)
+            config = json.loads(self._read_line(flush_buffer=True))
+
         if self._validate_config(config):
             return config
 
@@ -76,6 +82,7 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
     def _read_source(self):
 
         try:
+            print("Serial: Reading source stream")
             with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
 
                 self.streaming = True
@@ -89,6 +96,9 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
                     self.buffer.update_buffer(data)
 
                     time.sleep(0.00001)
+
+                print("Serial: Sending disconnect command")
+                ser.write(str.encode("disconnect"))
 
         except Exception as e:
             print(e)
