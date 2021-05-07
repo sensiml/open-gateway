@@ -46,6 +46,7 @@ class BLEReader(BaseReader):
         return devices
 
     async def connect_to_device(self, address):
+        print("BLE: Connecting to", address)
         async with BleakClient(address, timeout=1.0) as client:
             print("BLE: Connected to", address)
             self.streaming = True
@@ -92,6 +93,8 @@ class BLEReader(BaseReader):
 
     def read_device_config(self):
 
+        print("BLE: Read device config")
+
         if self.device_id is None:
             raise Exception("BLE Device ID Not Configured.")
 
@@ -115,7 +118,7 @@ class BLEReader(BaseReader):
             self.disconnect()
             raise e
 
-        print("streaming source stopped")
+        print("BLE: Streaming source stopped")
 
 
 class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
@@ -182,7 +185,7 @@ if __name__ == "__main__":
     device_id = "dd:6c:dc:c1:99:fb"
     device_id = "DB:E2:5F:47:EC:42"
     device_id = "E28AB79E-5D42-4E82-BCA7-55856287CD64"
-    """
+
     ble = BLEStreamReader(config, device_id=device_id)
     ble.set_app_config(config)
 
@@ -210,3 +213,4 @@ if __name__ == "__main__":
     ble.connect()
     while True:
         time.sleep(1)
+    """
