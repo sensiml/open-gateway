@@ -21,6 +21,7 @@ class BaseReader(object):
     def __init__(self, config, device_id=None, name=None, **kwargs):
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.class_map = config["CLASS_MAP"]
+        self.model_json = config["MODEL_JSON"]
         self.loop = config["LOOP"]
         self.name = name
         self.source_samples_per_packet = None
@@ -260,8 +261,12 @@ class BaseResultReaderMixin(object):
         return {"samples_per_packet": 1}
 
     def _map_classification(self, results):
+        if self.model_json:
+            return self.model["ModelDescriptions"][results["ModelNumber"]][
+                ["ClassMaps"]
+            ][str(results["Classification"])]
 
-        if self.class_map:
+        elif self.class_map:
             results["Classification"] = self.class_map.get(
                 results["Classification"], results["Classification"]
             )
