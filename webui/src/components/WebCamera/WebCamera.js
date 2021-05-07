@@ -45,7 +45,7 @@ const handleCameraRequest = (
   console.log(event);
 
   axios
-    .post(`/config-video`, {
+    .post(`${process.env.REACT_APP_API_URL}config-video`, {
       camera_index: 0,
       event_type: event,
     })
@@ -123,23 +123,23 @@ const WebCamera = (props) => {
                 Connect to Camera
               </Button>
             ) : (
-              <Button
-                aria-label="Stop Camera"
-                color="primary"
-                variant="contained"
-                fullWidth={true}
-                onClick={() => {
-                  handleCameraRequest(
-                    "camera-off",
-                    setCameraView,
-                    props.setIsCameraConnected,
-                    setCameraKey
-                  );
-                }}
-              >
-                Disconnect From Camera
-              </Button>
-            )}
+                <Button
+                  aria-label="Stop Camera"
+                  color="primary"
+                  variant="contained"
+                  fullWidth={true}
+                  onClick={() => {
+                    handleCameraRequest(
+                      "camera-off",
+                      setCameraView,
+                      props.setIsCameraConnected,
+                      setCameraKey
+                    );
+                  }}
+                >
+                  Disconnect From Camera
+                </Button>
+              )}
           </Grid>
         </Grid>
       </div>

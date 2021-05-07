@@ -46,8 +46,9 @@ class BLEReader(BaseReader):
         return devices
 
     async def connect_to_device(self, address):
+        print("BLE: Connecting to", address)
         async with BleakClient(address, timeout=1.0) as client:
-            print("connect to", address)
+            print("BLE: Connected to", address)
             self.streaming = True
             try:
                 await client.start_notify(self.charUUID, self.handleNotification)
@@ -57,11 +58,12 @@ class BLEReader(BaseReader):
                 print(e)
                 self.streaming = False
                 await client.stop_notify(self.charUUID)
+                print("BlE: Disconnected from:", address)
 
             self.streaming = False
             await client.stop_notify(self.charUUID)
 
-        print("disconnect from", address)
+        print("BlE: Disconnected from:", address)
 
     def disconnect(self):
 
@@ -91,6 +93,8 @@ class BLEReader(BaseReader):
 
     def read_device_config(self):
 
+        print("BLE: Read device config")
+
         if self.device_id is None:
             raise Exception("BLE Device ID Not Configured.")
 
@@ -107,13 +111,14 @@ class BLEReader(BaseReader):
         self.streaming = True
 
         try:
+            print("BLE: Setting up event loop for reading {}".format(self.device_id))
             self.loop.run_until_complete(self.connect_to_device(self.device_id))
         except Exception as e:
             print(e)
             self.disconnect()
             raise e
 
-        print("streaming source stopped")
+        print("BLE: Streaming source stopped")
 
 
 class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
@@ -154,7 +159,11 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
 
 
 if __name__ == "__main__":
+    import asyncio
 
+    # import nest_asyncio
+
+    # nest_asyncio.apply()
     config = {
         "DATA_SOURCE": "BLE",
         "CONFIG_SAMPLE_RATE": 119,
@@ -170,10 +179,12 @@ if __name__ == "__main__":
             "GyroscopeY": 4,
         },
         "CLASS_MAP": {},
+        "LOOP": asyncio.get_event_loop(),
     }
 
     device_id = "dd:6c:dc:c1:99:fb"
     device_id = "DB:E2:5F:47:EC:42"
+    device_id = "E28AB79E-5D42-4E82-BCA7-55856287CD64"
 
     ble = BLEStreamReader(config, device_id=device_id)
     ble.set_app_config(config)
@@ -200,5 +211,6 @@ if __name__ == "__main__":
     ble = BLEResultReader(config, device_id=device_id)
     ble.update_config(config)
     ble.connect()
-    ble.read_data()
+    while True:
+        time.sleep(1)
     """

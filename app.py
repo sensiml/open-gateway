@@ -212,10 +212,10 @@ def config():
 
         source.read_config()
 
-        print("SET CONFIG")
+        print("App: Configuring source reader")
         source.set_app_config(app.config)
 
-        print("SEND CONNECT")
+        print("App: Connecting to device")
         source.connect()
 
         app.config["MODE"] = form.data["mode"].upper()
@@ -525,7 +525,7 @@ def get_file_dcli(filename):
         "file_name": file_path,
         "metadata": [],
         "sessions": [],
-        "videos": [{"path": video_path}],
+        "videos": [{"video_path": video_path}],
     }
 
 
@@ -628,4 +628,3 @@ if __name__ == "__main__":
                 time.sleep(1)
         print("Shutting down server!")
         sys.exit()
-

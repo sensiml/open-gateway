@@ -6,6 +6,7 @@ import struct
 import time
 import csv
 import os
+import random
 
 try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
@@ -64,6 +65,8 @@ class BaseReader(object):
         if config.get("samples_per_packet", None) is None:
             raise Exception("Invalid Configuration: no samples_per_packet")
 
+        print("Found configuration:", config)
+
         return config
 
     @staticmethod
@@ -92,13 +95,12 @@ class BaseReader(object):
     def read_config(self):
         """ read the config from the device and set the properties of the object """
 
+        print("Reader: reading device config")
         config = self.read_device_config()
 
         self.source_samples_per_packet = config.get("samples_per_packet", None)
         self.sample_rate = config.get("sample_rate", None)
         self.config_columns = config.get("column_location", None)
-
-        print("Setting Configuration")
 
         return config
 
@@ -121,11 +123,14 @@ class BaseReader(object):
             )
             self.rbuffer = CircularResultsBufferQueue(self._lock, buffer_size=1)
 
+            print("Base: Sending subscribe to source")
             self._send_subscribe()
 
             time.sleep(1)
 
             self.buffer.reset_buffer()
+
+            print("Base: Setting up thread to read source")
 
             self._thread = threading.Thread(target=self._read_source)
             self._thread.start()
@@ -133,7 +138,7 @@ class BaseReader(object):
             time.sleep(1)
 
         else:
-            print("Thread Already Started!")
+            print("Base: Thread Already Started!")
 
     def disconnect(self):
         self.streaming = False
@@ -157,7 +162,7 @@ class BaseReader(object):
 
         if not os.path.exists(os.path.dirname(filename)):
             print(
-                "File directory does not exist,  recording to data directory in gateway location."
+                "Base: File directory does not exist,  recording to data directory in gateway location."
             )
             if not os.path.exists("./data"):
                 os.mkdir("./data")
@@ -184,12 +189,13 @@ class BaseStreamReaderMixin(object):
     def read_data(self):
         """ Generator to read the data stream out of the buffer """
 
-        print("starting read")
+        print("StreamReader: New stream reader connected")
+        # name = random.randint(0, 100)
 
         if self._thread:
             pass
         else:
-            print("sent connect")
+            print("StreamReader: establishing a connectiong to the device.")
             self.connect()
             self.streaming = True
 
@@ -211,13 +217,13 @@ class BaseStreamReaderMixin(object):
 
             time.sleep(0.001)
 
-        print("stream ended")
+        print("StreamReader: Stream Ended")
 
     def _record_data(self, filename):
 
         with open(filename + ".csv", "w", newline="") as csvfile:
             datawriter = csv.writer(csvfile, delimiter=",")
-            print("Starting to Record .csv")
+            print("StreamReader: Recording stream to ", filename + ".csv")
 
             datawriter.writerow(
                 [
@@ -245,12 +251,12 @@ class BaseStreamReaderMixin(object):
                             )
                         )
 
-        print("CSV recording thread finished")
+        print("StreamReader: CSV recording thread finished")
 
 
 class BaseResultReaderMixin(object):
     def read_device_config(self):
-        print("here")
+        print("ResultReader: reading device config")
         return {"samples_per_packet": 1}
 
     def _map_classification(self, results):
@@ -265,7 +271,7 @@ class BaseResultReaderMixin(object):
     def read_data(self):
         """ Genrator to read the result stream out of the buffer """
 
-        print("starting result read")
+        print("ResultReader: result read starting")
 
         if self._thread:
             pass
@@ -296,11 +302,12 @@ class BaseResultReaderMixin(object):
             else:
                 time.sleep(0.1)
 
-        print("result stream ended")
+        print("ResultReader: Result stream ended")
 
     def _record_data(self, filename):
 
         with open(filename + ".csv", "w", newline="") as out:
+            print("ResultReader: Recording results to ", filename + ".csv")
             data_reader = self.read_data()
 
             while self.recording:
@@ -310,4 +317,4 @@ class BaseResultReaderMixin(object):
                 if data:
                     out.write(data)
 
-        print("recording thread finished")
+        print("ResultReader: Recording data finished")
