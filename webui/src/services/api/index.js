@@ -6,6 +6,10 @@ const ApiService = {
   interceptor_401: null,
   refreshUrl: '/auth/refresh',
 
+  init(baseURL) {
+    axios.defaults.baseURL = baseURL;
+  },
+
   mount401Interceptor() {
     this.interceptor_401 = axios.interceptors.response.use((response) => response,
       async (error) => {
@@ -21,13 +25,13 @@ const ApiService = {
         throw error;
       });
   },
-  
+
 
   unmount401Interceptor() {
     // Eject the interceptor
     axios.interceptors.response.eject(this.interceptor_401);
   },
-  
+
   setCustomAuthHeader(key) {
     axios.defaults.headers.common.Authorization = key;
   },

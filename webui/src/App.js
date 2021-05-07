@@ -11,6 +11,9 @@ import ApiService from "./services/api";
 import { initStreamSensorReader } from "./redux/repositories/StreamSensorReader";
 import { apiHosts } from "./configs";
 
+// set base host to the axios instance
+ApiService.init(apiHosts.baseHost);
+
 // initialize StreamSensorReader for handle as entrypoint
 initStreamSensorReader();
 
@@ -23,7 +26,7 @@ const App = () => {
             horizontal: "right",
             vertical: "top",
           }}
-          autoHideDuration={ 2000 }
+          autoHideDuration={2000}
         >
           <Main />
         </SnackbarProvider>

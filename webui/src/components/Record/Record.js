@@ -57,7 +57,7 @@ const Record = (props) => {
     }
     console.log(filename);
     axios
-      .post(`/${url}`, {
+      .post(`${process.env.REACT_APP_API_URL}` + url, {
         filename: filename,
         event_type: event,
       })
@@ -80,8 +80,8 @@ const Record = (props) => {
   };
 
   const handleDownloadRequest = (event, filename) => {
-    console.log(`/download/${filename}`);
-    fetch(`/download/${filename}`, {
+    console.log(`${process.env.REACT_APP_API_URL}download/` + filename);
+    fetch(`${process.env.REACT_APP_API_URL}download/` + filename, {
       method: "GET",
       headers: { "Content-Type": "application/zip" },
     })
@@ -157,22 +157,22 @@ const Record = (props) => {
                 </Button>
               </Tooltip>
             ) : (
-              <Button
-                aria-label="Stop "
-                variant="contained"
-                fullWidth={true}
-                disabled={recordDistabled}
-                onClick={() => {
-                  handleRecordRequest(
-                    "record-stop",
-                    props.isCameraConnected ? "record" : "record-device",
-                    setRecording
-                  );
-                }}
-              >
-                Stop Recording
-              </Button>
-            )}
+                <Button
+                  aria-label="Stop "
+                  variant="contained"
+                  fullWidth={true}
+                  disabled={recordDistabled}
+                  onClick={() => {
+                    handleRecordRequest(
+                      "record-stop",
+                      props.isCameraConnected ? "record" : "record-device",
+                      setRecording
+                    );
+                  }}
+                >
+                  Stop Recording
+                </Button>
+              )}
           </Grid>
 
           <Grid item xs={6}>

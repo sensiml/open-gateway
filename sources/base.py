@@ -123,14 +123,14 @@ class BaseReader(object):
             )
             self.rbuffer = CircularResultsBufferQueue(self._lock, buffer_size=1)
 
-            print("BLE: Sending Subscribe")
+            print("Base: Sending subscribe to source")
             self._send_subscribe()
 
             time.sleep(1)
 
             self.buffer.reset_buffer()
 
-            print("BLE: Read Source Starting")
+            print("Base: Setting up thread to read source")
 
             self._thread = threading.Thread(target=self._read_source)
             self._thread.start()
@@ -138,7 +138,7 @@ class BaseReader(object):
             time.sleep(1)
 
         else:
-            print("Thread Already Started!")
+            print("Base: Thread Already Started!")
 
     def disconnect(self):
         self.streaming = False
@@ -162,7 +162,7 @@ class BaseReader(object):
 
         if not os.path.exists(os.path.dirname(filename)):
             print(
-                "File directory does not exist,  recording to data directory in gateway location."
+                "Base: File directory does not exist,  recording to data directory in gateway location."
             )
             if not os.path.exists("./data"):
                 os.mkdir("./data")

@@ -158,26 +158,26 @@ const Results = (props) => {
                 </Button>
               </div>
             ) : (
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  fullWidth={true}
-                  onClick={() => {
-                    handleStreamRequest(
-                      "clicked",
-                      `/results`,
-                      setDeviceRows,
-                      setIsStreaming,
-                      setReader
-                    );
-                  }}
-                >
-                  Start Stream
+                <div className={classes.controls}>
+                  <Button
+                    aria-label="disconnect"
+                    color="primary"
+                    variant="contained"
+                    fullWidth={true}
+                    onClick={() => {
+                      handleStreamRequest(
+                        "clicked",
+                        `${process.env.REACT_APP_API_URL}results`,
+                        setDeviceRows,
+                        setIsStreaming,
+                        setReader
+                      );
+                    }}
+                  >
+                    Start Stream
                 </Button>
-              </div>
-            )}
+                </div>
+              )}
           </Grid>
         </div>
 

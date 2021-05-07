@@ -82,6 +82,7 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
                 ser.reset_input_buffer()
 
                 while self.streaming:
+
                     data = ser.read(self.source_buffer_size)
 
                     self.buffer.update_buffer(data)
