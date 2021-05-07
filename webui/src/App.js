@@ -9,7 +9,11 @@ import { SnackbarProvider } from "notistack";
 import store from "./redux/store";
 import { initStreamSensorReader } from "./redux/repositories/StreamSensorReader";
 
+import ApiService from "./services/api";
+import { apiHosts } from "./configs";
 
+
+ApiService.init(apiHosts.baseHost);
 // initialize StreamSensorReader for handle as entrypoint
 initStreamSensorReader();
 
