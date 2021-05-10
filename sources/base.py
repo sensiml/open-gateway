@@ -262,9 +262,9 @@ class BaseResultReaderMixin(object):
 
     def _map_classification(self, results):
         if self.model_json:
-            return self.model["ModelDescriptions"][results["ModelNumber"]][
-                ["ClassMaps"]
-            ][str(results["Classification"])]
+            results["Classification"] = self.model_json["ModelDescriptions"][
+                results["ModelNumber"]
+            ]["ClassMaps"][str(results["Classification"])]
 
         elif self.class_map:
             results["Classification"] = self.class_map.get(
