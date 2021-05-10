@@ -1,5 +1,5 @@
 # SensiML Open Gateway
- 
+
 The Open Gateway implements the [Simple Streaming Service protocol](https://sensiml.com/documentation/simple-streaming-specification/introduction.html) to enable forwarding data to the SensiML Data Capture Lab for recording and annotation. The Gateway supports connecting to sensor sources over a Serial, BLE, and TCP/IP connections. It also supports recording video and sensor data locally to the gateway.
 
 ## Installation
@@ -76,14 +76,14 @@ In the Gateway Status screen you can start and stop a video source. If you start
 
 To see mappings from integer class results to text class results you can edit the class map directly in the app.py file. Add the class integer value as the key and the string you would like to show up in the UI as the value.
 
-``` python
+```python
 # Replace this with the dictionary in the model.json file
 app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
 ```
 
-For more complicated model hiearchies you can copy the dictionary directly from a model.json file and replace the 
+For more complicated model hierarchies you can copy the dictionary directly from a model.json file and replace the
 
-``` python
+```python
 # replace this with the dictionary in the model.json file
 app.config["MODEL_JSON"] = None
 ```
