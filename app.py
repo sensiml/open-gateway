@@ -43,7 +43,25 @@ app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
 
+###############################
+## USER SETTINGS ##
+###############################
+
+# Serial BAUD RATE
+app.config["BAUD_RATE"] = 460800
+
+# Replace this with the class map
+app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
+
+# replace this with the dictionary in the model.json file
+app.config["MODEL_JSON"] = None
+
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
+
+
+###############################
+
+
 app.config["SECRET_KEY"] = "any secret string"
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
@@ -55,17 +73,6 @@ app.config["MODE"] = ""
 app.config["VIDEO_SOURCE"] = None
 app.config["LOOP"] = loop
 
-
-# USER SETTINGS
-
-# Serial BAUD RATE
-app.config["BAUD_RATE"] = 460800
-
-# Replace this with the class map
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
-
-# replace this with the dictionary in the model.json file
-app.config["MODEL_JSON"] = None
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
