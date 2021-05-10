@@ -19,7 +19,7 @@ python3 app.py
 
 ## Installation (Windows, Mac)
 
-Currently the application uses bluepy for BLE connections on linux, which is not supported on windows or Mac. We have experimental support for BLE on windows/OSx using bleak. If you are installing for windows, remove bluepy as a dependency in requirements.txt.
+We are supporting for BLE on windows/OSx/Linux using bleak. If you are installing for windows, remove bluepy as a dependency in requirements.txt. We also have support for bluepy on linux.
 
 ## Usage
 
@@ -88,15 +88,30 @@ For more complicated model hierarchies you can copy the dictionary directly from
 app.config["MODEL_JSON"] = None
 ```
 
-## BLE Troubleshooting on Linux
+## Using Bluepy on linux
 
-**NOTE** To use Bluetooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
+If you would rather use the bluepy driver for ble, you can do that on linux.
+
+```raw
+In the sources/__init__.py file comment out the bleak driver import and uncomment the ble driver. Also install the latest version of bluepy
+```
+
+```python
+# use bluepy ble drivers
+#from sources.ble import BLEStreamReader, BLEResultReader
+# use bleak ble drivers
+from sources.ble_bleak import BLEStreamReader, BLEResultReader
+```
+
+**NOTE** To use Bluepy python library you may have to run the following to allow bluepy-helper to access the correct permissions
 
 ```bash
 find ~/ -name bluepy-helper
 cd <PATH>
 sudo setcap 'cap_net_raw,cap_net_admin+eip' bluepy-helper
 ```
+
+### BLE Troubleshooting on Linux
 
 ### Cycle Bloothooth on Linux
 
