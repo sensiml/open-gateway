@@ -72,6 +72,22 @@ In the Gateway Status screen you can start and stop a video source. If you start
 
 ![Configure Gateway](img/status.png)
 
+### Configuring the Model Class Map
+
+To see mappings from integer class results to text class results you can edit the class map directly in the app.py file. Add the class integer value as the key and the string you would like to show up in the UI as the value.
+
+``` python
+# Replace this with the dictionary in the model.json file
+app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
+```
+
+For more complicated model hiearchies you can copy the dictionary directly from a model.json file and replace the 
+
+``` python
+# replace this with the dictionary in the model.json file
+app.config["MODEL_JSON"] = None
+```
+
 ## BLE Troubleshooting on Linux
 
 **NOTE** To use Bluetooth as a source you may have to run the following to allow bluepy-helper to access the correct permissions
