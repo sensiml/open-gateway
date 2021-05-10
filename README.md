@@ -17,10 +17,6 @@ To Start the application run
 python3 app.py
 ```
 
-## Installation (Windows, Mac)
-
-We are supporting for BLE on windows/OSx/Linux using bleak. If you are installing for windows, remove bluepy as a dependency in requirements.txt. We also have support for bluepy on linux.
-
 ## Usage
 
 The Gateway must first be configured to record data from your target sensor. It does that by fetching a configuration json from the source device. You can scan for devices connected over Serial and BLE. The gateway does not support scanning for TCP/IP devices, these addresses must be entered manually into the device id field as <address:port>.
