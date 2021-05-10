@@ -61,7 +61,7 @@ app.config["LOOP"] = loop
 # Serial BAUD RATE
 app.config["BAUD_RATE"] = 460800
 
-# Replace this with the dictionary in the model.json file
+# Replace this with the class map
 app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
 
 # replace this with the dictionary in the model.json file
