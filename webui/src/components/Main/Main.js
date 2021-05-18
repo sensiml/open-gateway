@@ -45,16 +45,13 @@ const Main = () => {
     setStreamingSource(data.source.toUpperCase());
     setDeviceID(data.device_id);
     setIsCameraConnected(data.camera_on);
-
-    console.log("SETTING DATA TYPE");
-
+    
     switch (data.data_type){
       case('int16'):
         setDataType('int16');
         break;
       case('float32'):
         setDataType('float32');
-        console.log("SETTING DATA TYPE TO FLOAT32");
         break;
       default:
         setDataType('int16');
