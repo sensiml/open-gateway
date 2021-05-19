@@ -15,9 +15,14 @@ class TestReader(BaseReader):
 
     def list_available_devices(self):
         return [
-            {"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
-            {"id": 2, "name": "Test Data", "device_id": "Test Audio"},
-            {"id": 3, "name": "Test Data", "device_id": "Test IMU 6-axis Float"},
+            {"id": 1, "name": "Test IMU 6-axis", "device_id": "Test IMU 6-axis"},
+            {"id": 2, "name": "Test Audio", "device_id": "Test Audio"},
+            {
+                "id": 3,
+                "name": "Test IMU 6-axis Float",
+                "device_id": "Test IMU 6-axis Float",
+            },
+            {"id": 4, "name": "Test Acc", "device_id": "Test IMU 3-axis"},
         ]
 
 
@@ -163,6 +168,16 @@ def get_test_device_configs(device_id):
             "GyroscopeX": 3,
             "GyroscopeY": 4,
             "GyroscopeZ": 5,
+        }
+        config["sample_rate"] = 119
+        config["samples_per_packet"] = 6
+        config["data_type"] = "int16"
+
+    elif device_id == "Test IMU 3-axis":
+        config["column_location"] = {
+            "AccelerometerX": 0,
+            "AccelerometerY": 1,
+            "AccelerometerZ": 2,
         }
         config["sample_rate"] = 119
         config["samples_per_packet"] = 6

@@ -12,15 +12,16 @@ try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
 except:
     from buffers import CircularBufferQueue, CircularResultsBufferQueue
-SHORT = 2
 
 
 class BaseFusionReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
-    def __init__(self, config, sources, device_id):
+    def __init__(self, config, sources, device_id, data_source):
+
         self.class_map = config["CLASS_MAP"]
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
+        self.name = data_source
         self.sources = sources
         self.device_id = device_id
         self.source_samples_per_packet = 1
@@ -89,11 +90,13 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
         config = {}
         sample_rates = set()
         samples_per_packet = set()
+        data_type = set()
         combined_samples_per_packet = 0
         config_columns = set()
         combined_config_columns = {}
         for index, source in enumerate(self.sources):
             sample_rates.add(source.sample_rate)
+            data_type.add(source.data_type)
             samples_per_packet.add(source.samples_per_packet)
             config_columns.add(len(source.config_columns))
             combined_samples_per_packet += source.samples_per_packet
@@ -110,27 +113,20 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
         if len(samples_per_packet) != 1:
             raise Exception("All sources must have the same samples per packet.")
 
-        if len(config_columns) != 1:
-            raise Exception("All sources must have the same number of channels.")
+        if len(data_type) != 1:
+            raise Exception("All sources must have the same data type.")
 
         config["sample_rate"] = sample_rates.pop()
         config["samples_per_packet"] = combined_samples_per_packet
         config["column_location"] = combined_config_columns
+        config["data_type"] = data_type.pop()
 
         self.source_samples_per_packet = config["samples_per_packet"]
         self.sample_rate = config["sample_rate"]
         self.config_columns = config.get("column_location")
-        self.data_type = "int16"
+        self.data_type = config["data_type"]
 
         return config
-
-    def set_app_config(self, config):
-
-        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
-        config["DEVICE_ID"] = self.device_id
-        config["DATA_TYPE"] = self.data_type
 
     def read_data(self):
         def inerleave_buffers(data_buffers):
@@ -167,7 +163,7 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
                     bindex[index]
                 ):
                     data[index] = source.buffer.get_buffer_iterator(
-                        self.bindex[index], source.data_width
+                        bindex[index], source.data_width
                     )
                     data_ready[index] = True
                     bindex[index] = source.buffer.get_next_index(bindex[index])
@@ -184,7 +180,6 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
 
 class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
     def set_app_config(self, config):
-
         config["SOURCE_SAMPLES_PER_PACKET"] = self.samples_per_packet
         config["DEVICE_ID"] = self.device_id
 
