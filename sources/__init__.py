@@ -25,9 +25,9 @@ def get_fusion_source(
         )
 
     if source_type == "DATA_CAPTURE":
-        return FusionStreamReader(config, sources, device_ids)
+        return FusionStreamReader(config, sources, device_ids, data_source)
     else:
-        return FusionResultReader(config, sources, device_ids)
+        return FusionResultReader(config, sources, device_ids, data_source)
 
 
 def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwargs):

@@ -34,6 +34,7 @@ const TestMode = (props) => {
           <SensorStream
             columns={props.columns}
             isConnected={props.isConnected}
+            dataType={props.dataType}
           />
         </Grid>
       ) : (

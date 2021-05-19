@@ -1,7 +1,5 @@
 export const sensorDataForChart = column => (state) => {
   const { sensorSimpleData } = state.sensorData;
-  console.log("HEREE");
-  console.log(sensorSimpleData);
   // generate chart zero array
   const result = column.map(name => {
     return {

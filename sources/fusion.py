@@ -12,15 +12,16 @@ try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
 except:
     from buffers import CircularBufferQueue, CircularResultsBufferQueue
-SHORT = 2
 
 
 class BaseFusionReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
-    def __init__(self,config, sources, device_id):
+    def __init__(self, config, sources, device_id, data_source):
+
         self.class_map = config["CLASS_MAP"]
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
+        self.name = data_source
         self.sources = sources
         self.device_id = device_id
         self.source_samples_per_packet = 1
@@ -56,14 +57,12 @@ class BaseFusionReader(BaseReader):
     def is_streaming(self):
         return self._check_streaming()
 
-
     def is_data_ready(self, data_ready):
         for data in data_ready:
             if not data:
                 return False
 
         return True
-
 
     def _check_is_stream_source_ready(self, bindex):
         for index, source in enumerate(self.sources):
@@ -72,8 +71,6 @@ class BaseFusionReader(BaseReader):
                 return False
 
         return True
-
-
 
     def _check_is_result_source_ready(self, bindex):
         for index, source in enumerate(self.sources):
@@ -85,8 +82,6 @@ class BaseFusionReader(BaseReader):
 
 
 class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
-
-
     def read_config(self):
 
         for source in self.sources:
@@ -95,11 +90,13 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
         config = {}
         sample_rates = set()
         samples_per_packet = set()
+        data_type = set()
         combined_samples_per_packet = 0
         config_columns = set()
         combined_config_columns = {}
         for index, source in enumerate(self.sources):
             sample_rates.add(source.sample_rate)
+            data_type.add(source.data_type)
             samples_per_packet.add(source.samples_per_packet)
             config_columns.add(len(source.config_columns))
             combined_samples_per_packet += source.samples_per_packet
@@ -116,31 +113,22 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
         if len(samples_per_packet) != 1:
             raise Exception("All sources must have the same samples per packet.")
 
-        if len(config_columns) != 1:
-            raise Exception("All sources must have the same number of channels.")
+        if len(data_type) != 1:
+            raise Exception("All sources must have the same data type.")
 
         config["sample_rate"] = sample_rates.pop()
         config["samples_per_packet"] = combined_samples_per_packet
         config["column_location"] = combined_config_columns
+        config["data_type"] = data_type.pop()
 
         self.source_samples_per_packet = config["samples_per_packet"]
         self.sample_rate = config["sample_rate"]
         self.config_columns = config.get("column_location")
+        self.data_type = config["data_type"]
 
         return config
 
-    def set_app_config(self, config):
-
-        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
-        config["DEVICE_ID"] = self.device_id
-
-
     def read_data(self):
-
-
-
         def inerleave_buffers(data_buffers):
 
             packet_buffer = b""
@@ -175,12 +163,10 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
                     bindex[index]
                 ):
                     data[index] = source.buffer.get_buffer_iterator(
-                        self.bindex[index], source.data_width
+                        bindex[index], source.data_width
                     )
                     data_ready[index] = True
-                    bindex[index] = source.buffer.get_next_index(
-                        bindex[index]
-                    )
+                    bindex[index] = source.buffer.get_next_index(bindex[index])
 
                 if self.is_data_ready(data_ready):
                     yield inerleave_buffers(data)
@@ -192,19 +178,12 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
         yield None
 
 
-
-
 class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
-
-
     def set_app_config(self, config):
-
         config["SOURCE_SAMPLES_PER_PACKET"] = self.samples_per_packet
         config["DEVICE_ID"] = self.device_id
 
-
     def read_data(self):
-
 
         bindex = [False for _ in range(len(self.sources))]
         data = [[] for _ in range(self.num_sources)]
@@ -219,31 +198,30 @@ class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
         while self.is_streaming():
 
             for index, source in enumerate(self.sources):
-                if source.rbuffer.is_buffer_full(
-                    bindex[index]
-                ):
+                if source.rbuffer.is_buffer_full(bindex[index]):
 
                     data[index] = source.rbuffer.read_buffer(bindex[index])
                     bindex[index] = source.rbuffer.get_next_index(bindex[index])
                     data_ready[index] = True
 
-
             for index, is_datain_ready in enumerate(data_ready):
                 if is_datain_ready:
                     for result in data[index]:
                         if self._validate_results_data(result):
-                            result = self.sources[index]._map_classification(json.loads(result))
+                            result = self.sources[index]._map_classification(
+                                json.loads(result)
+                            )
                             result["timestap"] = time.time()
-                            result['source'] = self.sources[index].device_id
-                            result['name'] = self.sources[index].name
+                            result["source"] = self.sources[index].device_id
+                            result["name"] = self.sources[index].name
                             yield json.dumps(result) + "\n"
                     data_ready[index] = False
-
 
             time.sleep(0.001)
 
         print("stream ended")
         yield None
+
 
 if __name__ == "__main__":
 

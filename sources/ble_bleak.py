@@ -20,15 +20,13 @@ RecognitionClassUUID = "42421101-5A22-46DD-90F7-7AF26F723159"
 class BLEReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
+    name = "BLE"
+
     def __init__(self, config, device_id, connect=True, **kwargs):
 
         super(BLEReader, self).__init__(config, device_id, **kwargs)
 
-        self.new_data = False
-        self.data = []
         self.subscribed = False
-        self.peripheral = None
-        self.streaming = False
 
     def handleNotification(self, cHandle: int, value: bytearray):
         print(cHandle, value)
@@ -130,14 +128,6 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
     def handleNotification(self, cHandle: int, value: bytearray):
         self.buffer.update_buffer(value)
 
-    def set_app_config(self, config):
-
-        config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
-        config["CONFIG_COLUMNS"] = self.config_columns
-        config["CONFIG_SAMPLE_RATE"] = self.sample_rate
-        config["DATA_SOURCE"] = "BLE"
-        config["DEVICE_ID"] = self.device_id
-
 
 class BLEResultReader(BLEReader, BaseResultReaderMixin):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
@@ -149,7 +139,7 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
         return {"samples_per_packet": 1}
 
     def set_app_config(self, config):
-        config["DATA_SOURCE"] = "BLE"
+        config["DATA_SOURCE"] = self.name
         config["DEVICE_ID"] = self.device_id
 
     def handleNotification(self, cHandle: int, value: bytearray):

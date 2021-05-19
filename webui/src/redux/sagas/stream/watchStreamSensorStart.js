@@ -11,13 +11,16 @@ import {
 
 function* workerStreamStart(action) {
   try {
-    const { countSamples } = action?.payload;
+    const { countSamples, dataType } = action?.payload;
+    console.log(action.payload);
+
     yield call([streamSensorReader, "startStreaming"]);
     yield put({ type: SET_IS_STREAMING_SENSOR, payload: true });
     yield call(
       [streamSensorReader, "readStreamToRedux"],
       SET_CHUNK_SENSOR_DATA_SAGA,
-      countSamples
+      countSamples,
+      dataType,
     );
   } catch (e) {
     console.debug(e);
