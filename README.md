@@ -84,6 +84,25 @@ For more complicated model hierarchies you can copy the dictionary directly from
 app.config["MODEL_JSON"] = None
 ```
 
+
+### Running a knowledge pack on the gateway
+
+In some cases you may want to run a Knowledge Pack on the gateway itself. This is currently possible by turning the Knowledge Pack into a shared object file. Download a Knowledge Pack library for your gateway's platform. Unzip the folder and go to the libsensiml directory. Here you will see a libsensiml.a file. You need to convert this to a shared object by running the following.
+
+```bash
+ar -x libsensiml.a
+gcc -shared -o libsensiml.so *.o
+```
+
+Then update the app.py configuration file to point to the path folder containing the libsensiml.so file.
+
+```python
+# path to a libsensiml.so file if this is included the model will be run when live streaming data.
+app.config["SML_LIBRARY_PATH"] = "<path-to-the-folder-containing-libsensiml.so>"
+```
+
+Now connect to your device in data collection mode, switch to the Test Mode tab and click start stream. In the terminal window running the open gateway you will see the model results printed. In the webui you will see the data streaming.
+
 ## Using Bluepy on linux
 
 If you would rather use the bluepy driver for ble, you can do that on linux.

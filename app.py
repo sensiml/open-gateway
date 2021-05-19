@@ -58,6 +58,9 @@ app.config["MODEL_JSON"] = None
 
 app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
 
+# path to a libsensiml.so file if this is included the model will be run when live streaming data.
+app.config["SML_LIBRARY_PATH"] = ""
+
 
 ###############################
 

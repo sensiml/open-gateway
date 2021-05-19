@@ -7,6 +7,7 @@ import time
 import csv
 import os
 import random
+from sources.utils.sml_runner import SMLRunner
 
 try:
     from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
@@ -23,7 +24,8 @@ class BaseReader(object):
         self.model_json = config["MODEL_JSON"]
         self.loop = config["LOOP"]
         self.source_samples_per_packet = None
-        self.data_type = config.get("data_type", "int16")
+        self.data_type = config.get("DATA_TYPE", "int16")
+        self.sml_library_path = config.get("SML_LIBRARY_PATH", None)
         self.sample_rate = None
         self.config_columns = None
         self.device_id = device_id
@@ -230,6 +232,15 @@ class BaseReader(object):
 
         return True
 
+    def convert_data_to_list(self, data):
+
+        num_samples = len(data) // self.data_byte_size
+
+        tmp = struct.unpack(self.data_type_str * num_samples, data)
+
+        for index in range(self.source_samples_per_packet):
+            yield tmp[index * self.data_width : (index + 1) * self.data_width]
+
 
 class BaseStreamReaderMixin(object):
     def read_data(self):
@@ -247,6 +258,11 @@ class BaseStreamReaderMixin(object):
 
         index = self.buffer.get_latest_buffer()
 
+        if self.sml_library_path:
+            sml = SMLRunner(os.path.join(self.sml_library_path))
+            sml.init_model()
+            number_samples_run = 0
+
         while self.streaming:
 
             if index is None:
@@ -258,6 +274,16 @@ class BaseStreamReaderMixin(object):
                 data = self.buffer.read_buffer(index)
                 index = self.buffer.get_next_index(index)
 
+                if self.sml_library_path:
+                    for data_chunk in self.convert_data_to_list(data):
+                        ret = sml.run_model(data_chunk, 0)
+                        number_samples_run += 1
+
+                        if ret >= 0:
+                            print("Classification:", ret, "Samples", number_samples_run)
+                            sml.reset_model(0)
+                            ret = -1
+                            number_samples_run = 0
                 if data:
                     yield data
 
