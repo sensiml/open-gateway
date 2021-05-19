@@ -12,10 +12,11 @@ WIFI_PORT = ":80"
 
 
 class TCPIPReader(BaseReader):
+    name = "TCPIP"
+
     def __init__(self, config, device_id, **kwargs):
 
         self.device_id = device_id
-        self.name = "TCPIP"
 
         if kwargs.get("connect", True) is True:
 

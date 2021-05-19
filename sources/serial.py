@@ -11,10 +11,11 @@ BAUD_RATE = 460800
 
 
 class SerialReader(BaseReader):
+    name = "SERIAL"
+
     def __init__(self, config, device_id, **kwargs):
         self._port = device_id
         self._baud_rate = config.get("BAUD_RATE", BAUD_RATE)
-        self.name = "SERIAL"
 
         super(SerialReader, self).__init__(config, device_id, **kwargs)
 

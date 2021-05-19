@@ -53,6 +53,8 @@ class ResultDelegate(StreamingDelegate):
 class BLEReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
+    name = "BLE"
+
     def __init__(self, config, device_id, connect=True, **kwargs):
 
         super(BLEReader, self).__init__(config, device_id, **kwargs)
@@ -63,7 +65,6 @@ class BLEReader(BaseReader):
         self.streaming = False
         self.subscribed = False
         self.peripheral = None
-        self.name = "BLE"
 
         if self.device_id and connect:
             self.peripheral = btle.Peripheral(self.device_id)
@@ -175,7 +176,6 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
         self.delegate = ResultDelegate(self._lock)
         self.new_data = False
         self.data = []
-        self.streaming = False
         self.subscribed = False
         self.device_id = device_id
         self.name = "BLE"

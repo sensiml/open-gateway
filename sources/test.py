@@ -13,6 +13,15 @@ except:
 class TestReader(BaseReader):
     name = "TEST"
 
+    def list_available_devices(self):
+        return [
+            {"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
+            {"id": 2, "name": "Test Data", "device_id": "Test Audio"},
+            {"id": 3, "name": "Test Data", "device_id": "Test IMU 6-axis Float"},
+        ]
+
+
+class TestStreamReader(TestReader, BaseStreamReaderMixin):
     @property
     def delay(self):
         return 1.0 / self.sample_rate * self.samples_per_packet / 1.25
@@ -64,15 +73,6 @@ class TestReader(BaseReader):
             end = end_index * self.data_byte_size * num_columns
             return data[start:end], end_index
 
-    def list_available_devices(self):
-        return [
-            {"id": 1, "name": "Test Data", "device_id": "Test IMU 6-axis"},
-            {"id": 2, "name": "Test Data", "device_id": "Test Audio"},
-            {"id": 3, "name": "Test Data", "device_id": "Test IMU 6-axis Float"},
-        ]
-
-
-class TestStreamReader(TestReader, BaseStreamReaderMixin):
     def read_device_config(self):
 
         config = get_test_device_configs(self.device_id)
@@ -115,7 +115,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
             time.sleep(sleep_time - incycle)
 
 
-class TestResultReader(BaseReader, BaseResultReaderMixin):
+class TestResultReader(TestReader, BaseResultReaderMixin):
     def set_app_config(self, config):
         config["DATA_SOURCE"] = self.name
         config["DEVICE_ID"] = self.device_id

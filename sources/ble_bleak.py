@@ -20,16 +20,13 @@ RecognitionClassUUID = "42421101-5A22-46DD-90F7-7AF26F723159"
 class BLEReader(BaseReader):
     """ Base Reader Object, describes the methods that must be implemented for each data source"""
 
+    name = "BLE"
+
     def __init__(self, config, device_id, connect=True, **kwargs):
 
         super(BLEReader, self).__init__(config, device_id, **kwargs)
 
-        self.new_data = False
-        self.data = []
         self.subscribed = False
-        self.peripheral = None
-        self.streaming = False
-        self.name = "BLE"
 
     def handleNotification(self, cHandle: int, value: bytearray):
         print(cHandle, value)
