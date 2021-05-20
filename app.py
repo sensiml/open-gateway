@@ -42,30 +42,10 @@ app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
 app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
-
-###############################
-## USER SETTINGS ##
-###############################
-
-# Serial BAUD RATE
-app.config["BAUD_RATE"] = 460800
-
-# Replace this with the class map
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
-
-# replace this with the dictionary in the model.json file
-app.config["MODEL_JSON"] = None
-
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
-
-# path to a libsensiml.so file if this is included the model will be run when live streaming data.
-app.config["SML_LIBRARY_PATH"] = ""
+app.config.from_object("config")
 
 
-###############################
-
-
-app.config["SECRET_KEY"] = "any secret string"
+## Internal Config Settings
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
 app.config["DATA_TYPE"] = "int16"
