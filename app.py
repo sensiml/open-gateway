@@ -39,7 +39,11 @@ from video_sources import get_video_source, get_video_source_list
 import zipfile
 
 
-app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
+app = Flask(
+    __name__,
+    static_folder=os.path.join(os.path.dirname(__file__), "webui", "build"),
+    static_url_path="/",
+)
 app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
