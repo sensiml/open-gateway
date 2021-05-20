@@ -26,6 +26,8 @@ class BaseReader(object):
         self.source_samples_per_packet = None
         self.data_type = config.get("DATA_TYPE", "int16")
         self.sml_library_path = config.get("SML_LIBRARY_PATH", None)
+        self.convert_to_int16 = config.get("CONVERT_TO_INT16", False)
+        self.scaling_factor = config.get("SCALING_FACTOR", 1)
         self.sample_rate = None
         self.config_columns = None
         self.device_id = device_id
@@ -241,6 +243,23 @@ class BaseReader(object):
         for index in range(self.source_samples_per_packet):
             yield tmp[index * self.data_width : (index + 1) * self.data_width]
 
+    def convert_data_to_int16(self, data):
+
+        num_samples = len(data) // self.data_byte_size
+
+        tmp = struct.unpack(self.data_type_str * num_samples, data)
+
+        sample_data = bytearray(num_samples * 2)
+
+        for index in range(num_samples):
+            # print(tmp[index])
+
+            struct.pack_into(
+                "<" + "h", sample_data, index * 2, int(tmp[index] * self.scaling_factor)
+            )
+
+        return bytes(sample_data)
+
 
 class BaseStreamReaderMixin(object):
     def read_data(self):
@@ -284,6 +303,10 @@ class BaseStreamReaderMixin(object):
                             sml.reset_model(0)
                             ret = -1
                             number_samples_run = 0
+
+                if self.convert_to_int16 and self.data_type_str == "f":
+                    data = self.convert_data_to_int16(data)
+
                 if data:
                     yield data
 
