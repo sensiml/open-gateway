@@ -68,6 +68,19 @@ In the Gateway Status screen you can start and stop a video source. If you start
 
 ![Configure Gateway](img/status.png)
 
+### User Commands
+
+Useful configuration commands when launching the open-gateway
+
+```bash
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>
+
+-u --host : select the host address for the gateway to launch on
+-p --port : select the port address for the gateway to launch on
+-s --sml_library_path: set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+```
+
 ### Configuring the Model Class Map
 
 To see mappings from integer class results to text class results you can edit the class map directly in the config.py file. Add the class integer value as the key and the string you would like to show up in the UI as the value.
@@ -94,11 +107,12 @@ ar -x libsensiml.a
 gcc -shared -o libsensiml.so *.o
 ```
 
-Then update the app.py configuration file to point to the path folder containing the libsensiml.so file.
+copy the libsensiml.so file to the open-gateway/knowledgepack/libsensiml folder
 
-```python
-# path to a libsensiml.so file if this is included the model will be run when live streaming data.
-app.config["SML_LIBRARY_PATH"] = "<path-to-the-folder-containing-libsensiml.so>"
+Alternatively, you can pass the path in when you start the application
+
+```bash
+python app.y -s <path-to-libsensiml.so directory>
 ```
 
 Now connect to your device in data collection mode, switch to the Test Mode tab and click start stream. In the terminal window running the open gateway you will see the model results printed. In the webui you will see the data streaming.

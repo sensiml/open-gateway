@@ -613,18 +613,48 @@ if __name__ == "__main__":
     PORT = 5555
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "h:p:", ["host", "port"])
+        opts, args = getopt.getopt(
+            sys.argv[1:], "hu:p:s:", ["help", "host", "port", "sml_library_path"]
+        )
     except getopt.GetoptError:
-        print("python app.py -h <host> -p <port>")
+        print(
+            "python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>"
+        )
 
     for opt, arg in opts:
-        if opt in ("-h", "--host"):
+        if opt in ("-h", "--help"):
+            print(
+                """
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>
+
+-u --host : select the host address for the gateway to launch on
+-p --port : select the port address for the gateway to launch on
+-s --sml_library_path: set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+
+"""
+            )
+            sys.exit()
+        if opt in ("-u", "--host"):
             HOST = arg
         elif opt in ("-p", "--port"):
             PORT = int(arg)
+        elif opt in ("s", "--sml_library_path"):
+            app.config["SML_LIBRARY_PATH"] = arg
+            app.config["RUN_SML_MODEL"] = (
+                True if os.path.exists(os.path.join(arg, "libsensiml.so")) else False
+            )
+            if not app.config["RUN_SML_MODEL"]:
+                print("libsensiml.so not found in {}".format(arg))
+                raise Exception("libsensiml.so not found in {}".format(arg))
+        elif opt in ("m", "--model_json_path"):
+            if os.path.exists(arg):
+                app.config["MODEL_JSON"] = json.load(open(arg))
 
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
+
+    print(app.config)
 
     try:
         Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
