@@ -54,7 +54,7 @@ class BaseReader(object):
 
         if self.data_type == "int16":
             return INT16_BYTE_SIZE
-        elif self.data_type == "float32":
+        elif self.data_type == "float":
             return FLOAT32_BYTE_SIZE
 
         return INT16_BYTE_SIZE
@@ -63,7 +63,7 @@ class BaseReader(object):
     def data_type_str(self):
         if self.data_type == "int16":
             return "h"
-        elif self.data_type == "float32":
+        elif self.data_type == "float":
             return "f"
 
         return INT16_BYTE_SIZE
@@ -72,7 +72,7 @@ class BaseReader(object):
     def data_type_cast(self):
         if self.data_type == "int16":
             return int
-        elif self.data_type == "float32":
+        elif self.data_type == "float":
             return float
 
         return int

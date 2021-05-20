@@ -158,7 +158,7 @@ def get_test_device_configs(device_id):
         }
         config["sample_rate"] = 119
         config["samples_per_packet"] = 6
-        config["data_type"] = "float32"
+        config["data_type"] = "float"
 
     elif device_id == "Test IMU 6-axis":
         config["column_location"] = {
