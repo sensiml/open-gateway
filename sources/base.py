@@ -26,6 +26,7 @@ class BaseReader(object):
         self.source_samples_per_packet = None
         self.data_type = config.get("DATA_TYPE", "int16")
         self.sml_library_path = config.get("SML_LIBRARY_PATH", None)
+        self.run_sml_model = config.get("RUN_SML_MODEL", False)
         self.convert_to_int16 = config.get("CONVERT_TO_INT16", False)
         self.scaling_factor = config.get("SCALING_FACTOR", 1)
         self.sample_rate = None
@@ -277,7 +278,7 @@ class BaseStreamReaderMixin(object):
 
         index = self.buffer.get_latest_buffer()
 
-        if self.sml_library_path:
+        if self.run_sml_model:
             sml = SMLRunner(os.path.join(self.sml_library_path))
             sml.init_model()
             number_samples_run = 0
@@ -293,7 +294,7 @@ class BaseStreamReaderMixin(object):
                 data = self.buffer.read_buffer(index)
                 index = self.buffer.get_next_index(index)
 
-                if self.sml_library_path:
+                if self.run_sml_model:
                     for data_chunk in self.convert_data_to_list(data):
                         ret = sml.run_model(data_chunk, 0)
                         number_samples_run += 1
