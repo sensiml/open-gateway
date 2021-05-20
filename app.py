@@ -14,6 +14,7 @@ import nest_asyncio
 import time
 from threading import Timer
 import webbrowser
+import getopt
 
 nest_asyncio.apply()
 
@@ -609,12 +610,19 @@ def delete_cache():
 if __name__ == "__main__":
 
     HOST = os.environ.get("SERVER_HOST", "localhost")
-    try:
-        PORT = int(os.environ.get("SERVER_PORT", "5555"))
-    except ValueError:
-        PORT = 5555
+    PORT = 5555
 
-    # PORT = 5555
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "h:p:", ["host", "port"])
+    except getopt.GetoptError:
+        print("python app.py -h <host> -p <port>")
+
+    for opt, arg in opts:
+        if opt in ("-h", "--host"):
+            HOST = arg
+        elif opt in ("-p", "--port"):
+            PORT = int(arg)
+
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
 

@@ -32,7 +32,7 @@ After fetching the configuration your gateway will connect to the device. When c
     3. Enter the Device ID (which is the port) into the Text Field and Click Configure
     4. The SensiML Gateway is now configured to Stream Data from your Device over Wi-Fi
 
-**NOTE** The BAUD RATE for the serial connection can be changed in the app.py by updating the default BAUD_RATE configuration.
+**NOTE** The BAUD RATE for the serial connection can be changed in the config.py by updating the default BAUD_RATE configuration.
 
 ## Data Collection from TCP/IP Source
 
@@ -70,18 +70,18 @@ In the Gateway Status screen you can start and stop a video source. If you start
 
 ### Configuring the Model Class Map
 
-To see mappings from integer class results to text class results you can edit the class map directly in the app.py file. Add the class integer value as the key and the string you would like to show up in the UI as the value.
+To see mappings from integer class results to text class results you can edit the class map directly in the config.py file. Add the class integer value as the key and the string you would like to show up in the UI as the value.
 
 ```python
 # Replace this with the dictionary in the model.json file
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
+CLASS_MAP = {65534: "Classification Limit Reached", 0: "Unknown"}
 ```
 
-For more complicated model hierarchies you can copy the dictionary directly from a model.json file and replace the
+For more complicated model hierarchies you can copy the dictionary directly from a model.json file and replace the MODEL_JSON in the config.py file
 
 ```python
 # replace this with the dictionary in the model.json file
-app.config["MODEL_JSON"] = None
+MODEL_JSON = None
 ```
 
 
