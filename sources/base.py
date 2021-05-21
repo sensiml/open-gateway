@@ -312,6 +312,14 @@ class BaseStreamReaderMixin(object):
                             ret = -1
                             number_samples_run = 0
 
+                        if number_samples_run % 600 == 0:
+                            print(
+                                "sample sent",
+                                number_samples_run,
+                                "current model output",
+                                ret,
+                            )
+
                 if self.convert_to_int16 and self.data_type_str == "f":
                     data = self.convert_data_to_int16(data)
 

@@ -53,6 +53,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
         ]
 
         sample_data = bytearray(num_columns * len(x) * self.data_byte_size)
+
         for index in x:
             for y in range(0, num_columns):
                 struct.pack_into(
