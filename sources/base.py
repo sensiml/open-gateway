@@ -255,8 +255,6 @@ class BaseReader(object):
 
         sample_data = bytearray(num_samples * 2)
 
-        print("convert")
-
         for index in range(num_samples):
             # print(tmp[index])
 
