@@ -314,10 +314,7 @@ class BaseStreamReaderMixin(object):
                 index = self.buffer.get_next_index(index)
 
                 if self.convert_to_int16 and self.data_type_str == "f":
-                    print("convert data")
                     data = self.convert_data_to_int16(data)
-
-                print("data")
 
                 if data:
                     yield data
