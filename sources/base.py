@@ -29,6 +29,7 @@ class BaseReader(object):
         self.run_sml_model = config.get("RUN_SML_MODEL", False)
         self.convert_to_int16 = config.get("CONVERT_TO_INT16", False)
         self.scaling_factor = config.get("SCALING_FACTOR", 1)
+        self.sml = None
         self.sample_rate = None
         self.config_columns = None
         self.device_id = device_id
@@ -282,13 +283,13 @@ class BaseStreamReaderMixin(object):
             self.connect()
             self.streaming = True
 
-        index = self.buffer.get_latest_buffer()
-
-        if self.run_sml_model:
-            sml = SMLRunner(os.path.join(self.sml_library_path))
-            sml.init_model()
+        if self.run_sml_model and self.sml is None:
+            self.sml = SMLRunner(os.path.join(self.sml_library_path))
+            self.sml.init_model()
             number_samples_run = 0
             print("Model initialized")
+
+        index = self.buffer.get_latest_buffer()
 
         while self.streaming:
 
@@ -301,13 +302,13 @@ class BaseStreamReaderMixin(object):
                 data = self.buffer.read_buffer(index)
                 index = self.buffer.get_next_index(index)
 
-                if self.run_sml_model:
+                if self.run_sml_model and self.sml:
                     for data_chunk in self.convert_data_to_list(data):
-                        ret = sml.run_model(data_chunk, 0)
+                        ret = self.sml.run_model(data_chunk, 0)
                         number_samples_run += 1
                         if ret >= 0:
                             print("Classification:", ret, "Samples", number_samples_run)
-                            sml.reset_model(0)
+                            self.sml.reset_model(0)
                             ret = -1
                             number_samples_run = 0
 
