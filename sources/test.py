@@ -189,7 +189,7 @@ def get_test_device_configs(device_id):
         config["sample_rate"] = 16000
         config["samples_per_packet"] = 480
 
-    elif device_id == "Test IMU 9-axis":
+    elif device_id == "Test IMU 9-axis float":
         config["column_location"] = {
             "AccelerometerX": 0,
             "AccelerometerY": 1,
