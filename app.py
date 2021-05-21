@@ -123,7 +123,9 @@ def parse_current_config():
     ret["baud_rate"] = app.config["BAUD_RATE"]
     ret["mode"] = app.config["MODE"].lower()
     ret["recording"] = get_recording()
-    ret["data_type"] = app.config["DATA_TYPE"]
+    ret["data_type"] = (
+        app.config["DATA_TYPE"] if not app.config["CONVERT_TO_INT16"] else "int16"
+    )
 
     if app.config["CONFIG_COLUMNS"]:
         ret["column_location"] = app.config["CONFIG_COLUMNS"]
