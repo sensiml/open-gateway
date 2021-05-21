@@ -59,7 +59,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                     "<" + self.data_type_str,
                     sample_data,
                     (y + (index * num_columns)) * self.data_byte_size,
-                    self.data_type_cast(data[y][index] + 0.5),
+                    self.data_type_cast(float(data[y][index]) / 100 + 0.5),
                 )
 
         return bytes(sample_data), len(x)
