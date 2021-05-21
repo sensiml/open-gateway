@@ -188,6 +188,22 @@ def get_test_device_configs(device_id):
         config["sample_rate"] = 16000
         config["samples_per_packet"] = 480
 
+    elif device_id == "Test IMU 9-axis":
+        config["column_location"] = {
+            "AccelerometerX": 0,
+            "AccelerometerY": 1,
+            "AccelerometerZ": 2,
+            "GyroscopeX": 3,
+            "GyroscopeY": 4,
+            "GyroscopeZ": 5,
+            "X": 6,
+            "Y": 7,
+            "Z": 8,
+        }
+        config["sample_rate"] = 119
+        config["samples_per_packet"] = 6
+        config["data_type"] = "float"
+
     else:
         raise Exception("Invalid Device ID")
 

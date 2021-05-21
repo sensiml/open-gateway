@@ -255,9 +255,15 @@ class BaseReader(object):
         for index in range(num_samples):
             # print(tmp[index])
 
-            struct.pack_into(
-                "<" + "h", sample_data, index * 2, int(tmp[index] * self.scaling_factor)
-            )
+            try:
+                struct.pack_into(
+                    "<" + "h",
+                    sample_data,
+                    index * 2,
+                    int(tmp[index] * self.scaling_factor),
+                )
+            except:
+                print(int(tmp[index] * self.scaling_factor))
 
         return bytes(sample_data)
 
@@ -282,6 +288,7 @@ class BaseStreamReaderMixin(object):
             sml = SMLRunner(os.path.join(self.sml_library_path))
             sml.init_model()
             number_samples_run = 0
+            print("Model initialized")
 
         while self.streaming:
 
@@ -298,7 +305,6 @@ class BaseStreamReaderMixin(object):
                     for data_chunk in self.convert_data_to_list(data):
                         ret = sml.run_model(data_chunk, 0)
                         number_samples_run += 1
-                        print(ret)
                         if ret >= 0:
                             print("Classification:", ret, "Samples", number_samples_run)
                             sml.reset_model(0)
