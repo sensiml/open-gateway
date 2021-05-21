@@ -242,6 +242,8 @@ class BaseReader(object):
 
         tmp = struct.unpack(self.data_type_str * num_samples, data)
 
+        tmp = [x * self.scaling_factor for x in tmp]
+
         for index in range(self.source_samples_per_packet):
             yield tmp[index * self.data_width : (index + 1) * self.data_width]
 
