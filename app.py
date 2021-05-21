@@ -637,6 +637,7 @@ if __name__ == "__main__":
         )
 
     for opt, arg in opts:
+        print(opt, arg)
         if opt in ("-h", "--help"):
             print(
                 """
@@ -656,7 +657,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
             HOST = arg
         elif opt in ("-p", "--port"):
             PORT = int(arg)
-        elif opt in ("s", "--sml_library_path"):
+        elif opt in ("-s", "--sml_library_path"):
             app.config["SML_LIBRARY_PATH"] = arg
             app.config["RUN_SML_MODEL"] = (
                 True if os.path.exists(os.path.join(arg, "libsensiml.so")) else False
@@ -664,12 +665,13 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
             if not app.config["RUN_SML_MODEL"]:
                 print("libsensiml.so not found in {}".format(arg))
                 raise Exception("libsensiml.so not found in {}".format(arg))
-        elif opt in ("m", "--model_json_path"):
+        elif opt in ("-m", "--model_json_path"):
             if os.path.exists(arg):
                 app.config["MODEL_JSON"] = json.load(open(arg))
-        elif opt in ("c", "--convert_to_int16"):
+        elif opt in ("-c", "--convert_to_int16"):
             app.config["CONVERT_TO_INT16"] = arg
-        elif opt in ("f", "--scaling_factor"):
+        elif opt in ("-f", "--scaling_factor"):
+            print("setting scaling factor", arg)
             app.config["SCALING_FACTOR"] = int(arg)
 
     if os.path.exists("./.config.cache"):
