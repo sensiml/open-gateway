@@ -285,9 +285,9 @@ class BaseStreamReaderMixin(object):
             self.connect()
             self.streaming = True
 
-        if self.run_sml_model and self.sml is None:
-            self.sml = SMLRunner(os.path.join(self.sml_library_path))
-            self.sml.init_model()
+        if self.run_sml_model:
+            sml = SMLRunner(os.path.join(self.sml_library_path))
+            sml.init_model()
             number_samples_run = 0
             print("Model initialized")
 
@@ -304,13 +304,13 @@ class BaseStreamReaderMixin(object):
                 data = self.buffer.read_buffer(index)
                 index = self.buffer.get_next_index(index)
 
-                if self.run_sml_model and self.sml:
+                if self.run_sml_model:
                     for data_chunk in self.convert_data_to_list(data):
-                        ret = self.sml.run_model(data_chunk, 0)
+                        ret = sml.run_model(data_chunk, 0)
                         number_samples_run += 1
                         if ret >= 0:
                             print("Classification:", ret, "Samples", number_samples_run)
-                            self.sml.reset_model(0)
+                            sml.reset_model(0)
                             ret = -1
                             number_samples_run = 0
 
