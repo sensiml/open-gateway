@@ -23,7 +23,7 @@ class TestReader(BaseReader):
                 "device_id": "Test IMU 6-axis Float",
             },
             {"id": 4, "name": "Test Acc", "device_id": "Test IMU 3-axis"},
-            {"id": 5, "name": " Test IMU 9-axis", "device_id": " Test IMU 9-axis"},
+            {"id": 5, "name": " Test IMU 9-axis", "device_id": "Test IMU 9-axis"},
         ]
 
 
