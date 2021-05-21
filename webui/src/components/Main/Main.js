@@ -42,7 +42,7 @@ const Main = () => {
     }
     setIsConnected(data.streaming);
     setColumns(Object.keys(data.column_location).sort());
-    setStreamingSource(data.source.toUpperCase());
+    setStreamingSource(data.source?.toUpperCase());
     setDeviceID(data.device_id);
     setIsCameraConnected(data.camera_on);
     

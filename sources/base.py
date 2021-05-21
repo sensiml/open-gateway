@@ -298,7 +298,7 @@ class BaseStreamReaderMixin(object):
                     for data_chunk in self.convert_data_to_list(data):
                         ret = sml.run_model(data_chunk, 0)
                         number_samples_run += 1
-
+                        print(ret)
                         if ret >= 0:
                             print("Classification:", ret, "Samples", number_samples_run)
                             sml.reset_model(0)

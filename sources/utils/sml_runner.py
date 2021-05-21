@@ -476,7 +476,7 @@ class SMLRunner(object):
         model_index_ctype = ctypes.c_int(model_index)
 
         for index, value in enumerate(data):
-            data_array[index] = ctypes.c_int16(value)
+            data_array[index] = ctypes.c_int16(int(value))
 
         ret = self._run_model(data_array, nsensors_ctype, model_index_ctype)
 
