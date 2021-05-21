@@ -91,11 +91,19 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
                 ser.reset_input_buffer()
                 ser.read(self.source_buffer_size)
 
+                if self.run_sml_model:
+                    sml = self.get_sml_model_obj()
+                else:
+                    sml = None
+
                 while self.streaming:
 
                     data = ser.read(self.source_buffer_size)
 
                     self.buffer.update_buffer(data)
+
+                    if self.run_sml_model:
+                        self.execute_run_sml_model(sml, data)
 
                     time.sleep(0.00001)
 

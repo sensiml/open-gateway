@@ -108,7 +108,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
             incycle = time.time()
 
             try:
-                sample_data, index = self._pack_data(
+                data, index = self._pack_data(
                     data,
                     data_len,
                     self.data_width,
@@ -116,10 +116,10 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                     index,
                 )
 
-                self.buffer.update_buffer(sample_data)
+                self.buffer.update_buffer(data)
 
                 if self.run_sml_model:
-                    self.execute_run_sml_model(sml, sample_data)
+                    self.execute_run_sml_model(sml, data)
 
             except Exception as e:
                 self.disconnect()
