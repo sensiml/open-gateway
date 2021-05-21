@@ -255,18 +255,17 @@ class BaseReader(object):
 
         sample_data = bytearray(num_samples * 2)
 
+        print("convert")
+
         for index in range(num_samples):
             # print(tmp[index])
 
-            try:
-                struct.pack_into(
-                    "<" + "h",
-                    sample_data,
-                    index * 2,
-                    int(tmp[index] * self.scaling_factor),
-                )
-            except:
-                print(int(tmp[index] * self.scaling_factor))
+            struct.pack_into(
+                "<" + "h",
+                sample_data,
+                index * 2,
+                int(tmp[index] * self.scaling_factor),
+            )
 
         return bytes(sample_data)
 
@@ -315,7 +314,10 @@ class BaseStreamReaderMixin(object):
                 index = self.buffer.get_next_index(index)
 
                 if self.convert_to_int16 and self.data_type_str == "f":
+                    print("convert data")
                     data = self.convert_data_to_int16(data)
+
+                print("data")
 
                 if data:
                     yield data

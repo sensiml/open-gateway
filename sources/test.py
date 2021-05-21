@@ -48,9 +48,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
         x = list(range(0, fs))  # the points on the x axis for plotting
 
-        data = [
-            [1000 * offset + xs - 32767 for xs in x] for offset in range(0, num_columns)
-        ]
+        data = [[10 * offset + xs for xs in x] for offset in range(0, num_columns)]
 
         sample_data = bytearray(num_columns * len(x) * self.data_byte_size)
 
@@ -60,7 +58,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                     "<" + self.data_type_str,
                     sample_data,
                     (y + (index * num_columns)) * self.data_byte_size,
-                    self.data_type_cast(float(data[y][index]) / 100 + 0.5),
+                    self.data_type_cast(float(data[y][index]) + 0.5),
                 )
 
         return bytes(sample_data), len(x)

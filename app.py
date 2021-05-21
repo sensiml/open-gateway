@@ -620,11 +620,20 @@ if __name__ == "__main__":
 
     try:
         opts, args = getopt.getopt(
-            sys.argv[1:], "hu:p:s:", ["help", "host", "port", "sml_library_path"]
+            sys.argv[1:],
+            "hu:p:s:c:f:",
+            [
+                "help",
+                "host",
+                "port",
+                "sml_library_path",
+                "convert_to_in16",
+                "scaling_factor",
+            ],
         )
     except getopt.GetoptError:
         print(
-            "python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>"
+            "python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <convert_to_int16> -f <scaling_factor>"
         )
 
     for opt, arg in opts:
@@ -633,10 +642,12 @@ if __name__ == "__main__":
                 """
 python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>
 
--u --host : select the host address for the gateway to launch on
--p --port : select the port address for the gateway to launch on
--s --sml_library_path: set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+-u --host (str) : select the host address for the gateway to launch on
+-p --port (int) : select the port address for the gateway to launch on
+-s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+-c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
+-f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
 
 """
             )
@@ -656,6 +667,10 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
         elif opt in ("m", "--model_json_path"):
             if os.path.exists(arg):
                 app.config["MODEL_JSON"] = json.load(open(arg))
+        elif opt in ("c", "--convert_to_int16"):
+            app.config["CONVERT_TO_INT16"] = arg
+        elif opt in ("f", "--scaling_factor"):
+            app.config["SCALING_FACTOR"] = int(arg)
 
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
