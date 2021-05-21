@@ -279,7 +279,12 @@ class BaseReader(object):
         for data_chunk in self.convert_data_to_list(data):
             ret = sml.run_model(data_chunk, 0)
             if ret >= 0:
-                print("Classification:", ret)
+
+                print(
+                    self._map_classification(
+                        {{"ModelNumber": 0, "Classification": ret}}
+                    )
+                )
                 sml.reset_model(0)
                 ret = -1
 
