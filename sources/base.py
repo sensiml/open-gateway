@@ -270,6 +270,22 @@ class BaseReader(object):
 
         return bytes(sample_data)
 
+    def get_sml_model_obj(self):
+
+        sml = SMLRunner(os.path.join(self.sml_library_path))
+        sml.init_model()
+        print("Model initialized")
+
+        return sml
+
+    def execute_run_sml_model(self, sml, data):
+        for data_chunk in self.convert_data_to_list(data):
+            ret = sml.run_model(data_chunk, 0)
+            if ret >= 0:
+                print("Classification:", ret)
+                sml.reset_model(0)
+                ret = -1
+
 
 class BaseStreamReaderMixin(object):
     def read_data(self):
@@ -285,12 +301,6 @@ class BaseStreamReaderMixin(object):
             self.connect()
             self.streaming = True
 
-        if self.run_sml_model:
-            sml = SMLRunner(os.path.join(self.sml_library_path))
-            sml.init_model()
-            number_samples_run = 0
-            print("Model initialized")
-
         index = self.buffer.get_latest_buffer()
 
         while self.streaming:
@@ -303,24 +313,6 @@ class BaseStreamReaderMixin(object):
             if self.buffer.is_buffer_full(index):
                 data = self.buffer.read_buffer(index)
                 index = self.buffer.get_next_index(index)
-
-                if self.run_sml_model:
-                    for data_chunk in self.convert_data_to_list(data):
-                        ret = sml.run_model(data_chunk, 0)
-                        number_samples_run += 1
-                        if ret >= 0:
-                            print("Classification:", ret, "Samples", number_samples_run)
-                            sml.reset_model(0)
-                            ret = -1
-                            number_samples_run = 0
-
-                        if number_samples_run % 600 == 0:
-                            print(
-                                "sample sent",
-                                number_samples_run,
-                                "current model output",
-                                ret,
-                            )
 
                 if self.convert_to_int16 and self.data_type_str == "f":
                     data = self.convert_data_to_int16(data)

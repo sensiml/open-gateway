@@ -98,6 +98,11 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
         self.streaming = True
 
+        if self.run_sml_model:
+            sml = self.get_sml_model_obj()
+        else:
+            sml = None
+
         sleep_time = self.source_samples_per_packet / float(self.sample_rate)
         while self.streaming:
             incycle = time.time()
@@ -112,6 +117,9 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                 )
 
                 self.buffer.update_buffer(sample_data)
+
+                if self.run_sml_model:
+                    self.execute_run_sml_model(sml, sample_data)
 
             except Exception as e:
                 self.disconnect()

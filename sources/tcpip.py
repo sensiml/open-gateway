@@ -54,6 +54,11 @@ class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
 
             self.streaming = True
 
+            if self.run_sml_model:
+                sml = self.get_sml_model_obj()
+            else:
+                sml = None
+
             with s.get(url, headers=None, stream=True) as resp:
                 for line in resp.iter_content(chunk_size=self.source_buffer_size):
 
@@ -61,6 +66,10 @@ class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
                         return
 
                     self.buffer.update_buffer(line)
+
+                    if self.run_sml_model:
+                        self.execute_run_sml_model(sml, line)
+
                     time.sleep(0.0001)
 
         except Exception as e:
