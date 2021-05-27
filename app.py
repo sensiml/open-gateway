@@ -14,6 +14,7 @@ import nest_asyncio
 import time
 from threading import Timer
 import webbrowser
+import getopt
 
 nest_asyncio.apply()
 
@@ -38,31 +39,18 @@ from video_sources import get_video_source, get_video_source_list
 import zipfile
 
 
-app = Flask(__name__, static_folder="./webui/build", static_url_path="/")
+app = Flask(
+    __name__,
+    static_folder=os.path.join(os.path.dirname(__file__), "webui", "build"),
+    static_url_path="/",
+)
 app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
-
-###############################
-## USER SETTINGS ##
-###############################
-
-# Serial BAUD RATE
-app.config["BAUD_RATE"] = 460800
-
-# Replace this with the class map
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
-
-# replace this with the dictionary in the model.json file
-app.config["MODEL_JSON"] = None
-
-app.config["CONFIG_SAMPLES_PER_PACKET"] = 1
+app.config.from_object("config")
 
 
-###############################
-
-
-app.config["SECRET_KEY"] = "any secret string"
+## Internal Config Settings
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
 app.config["DATA_TYPE"] = "int16"
@@ -135,7 +123,9 @@ def parse_current_config():
     ret["baud_rate"] = app.config["BAUD_RATE"]
     ret["mode"] = app.config["MODE"].lower()
     ret["recording"] = get_recording()
-    ret["data_type"] = app.config["DATA_TYPE"]
+    ret["data_type"] = (
+        app.config["DATA_TYPE"] if not app.config["CONVERT_TO_INT16"] else "int16"
+    )
 
     if app.config["CONFIG_COLUMNS"]:
         ret["column_location"] = app.config["CONFIG_COLUMNS"]
@@ -626,14 +616,68 @@ def delete_cache():
 if __name__ == "__main__":
 
     HOST = os.environ.get("SERVER_HOST", "localhost")
-    try:
-        PORT = int(os.environ.get("SERVER_PORT", "5555"))
-    except ValueError:
-        PORT = 5555
+    PORT = 5555
 
-    # PORT = 5555
+    try:
+        opts, args = getopt.getopt(
+            sys.argv[1:],
+            "hu:p:s:c:f:",
+            [
+                "help",
+                "host",
+                "port",
+                "sml_library_path",
+                "convert_to_in16",
+                "scaling_factor",
+            ],
+        )
+    except getopt.GetoptError:
+        print(
+            "python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <convert_to_int16> -f <scaling_factor>"
+        )
+
+    for opt, arg in opts:
+        print(opt, arg)
+        if opt in ("-h", "--help"):
+            print(
+                """
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>
+
+-u --host (str) : select the host address for the gateway to launch on
+-p --port (int) : select the port address for the gateway to launch on
+-s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+-c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
+-f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
+
+"""
+            )
+            sys.exit()
+        if opt in ("-u", "--host"):
+            HOST = arg
+        elif opt in ("-p", "--port"):
+            PORT = int(arg)
+        elif opt in ("-s", "--sml_library_path"):
+            app.config["SML_LIBRARY_PATH"] = arg
+            app.config["RUN_SML_MODEL"] = (
+                True if os.path.exists(os.path.join(arg, "libsensiml.so")) else False
+            )
+            if not app.config["RUN_SML_MODEL"]:
+                print("libsensiml.so not found in {}".format(arg))
+                raise Exception("libsensiml.so not found in {}".format(arg))
+        elif opt in ("-m", "--model_json_path"):
+            if os.path.exists(arg):
+                app.config["MODEL_JSON"] = json.load(open(arg))
+        elif opt in ("-c", "--convert_to_int16"):
+            app.config["CONVERT_TO_INT16"] = arg
+        elif opt in ("-f", "--scaling_factor"):
+            print("setting scaling factor", arg)
+            app.config["SCALING_FACTOR"] = int(arg)
+
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
+
+    print(app.config)
 
     try:
         Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))

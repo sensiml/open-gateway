@@ -23,6 +23,7 @@ class TestReader(BaseReader):
                 "device_id": "Test IMU 6-axis Float",
             },
             {"id": 4, "name": "Test Acc", "device_id": "Test IMU 3-axis"},
+            {"id": 5, "name": " Test IMU 9-axis", "device_id": "Test IMU 9-axis float"},
         ]
 
 
@@ -47,18 +48,17 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
         x = list(range(0, fs))  # the points on the x axis for plotting
 
-        data = [
-            [1000 * offset + xs - 32767 for xs in x] for offset in range(0, num_columns)
-        ]
+        data = [[10 * offset + xs for xs in x] for offset in range(0, num_columns)]
 
         sample_data = bytearray(num_columns * len(x) * self.data_byte_size)
+
         for index in x:
             for y in range(0, num_columns):
                 struct.pack_into(
                     "<" + self.data_type_str,
                     sample_data,
                     (y + (index * num_columns)) * self.data_byte_size,
-                    self.data_type_cast(data[y][index] + 0.5),
+                    self.data_type_cast(float(data[y][index]) + 0.5),
                 )
 
         return bytes(sample_data), len(x)
@@ -96,6 +96,11 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
         self.streaming = True
 
+        if self.run_sml_model:
+            sml = self.get_sml_model_obj()
+        else:
+            sml = None
+
         sleep_time = self.source_samples_per_packet / float(self.sample_rate)
         while self.streaming:
             incycle = time.time()
@@ -110,6 +115,9 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                 )
 
                 self.buffer.update_buffer(sample_data)
+
+                if self.run_sml_model:
+                    self.execute_run_sml_model(sml, sample_data)
 
             except Exception as e:
                 self.disconnect()
@@ -158,7 +166,7 @@ def get_test_device_configs(device_id):
         }
         config["sample_rate"] = 119
         config["samples_per_packet"] = 6
-        config["data_type"] = "float32"
+        config["data_type"] = "float"
 
     elif device_id == "Test IMU 6-axis":
         config["column_location"] = {
@@ -187,6 +195,22 @@ def get_test_device_configs(device_id):
         config["column_location"] = {"Microphone": 0}
         config["sample_rate"] = 16000
         config["samples_per_packet"] = 480
+
+    elif device_id == "Test IMU 9-axis float":
+        config["column_location"] = {
+            "AccelerometerX": 0,
+            "AccelerometerY": 1,
+            "AccelerometerZ": 2,
+            "GyroscopeX": 3,
+            "GyroscopeY": 4,
+            "GyroscopeZ": 5,
+            "X": 6,
+            "Y": 7,
+            "Z": 8,
+        }
+        config["sample_rate"] = 119
+        config["samples_per_packet"] = 6
+        config["data_type"] = "float"
 
     else:
         raise Exception("Invalid Device ID")

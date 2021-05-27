@@ -42,7 +42,7 @@ const Main = () => {
     }
     setIsConnected(data.streaming);
     setColumns(Object.keys(data.column_location).sort());
-    setStreamingSource(data.source.toUpperCase());
+    setStreamingSource(data.source?.toUpperCase());
     setDeviceID(data.device_id);
     setIsCameraConnected(data.camera_on);
     
@@ -50,8 +50,8 @@ const Main = () => {
       case('int16'):
         setDataType('int16');
         break;
-      case('float32'):
-        setDataType('float32');
+      case('float'):
+        setDataType('float');
         break;
       default:
         setDataType('int16');

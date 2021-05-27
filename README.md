@@ -32,7 +32,7 @@ After fetching the configuration your gateway will connect to the device. When c
     3. Enter the Device ID (which is the port) into the Text Field and Click Configure
     4. The SensiML Gateway is now configured to Stream Data from your Device over Wi-Fi
 
-**NOTE** The BAUD RATE for the serial connection can be changed in the app.py by updating the default BAUD_RATE configuration.
+**NOTE** The BAUD RATE for the serial connection can be changed in the config.py by updating the default BAUD_RATE configuration.
 
 ## Data Collection from TCP/IP Source
 
@@ -68,21 +68,54 @@ In the Gateway Status screen you can start and stop a video source. If you start
 
 ![Configure Gateway](img/status.png)
 
+### User Commands
+
+Useful configuration commands when launching the open-gateway
+
+```bash
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>
+
+-u --host : select the host address for the gateway to launch on
+-p --port : select the port address for the gateway to launch on
+-s --sml_library_path: set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+```
+
 ### Configuring the Model Class Map
 
-To see mappings from integer class results to text class results you can edit the class map directly in the app.py file. Add the class integer value as the key and the string you would like to show up in the UI as the value.
+To see mappings from integer class results to text class results you can edit the class map directly in the config.py file. Add the class integer value as the key and the string you would like to show up in the UI as the value.
 
 ```python
 # Replace this with the dictionary in the model.json file
-app.config["CLASS_MAP"] = {65534: "Classification Limit Reached", 0: "Unknown"}
+CLASS_MAP = {65534: "Classification Limit Reached", 0: "Unknown"}
 ```
 
-For more complicated model hierarchies you can copy the dictionary directly from a model.json file and replace the
+For more complicated model hierarchies you can copy the dictionary directly from a model.json file and replace the MODEL_JSON in the config.py file
 
 ```python
 # replace this with the dictionary in the model.json file
-app.config["MODEL_JSON"] = None
+MODEL_JSON = None
 ```
+
+
+### Running a knowledge pack on the gateway
+
+In some cases you may want to run a Knowledge Pack on the gateway itself. This is currently possible by turning the Knowledge Pack into a shared object file. Download a Knowledge Pack library for your gateway's platform. Unzip the folder and go to the libsensiml directory. Here you will see a libsensiml.a file. You need to convert this to a shared object by running the following.
+
+```bash
+ar -x libsensiml.a
+gcc -shared -o libsensiml.so *.o
+```
+
+copy the libsensiml.so file to the open-gateway/knowledgepack/libsensiml folder
+
+Alternatively, you can pass the path in when you start the application
+
+```bash
+python app.y -s <path-to-libsensiml.so directory>
+```
+
+Now connect to your device in data collection mode, switch to the Test Mode tab and click start stream. In the terminal window running the open gateway you will see the model results printed. In the webui you will see the data streaming.
 
 ## Using Bluepy on linux
 
