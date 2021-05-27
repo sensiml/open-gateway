@@ -7,7 +7,8 @@ The Open Gateway implements the [Simple Streaming Service protocol](https://sens
 To install the app dependencies run
 
 ```bash
-cd simple-streaming-gateway
+cd open-gateway
+
 pip install -r requirements.txt
 ```
 
@@ -16,6 +17,8 @@ To Start the application run
 ```bash
 python3 app.py
 ```
+
+Note: On windows use python 3.7 or 3.8.
 
 ## Usage
 
@@ -78,7 +81,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
 -u --host : select the host address for the gateway to launch on
 -p --port : select the port address for the gateway to launch on
 -s --sml_library_path: set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+-m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file
 ```
 
 ### Configuring the Model Class Map
@@ -96,7 +99,6 @@ For more complicated model hierarchies you can copy the dictionary directly from
 # replace this with the dictionary in the model.json file
 MODEL_JSON = None
 ```
-
 
 ### Running a knowledge pack on the gateway
 
