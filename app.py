@@ -614,14 +614,24 @@ def delete_cache():
 
 
 if __name__ == "__main__":
+    options_string = """
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <True/False> -f <scaling-factor> 
 
+-u --host (str) : select the host address for the gateway to launch on
+-p --port (int) : select the port address for the gateway to launch on
+-s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+-c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
+-f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
+
+"""
     HOST = os.environ.get("SERVER_HOST", "localhost")
     PORT = 5555
 
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hu:p:s:c:f:",
+            "hu:p:s:c:f:m:",
             [
                 "help",
                 "host",
@@ -632,26 +642,14 @@ if __name__ == "__main__":
             ],
         )
     except getopt.GetoptError:
-        print(
-            "python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <convert_to_int16> -f <scaling_factor>"
-        )
+        print("Invalid nvalid opt selection!")
+        print(options_string)
+        sys.exit()
 
     for opt, arg in opts:
         print(opt, arg)
         if opt in ("-h", "--help"):
-            print(
-                """
-python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>
-
--u --host (str) : select the host address for the gateway to launch on
--p --port (int) : select the port address for the gateway to launch on
--s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
--c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
--f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
-
-"""
-            )
+            print(options_string)
             sys.exit()
         if opt in ("-u", "--host"):
             HOST = arg
