@@ -666,6 +666,8 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
         elif opt in ("-m", "--model_json_path"):
             if os.path.exists(arg):
                 app.config["MODEL_JSON"] = json.load(open(arg))
+            else:
+                print("Model json file was not found!")
         elif opt in ("-c", "--convert_to_int16"):
             app.config["CONVERT_TO_INT16"] = arg
         elif opt in ("-f", "--scaling_factor"):
@@ -675,7 +677,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
     if os.path.exists("./.config.cache"):
         app.config.update(json.load(open("./.config.cache", "r")))
 
-    print(app.config)
+    # print(app.config)
 
     try:
         Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))

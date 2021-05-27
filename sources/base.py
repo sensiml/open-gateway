@@ -259,10 +259,7 @@ class BaseReader(object):
             # print(tmp[index])
 
             struct.pack_into(
-                "<" + "h",
-                sample_data,
-                index * 2,
-                int(tmp[index] * self.scaling_factor),
+                "<" + "h", sample_data, index * 2, int(tmp[index] * self.scaling_factor)
             )
 
         return bytes(sample_data)
@@ -280,11 +277,22 @@ class BaseReader(object):
             ret = sml.run_model(data_chunk, 0)
             if ret >= 0:
                 print(
-                    self._map_classification(
-                        {{"ModelNumber": 0, "Classification": ret}}
-                    )
+                    self._map_classification({"ModelNumber": 0, "Classification": ret})
                 )
                 sml.reset_model(0)
+
+    def _map_classification(self, results):
+        if self.model_json:
+            results["Classification"] = self.model_json["ModelDescriptions"][
+                results["ModelNumber"]
+            ]["ClassMaps"][str(results["Classification"])]
+
+        elif self.class_map:
+            results["Classification"] = self.class_map.get(
+                results["Classification"], results["Classification"]
+            )
+
+        return results
 
 
 class BaseStreamReaderMixin(object):
@@ -363,19 +371,6 @@ class BaseResultReaderMixin(object):
     def read_device_config(self):
         print("ResultReader: reading device config")
         return {"samples_per_packet": 1}
-
-    def _map_classification(self, results):
-        if self.model_json:
-            results["Classification"] = self.model_json["ModelDescriptions"][
-                results["ModelNumber"]
-            ]["ClassMaps"][str(results["Classification"])]
-
-        elif self.class_map:
-            results["Classification"] = self.class_map.get(
-                results["Classification"], results["Classification"]
-            )
-
-        return results
 
     def read_data(self):
         """ Genrator to read the result stream out of the buffer """
