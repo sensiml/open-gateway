@@ -398,7 +398,18 @@ class BaseResultReaderMixin(object):
 
                 for result in data:
                     if self._validate_results_data(result):
-                        result = self._map_classification(json.loads(result))
+                        try:
+                            result = json.loads(result)
+                        except Exception as e:
+                            print("ResultReader: Failed to read result as a json.")
+                            print(e)
+                            continue
+                        try:
+                            result = self._map_classification(result)
+                        except Exception as e:
+                            print("ResultReader: Failed map the classification.")
+                            print(e)
+                            continue
                         result["timestap"] = time.time()
                         print(result)
                         yield json.dumps(result) + "\n"
