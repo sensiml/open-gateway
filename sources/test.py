@@ -139,15 +139,17 @@ class TestResultReader(TestReader, BaseResultReaderMixin):
 
         while self.streaming:
 
-            self.rbuffer.update_buffer(
-                [
-                    json.dumps(
-                        self._map_classification(
-                            {"ModelNumber": 0, "Classification": random.randint(0, 10)}
-                        )
-                    )
-                ]
+            import random
+
+            result = json.dumps(
+                self._map_classification(
+                    {"ModelNumber": 0, "Classification": random.randint(0, 10)}
+                )
             )
+            # Randomly removes a character to simulate dropped packets
+            # index = random.randint(0, len(result) - 1)
+            # result = result[:index] + result[index + 1 :]
+            self.rbuffer.update_buffer([result, result])
             time.sleep(2)
 
 
