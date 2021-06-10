@@ -29,6 +29,7 @@ class BaseReader(object):
         self.run_sml_model = config.get("RUN_SML_MODEL", False)
         self.convert_to_int16 = config.get("CONVERT_TO_INT16", False)
         self.scaling_factor = config.get("SCALING_FACTOR", 1)
+        self.version=1
         self.sml = None
         self.sample_rate = None
         self.config_columns = None
@@ -78,6 +79,13 @@ class BaseReader(object):
             return float
 
         return int
+
+    @property
+    def overhead_buffer_size(self):
+        if self.version==2:
+            return 10
+        else:
+            return 0
 
     @property
     def data_width_bytes(self):
@@ -144,6 +152,7 @@ class BaseReader(object):
         self.sample_rate = config.get("sample_rate", None)
         self.config_columns = config.get("column_location", None)
         self.data_type = config.get("data_type", "int16")
+        self.version = config.get("version", 1)
 
         return config
 
@@ -154,6 +163,7 @@ class BaseReader(object):
         config["SOURCE_SAMPLES_PER_PACKET"] = self.source_samples_per_packet
         config["DEVICE_ID"] = self.device_id
         config["DATA_TYPE"] = self.data_type
+        config['VERSION'] = self.version
 
     def update_config(self, config):
         """ update the objects local config values from the app cache """
@@ -164,6 +174,7 @@ class BaseReader(object):
         self.config_columns = config.get("CONFIG_COLUMNS")
         self.class_map = config.get("CLASS_MAP")
         self.data_type = config.get("DATA_TYPE", "int16")
+        self.version = config.get("VERSION", 1)
 
     def connect(self):
 

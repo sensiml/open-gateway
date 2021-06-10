@@ -53,6 +53,7 @@ app.config.from_object("config")
 ## Internal Config Settings
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
+app.config["VERSION"]=1
 app.config["DATA_TYPE"] = "int16"
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []
@@ -76,6 +77,7 @@ def cache_config(config):
         "MODE": app.config["MODE"],
         "SOURCE_SAMPLES_PER_PACKET": app.config["SOURCE_SAMPLES_PER_PACKET"],
         "DATA_TYPE": app.config["DATA_TYPE"],
+        "VERSION": app.config['VERSION']
     }
     json.dump(tmp, open("./.config.cache", "w"))
 
@@ -126,6 +128,7 @@ def parse_current_config():
     ret["data_type"] = (
         app.config["DATA_TYPE"] if not app.config["CONVERT_TO_INT16"] else "int16"
     )
+    ret["version"] = app.config['VERSION']
 
     if app.config["CONFIG_COLUMNS"]:
         ret["column_location"] = app.config["CONFIG_COLUMNS"]
@@ -615,12 +618,12 @@ def delete_cache():
 
 if __name__ == "__main__":
     options_string = """
-python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <True/False> -f <scaling-factor> 
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <True/False> -f <scaling-factor>
 
 -u --host (str) : select the host address for the gateway to launch on
 -p --port (int) : select the port address for the gateway to launch on
 -s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file
 -c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
 -f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
 

@@ -24,6 +24,7 @@ class TestReader(BaseReader):
             },
             {"id": 4, "name": "Test Acc", "device_id": "Test IMU 3-axis"},
             {"id": 5, "name": " Test IMU 9-axis", "device_id": "Test IMU 9-axis float"},
+            {"id": 6, "name": "Test IMU 6-axis V2", "device_id": "Test IMU 6-axis V2"},
         ]
 
 
@@ -71,12 +72,36 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
             end_index = data_len - (start_index + samples_per_packet)
             end = end_index * self.data_byte_size * num_columns
 
-            return data[start:] + data[:end], end_index
+            data_packet= data[start:] + data[:end]
 
         else:
             end_index = start_index + samples_per_packet
             end = end_index * self.data_byte_size * num_columns
-            return data[start:end], end_index
+            data_packet= data[start:end]
+
+
+        if self.version == 2:
+            sync_byte = 255
+            data_length_byte = 6+len(data_packet)
+            reserved_byte = 0
+            channel_byte = 0
+            sequence=1
+            header = bytearray(9)
+            tail = bytearray(1)
+
+            header = struct.pack('BHBBL', sync_byte, data_length_byte, reserved_byte, channel_byte, sequence)
+
+            data_packet = header + data_packet
+
+            checksum = data_packet[3]
+            for byte in data_packet[4:]:
+                checksum ^= byte
+
+            tail = struct.pack("B", checksum)
+
+            data_packet = data_packet+tail
+
+        return data_packet, end_index
 
     def read_device_config(self):
 
@@ -214,6 +239,19 @@ def get_test_device_configs(device_id):
         config["samples_per_packet"] = 6
         config["data_type"] = "float"
 
+    elif device_id == "Test IMU 6-axis V2":
+        config["column_location"] = {
+            "AccelerometerX": 0,
+            "AccelerometerY": 1,
+            "AccelerometerZ": 2,
+            "GyroscopeX": 3,
+            "GyroscopeY": 4,
+            "GyroscopeZ": 5,
+        }
+        config["sample_rate"] = 119
+        config["samples_per_packet"] = 6
+        config["data_type"] = "int16"
+        config['version'] = 2
     else:
         raise Exception("Invalid Device ID")
 
