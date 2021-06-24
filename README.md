@@ -49,7 +49,7 @@ After fetching the configuration your gateway will connect to the device. When c
     1. Connect edge node to Gateway over USB serial
     2. Go to Gateway Configure Screen, Select BLE Radio and Click Scan
     3. Enter the Device ID (which is the port) into the Text Field and Click Configure
-    4. The SensiML Gateway is now configured to Stream Data from your Device over Wi-Fi
+    4. The SensiML Gateway is now configured to Stream Data from your Device over BLE
 
 ## Data Capture and Recognition Mode
 
