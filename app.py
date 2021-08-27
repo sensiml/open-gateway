@@ -565,6 +565,7 @@ def download_filename(filename):
 
     return send_from_directory(
         directory="./cache",
+        path="{}.zip".format(filename),
         filename="{}.zip".format(filename),
         mimetype="application/zip",
         as_attachment=True,
@@ -596,6 +597,7 @@ def download():
 
     return send_from_directory(
         directory="./cache",
+        path="data.zip",
         filename="data.zip",
         mimetype="application/zip",
         as_attachment=True,

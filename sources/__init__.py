@@ -5,12 +5,12 @@ from sources.tcpip import TCPIPStreamReader, TCPIPResultReader
 from sources.fusion import FusionStreamReader, FusionResultReader
 
 
-try:
-    # use bleak ble drivers
-    from sources.ble_bleak import BLEStreamReader, BLEResultReader
-except:
-    # use bluepy ble driver
-    from sources.ble import BLEStreamReader, BLEResultReader
+#try:
+#    # use bleak ble drivers
+#    from sources.ble_bleak import BLEStreamReader, BLEResultReader
+#except:
+#    # use bluepy ble driver
+#    from sources.ble import BLEStreamReader, BLEResultReader
 
 
 def get_fusion_source(

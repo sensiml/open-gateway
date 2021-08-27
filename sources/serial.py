@@ -7,7 +7,7 @@ import random
 from sources.base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 import threading
 
-BAUD_RATE = 460800
+BAUD_RATE = 921600
 
 
 class SerialReader(BaseReader):
@@ -25,7 +25,7 @@ class SerialReader(BaseReader):
 
     @property
     def baud_rate(self):
-        return self._baud_rate
+        return BAUD_RATE
 
     def _write(self, command):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
@@ -34,9 +34,12 @@ class SerialReader(BaseReader):
     def _read_line(self, flush_buffer=False):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
 
+            print(self.baud_rate)
             value = ser.readline()
+            print("2", value.decode("ascii"))
             if flush_buffer:
                 value = ser.readline()
+            print("3")
             try:
                 return value.decode("ascii")
             except:
@@ -71,6 +74,7 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
 
         try:
             config = json.loads(self._read_line(flush_buffer=True))
+            print(config)
         except:
             self._write("disconnect")
             time.sleep(1.0)
