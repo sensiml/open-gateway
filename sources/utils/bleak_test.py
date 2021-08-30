@@ -54,4 +54,3 @@ if __name__ == "__main__":
     task1 = asyncio.create_task(connect_to_device(address, uuidOfDataChar))
 
     asyncio.run(task1)
-

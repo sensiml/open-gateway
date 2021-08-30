@@ -654,14 +654,24 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
         if opt in ("-u", "--host"):
             HOST = arg
         elif opt in ("-p", "--port"):
+            print(opt)
             PORT = int(arg)
         elif opt in ("-s", "--sml_library_path"):
             app.config["SML_LIBRARY_PATH"] = arg
-            app.config["RUN_SML_MODEL"] = (
-                True if os.path.exists(os.path.join(arg, "libsensiml.so")) else False
-            )
+            if os.name == "nt":
+                app.config["RUN_SML_MODEL"] = (
+                    True
+                    if os.path.exists(os.path.join(arg, "libsensiml.dll"))
+                    else False
+                )
+            else:
+                app.config["RUN_SML_MODEL"] = (
+                    True
+                    if os.path.exists(os.path.join(arg, "libsensiml.so"))
+                    else False
+                )
             if not app.config["RUN_SML_MODEL"]:
-                print("libsensiml.so not found in {}".format(arg))
+                print("libsensiml not found in {}".format(arg))
                 raise Exception("libsensiml.so not found in {}".format(arg))
         elif opt in ("-m", "--model_json_path"):
             if os.path.exists(arg):
@@ -680,7 +690,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
     # print(app.config)
 
     try:
-        Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
+        # Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
         app.run(HOST, PORT)
     except KeyboardInterrupt:
         print("Keyboard Interupt Detected. Shutting down server!")

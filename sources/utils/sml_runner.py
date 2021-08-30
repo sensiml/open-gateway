@@ -1,7 +1,7 @@
 import os
 import json
 import ctypes
-from ctypes import Array, CDLL
+from ctypes import Array, CDLL, WinDLL
 
 
 class ImportPathException(Exception):
@@ -131,16 +131,27 @@ class SMLRunner(object):
     def __init__(self, path):
         self._run_type = None
         self._model_initialized = False
+
         if os.name == "nt":
-            print("SML Runner is not supported on Windows OS.")
+            print("loading dll")
+            if not os.path.exists(os.path.join(path, "libsensiml.dll")):
+                print("ERROR: libsensiml.so as not found in {}.".format(path))
+                raise ImportPathException(
+                    "ERROR: libsensiml.dll as not found in {}".format(path)
+                )
 
-        if not os.path.exists(os.path.join(path, "libsensiml.so")):
-            print("ERROR: libsensiml.so as not found in {}.".format(path))
-            raise ImportPathException(
-                "ERROR: libsensiml.so as not found in {}".format(path)
-            )
+            clf_lib = WinDLL(os.path.join(path, "libsensiml.dll"))
 
-        clf_lib = CDLL(os.path.join(path, "libsensiml.so"))
+        else:
+            # linux
+            if not os.path.exists(os.path.join(path, "libsensiml.so")):
+                print("ERROR: libsensiml.so as not found in {}.".format(path))
+                raise ImportPathException(
+                    "ERROR: libsensiml.so as not found in {}".format(path)
+                )
+
+            clf_lib = CDLL(os.path.join(path, "libsensiml.so"))
+
         self._model_init = clf_lib.kb_model_init
         self._model_init.argtypes = []
 
