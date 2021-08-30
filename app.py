@@ -690,7 +690,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
     # print(app.config)
 
     try:
-        # Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
+        Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
         app.run(HOST, PORT)
     except KeyboardInterrupt:
         print("Keyboard Interupt Detected. Shutting down server!")
