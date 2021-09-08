@@ -25,7 +25,7 @@ class SerialReader(BaseReader):
 
     @property
     def baud_rate(self):
-        return self._baud_rate
+        return BAUD_RATE
 
     def _write(self, command):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
