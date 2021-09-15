@@ -1,6 +1,11 @@
 import os
 
-basedir = os.path.join(os.path.dirname(__file__), "..", "database")
+from appdirs import *
+
+appname = "Open Gateway"
+appauthor = "SensiML"
+basedir = user_data_dir(appname, appauthor)
+print("captured data stored in {basedir}".format(basedir=basedir))
 
 
 config = {
@@ -11,7 +16,6 @@ config = {
     "CONFIG_SAMPLES_PER_PACKET": 1,
     "CONVERT_TO_INT16": True,
     "SCALING_FACTOR": 1,
-    "SML_LIBRARY_PATH": os.path.join(basedir, "knowledgepack", "libsensiml"),
 }
 
 
