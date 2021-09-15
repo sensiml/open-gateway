@@ -6,12 +6,16 @@ import struct
 import time
 import csv
 import os
-from sources.base import BaseReader, BaseStreamReaderMixin, BaseResultReaderMixin
+from open_gateway.sources.base import (
+    BaseReader,
+    BaseStreamReaderMixin,
+    BaseResultReaderMixin,
+)
 
-try:
-    from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
-except:
-    from buffers import CircularBufferQueue, CircularResultsBufferQueue
+from open_gateway.sources.buffers import (
+    CircularBufferQueue,
+    CircularResultsBufferQueue,
+)
 
 
 class BaseFusionReader(BaseReader):

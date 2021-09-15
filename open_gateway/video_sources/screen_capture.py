@@ -1,4 +1,3 @@
-from video_sources.video_base import VideoBase
 import os
 import mss
 import time
@@ -6,6 +5,7 @@ import numpy as np
 import cv2
 import threading
 
+from open_gateway.video_sources.video_base import VideoBase
 
 SAMPLES_PER_FRAME = 10.0
 

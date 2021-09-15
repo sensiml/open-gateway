@@ -4,8 +4,14 @@ import struct
 import math
 import time
 import random
-from sources.base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
 import threading
+
+
+from open_gateway.sources.base import (
+    BaseReader,
+    BaseResultReaderMixin,
+    BaseStreamReaderMixin,
+)
 
 BAUD_RATE = 460800
 
