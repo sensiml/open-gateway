@@ -32,7 +32,7 @@ from open_gateway.sources import get_source
 from open_gateway.errors import errors
 from open_gateway.video_sources import get_video_source, get_video_source_list
 import zipfile
-from open_gateway import basedir, ensure_folder_exists
+from open_gateway import basedir, ensure_folder_exists, config
 
 
 app = Flask(
@@ -43,7 +43,7 @@ app = Flask(
 # app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
-app.config.from_object("open_gateway.config")
+app.config.update(config)
 
 
 ## Internal Config Settings
