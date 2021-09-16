@@ -4,10 +4,11 @@ import math
 import time
 import random
 
-try:
-    from sources.base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
-except:
-    from base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
+from open_gateway.sources.base import (
+    BaseReader,
+    BaseResultReaderMixin,
+    BaseStreamReaderMixin,
+)
 
 
 class TestReader(BaseReader):

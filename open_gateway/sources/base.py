@@ -7,12 +7,17 @@ import time
 import csv
 import os
 import random
-from sources.utils.sml_runner import SMLRunner
+from open_gateway.sources.utils.sml_runner import SMLRunner
+from open_gateway import basedir, ensure_folder_exists
+
 
 try:
-    from sources.buffers import CircularBufferQueue, CircularResultsBufferQueue
+    from open_gateway.sources.buffers import (
+        CircularBufferQueue,
+        CircularResultsBufferQueue,
+    )
 except:
-    from buffers import CircularBufferQueue, CircularResultsBufferQueue
+    from open_gateway.buffers import CircularBufferQueue, CircularResultsBufferQueue
 
 
 class BaseReader(object):
@@ -216,10 +221,9 @@ class BaseReader(object):
             print(
                 "Base: File directory does not exist,  recording to data directory in gateway location."
             )
-            if not os.path.exists("./data"):
-                os.mkdir("./data")
+            ensure_folder_exists("data")
 
-            filename = os.path.join("./data", os.path.basename(filename))
+            filename = os.path.join(basedir, "data", os.path.basename(filename))
 
         self.recording = True
         self._record_thread = threading.Thread(

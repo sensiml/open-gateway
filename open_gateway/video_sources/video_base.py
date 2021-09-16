@@ -3,7 +3,8 @@ import sys
 import threading
 import time
 import cv2
-from video_sources import get_video_source_name
+from open_gateway.video_sources import get_video_source_name
+from open_gateway import basedir, ensure_folder_exists
 
 MAX_VIDEO_STREAMS = 1
 
@@ -123,10 +124,9 @@ class VideoBase(object):
                 print(
                     "File directory does not exist,  recording to video directory in gateway location."
                 )
-                if not os.path.exists("./video"):
-                    os.mkdir("./video")
+                ensure_folder_exists("video")
 
-                filename = os.path.join("./video", os.path.basename(filename))
+                filename = os.path.join(basedir, "video", os.path.basename(filename))
 
             self.video_writer = cv2.VideoWriter(
                 filename + ".mp4",

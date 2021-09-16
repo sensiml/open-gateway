@@ -1,16 +1,16 @@
 import sys
-from sources.test import TestStreamReader, TestResultReader
-from sources.serial import SerialStreamReader, SerialResultReader
-from sources.tcpip import TCPIPStreamReader, TCPIPResultReader
-from sources.fusion import FusionStreamReader, FusionResultReader
+from open_gateway.sources.test import TestStreamReader, TestResultReader
+from open_gateway.sources.serial import SerialStreamReader, SerialResultReader
+from open_gateway.sources.tcpip import TCPIPStreamReader, TCPIPResultReader
+from open_gateway.sources.fusion import FusionStreamReader, FusionResultReader
 
 
 try:
     # use bleak ble drivers
-    from sources.ble_bleak import BLEStreamReader, BLEResultReader
+    from open_gateway.sources.ble_bleak import BLEStreamReader, BLEResultReader
 except:
     # use bluepy ble driver
-    from sources.ble import BLEStreamReader, BLEResultReader
+    from open_gateway.sources.ble import BLEStreamReader, BLEResultReader
 
 
 def get_fusion_source(

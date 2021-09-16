@@ -6,7 +6,7 @@ import threading
 import time
 import cv2
 
-from video_sources.video_base import VideoBase
+from open_gateway.video_sources.video_base import VideoBase
 
 SAMPLES_PER_FRAME = 24.0
 

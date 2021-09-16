@@ -6,7 +6,11 @@ import random
 import requests
 import threading
 import copy
-from sources.base import BaseReader, BaseResultReaderMixin, BaseStreamReaderMixin
+from open_gateway.sources.base import (
+    BaseReader,
+    BaseResultReaderMixin,
+    BaseStreamReaderMixin,
+)
 
 WIFI_PORT = ":80"
 

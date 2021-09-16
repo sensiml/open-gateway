@@ -7,12 +7,12 @@ import re
 def get_video_source(camera_index):
 
     if camera_index == -1:
-        from video_sources.screen_capture import ScreenCatpure
+        from open_gateway.video_sources.screen_capture import ScreenCatpure
 
         return ScreenCatpure(camera_index)
 
     else:
-        from video_sources.webcam import WebCam
+        from open_gateway.video_sources.webcam import WebCam
 
         return WebCam(camera_index)
 
