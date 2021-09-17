@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { Grid } from "@material-ui/core";
+import React from "react";
+import {
+  Box,
+} from "@material-ui/core";
 
-const Camera = (props) => {
-  console.log(props);
+
+const Camera = ({ cameraKey, classes, isCameraConnected }) => {
   return (
-    <img
-      src={"http://localhost:5555/stream-video" + "?" + props.cameraKey}
-      alt="Camera Not Started."
-    />
+    <Box className={classes.cameraViewWrapper}>
+    { isCameraConnected ?
+      <img
+        src={`http://localhost:5555/stream-video?${cameraKey}`}
+        alt="Camera"
+      />
+      : "Video Source is not connected"
+    }
+    </Box>
   );
 };
 

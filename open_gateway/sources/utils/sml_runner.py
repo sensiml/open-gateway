@@ -326,7 +326,7 @@ class SMLRunner(object):
     def init_model(self):
         """
         This will initialize the parameters of all the models, it should be run once before
-        running anything elese.
+        running anything else.
         """
         if not self._model_initialized:
             self._model_initialized = True

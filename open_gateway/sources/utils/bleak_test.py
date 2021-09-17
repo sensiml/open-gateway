@@ -25,7 +25,7 @@ async def connect_to_device(address, charUUID):
         except Exception as e:
             print(e)
 
-    print("disconnect from", address)
+    print("disconnect ", address)
 
 
 async def read_gatt(address, charUUID):
