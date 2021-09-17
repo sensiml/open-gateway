@@ -125,7 +125,7 @@ const WebCamera = (props) => {
       setVideoSourceLoadError("Failed to load video sources, please, try again");
     }
     setVideoSourceLoading(false);
-  }; 
+  };
 
   useEffect(() => {
     loadVideoSource();
@@ -172,44 +172,44 @@ const WebCamera = (props) => {
         <Grid container rows spacing={2}>
           <Grid item xs={12}>
             <Box className={classes.selectWrapper} display="flex" alignItems="center" justifyContent="center">
-              { videoSourceLoadError
-                ? <Typography color="error"> { videoSourceLoadError } </Typography>
+              {videoSourceLoadError
+                ? <Typography color="error"> {videoSourceLoadError} </Typography>
                 : videoSourceLoading
-                ? <Box className={classes.selectLoading}>{"Loading..."}</Box>
-                : <>
-                  <FormControl className={classes.selectSource} variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                    <InputLabel id="video_sources_select_label">Video Source</InputLabel>
-                    <Select
-                      labelId="video_sources_select_label"
-                      id="video_sources_select"
-                      value={videoSource}
-                      onChange={handleCameraSourceSelect}
-                      label="Video source"
-                      disabled={props.isCameraConnected !== false}
-                    >
-                      { videoSourceList.map(sourceCam => 
-                        <MenuItem value={sourceCam.index} key={`source_select_${sourceCam.index}`}>
-                          { sourceCam.name }
-                        </MenuItem>
-                      )}
-                    </Select>
-                    {props.isCameraConnected !== false
-                      ? <FormHelperText id="my-helper-text">To change souce, plese, disconnect { getVideoSourceName() } first</FormHelperText>
-                      : null
-                    }
-                  </FormControl>
-                  <Tooltip title="Reload video sources">
-                    <IconButton
-                      aria-label="delete"
-                      size="large"
-                      color="primary"
-                      disabled={props.isCameraConnected !== false}
-                      onClick={handleUpdateVideoSourceList}
-                    >
-                      <CachedIcon fontSize="inherit" />
-                    </IconButton>
-                  </Tooltip>
-                </>
+                  ? <Box className={classes.selectLoading}>{"Loading..."}</Box>
+                  : <>
+                    <FormControl className={classes.selectSource} variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                      <InputLabel id="video_sources_select_label">Video Source</InputLabel>
+                      <Select
+                        labelId="video_sources_select_label"
+                        id="video_sources_select"
+                        value={videoSource}
+                        onChange={handleCameraSourceSelect}
+                        label="Video source"
+                        disabled={props.isCameraConnected !== false}
+                      >
+                        {videoSourceList.map(sourceCam =>
+                          <MenuItem value={sourceCam.index} key={`source_select_${sourceCam.index}`}>
+                            {sourceCam.name}
+                          </MenuItem>
+                        )}
+                      </Select>
+                      {props.isCameraConnected !== false
+                        ? <FormHelperText id="my-helper-text">To change souce, first disconnect {getVideoSourceName()}</FormHelperText>
+                        : null
+                      }
+                    </FormControl>
+                    <Tooltip title="Reload video sources">
+                      <IconButton
+                        aria-label="delete"
+                        size="large"
+                        color="primary"
+                        disabled={props.isCameraConnected !== false}
+                        onClick={handleUpdateVideoSourceList}
+                      >
+                        <CachedIcon fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  </>
               }
             </Box>
           </Grid>
@@ -231,27 +231,27 @@ const WebCamera = (props) => {
                   );
                 }}
               >
-                Connect to { getVideoSourceName() }
+                Connect to {getVideoSourceName()}
               </Button>
             ) : (
-                <Button
-                  aria-label="Stop Camera"
-                  color="primary"
-                  variant="contained"
-                  fullWidth={true}
-                  onClick={() => {
-                    handleCameraRequest(
-                      "camera-off",
-                      setCameraView,
-                      props.setIsCameraConnected,
-                      setCameraKey,
-                      videoSource,
-                    );
-                  }}
-                >
-                  Disconnect From { getVideoSourceName() }
-                </Button>
-              )}
+              <Button
+                aria-label="Stop Camera"
+                color="primary"
+                variant="contained"
+                fullWidth={true}
+                onClick={() => {
+                  handleCameraRequest(
+                    "camera-off",
+                    setCameraView,
+                    props.setIsCameraConnected,
+                    setCameraKey,
+                    videoSource,
+                  );
+                }}
+              >
+                Disconnect {getVideoSourceName()}
+              </Button>
+            )}
           </Grid>
         </Grid>
       </div>
