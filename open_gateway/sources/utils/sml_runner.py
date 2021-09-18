@@ -299,9 +299,6 @@ class SMLRunner(object):
             self._classification_result_info = empty_function
 
     def _initialized(self):
-        if os.name == "nt":
-            print("SML Runner is not supported on Windows OS.")
-            return None
 
         if not self._model_initialized:
             print("Initialize the model before running this function")
