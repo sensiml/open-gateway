@@ -671,6 +671,8 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
             if not app.config["RUN_SML_MODEL"]:
                 print("libsensiml not found in {}".format(arg))
                 raise Exception("libsensiml not found in {}".format(arg))
+            else:
+                print("Loaded model at ", app.config["SML_LIBRARY_PATH"])
         elif opt in ("-m", "--model_json_path"):
             if os.path.exists(arg):
                 app.config["MODEL_JSON"] = json.load(open(arg))
