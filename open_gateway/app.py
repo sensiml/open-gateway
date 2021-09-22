@@ -34,7 +34,7 @@ from open_gateway.errors import errors
 from open_gateway.video_sources import get_video_source, get_video_source_list
 import zipfile
 from open_gateway import basedir, ensure_folder_exists, config
-
+from .services import ImageManager
 
 CLASS_MAP_IMG_FLD_NAME = "classmap_img"
 C_CLR_ERROR = "\033[91m"
@@ -697,39 +697,25 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
             else:
                 print("Model json file was not found!")
         elif opt in ("-i", "--classmap_images_json_path"):
+            print(f"{C_CLR_OKBLUE}Start saving classmap images:")
             if os.path.exists(arg):
 
-                app.config["CLASS_MAP_IMAGES"] = []
                 images_read = json.load(open(arg))
-                img_dir_to_save  = os.path.join(app.static_folder, CLASS_MAP_IMG_FLD_NAME)
+                app.config["CLASS_MAP_IMAGES"] = []
+                dir_to_save  = os.path.join(app.static_folder, CLASS_MAP_IMG_FLD_NAME)
 
-                if not os.path.isdir(img_dir_to_save):
-                    os.mkdir(img_dir_to_save)
+                image_manager = ImageManager(dir_to_save=dir_to_save)
 
                 for class_name, img_path in images_read.items():
-                    if not os.path.exists(img_path):
-                        print(f"{C_CLR_ERROR} We can't open image {img_path}. Please, make sure if this image is exist!!!")
-                        sys.exit()
                     try:
-                        new_img_name = "_".join(class_name.lower().split())
-                        new_img_path = os.path.join(img_dir_to_save, f"{new_img_name}.png")
-                        
-                        read_img = cv2.imread(img_path)
-                        saved = cv2.imwrite(new_img_path, read_img)
-
-                        if saved:
-                            image_obj = { "name": class_name, "img": f"{new_img_name}.png" }
-                            print(f"{C_CLR_OKBLUE} Saved image for class {class_name}")
-                        else:
-                            print(f"{C_CLR_ERROR} Image {img_path} was not save! Please, make sure if this image is exist!!! ")
-                            sys.exit()
-
-                    except cv2.error:
-                        print(f"{C_CLR_ERROR} Image {img_path} was not save! Please, make sure if this image is exist!!!")
+                        # save image into the static folder
+                        new_img_name = image_manager.resave_img(img_path, img_name="_".join(class_name.lower().split()))
+                    except ImageManager.errors as e:
+                        print(f"{C_CLR_ERROR}{e}")
                         sys.exit()
-
-                    app.config["CLASS_MAP_IMAGES"].append(image_obj)
-
+                    else:
+                        print(f"{C_CLR_OKBLUE} Saved image for class {class_name}")
+                    app.config["CLASS_MAP_IMAGES"].append({ "name": class_name, "img": new_img_name })
             else:
                 print(f"{C_CLR_ERROR} Classmap images json file was not found!")
                 sys.exit()
