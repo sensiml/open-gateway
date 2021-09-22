@@ -624,6 +624,11 @@ def class_map_images():
     res = app.config.get("CLASS_MAP_IMAGES", [])
     return jsonify([ { "name": item.get("name"), "img": get_img_path(item.get('img')) } for item in res ])
 
+def exit_with_delay(delay=3, status_code=1):
+    """controled exit from the app """
+    time.sleep(delay)
+    sys.exit(status_code)
+
 def main():
 
     options_string = """
@@ -632,8 +637,8 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
 -u --host (str) : select the host address for the gateway to launch on
 -p --port (int) : select the port address for the gateway to launch on
 -s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
--i --classmap_images_json_path (str): set a path of json file with images for classmap, the recognition mode will use them to represent events result
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the class_map described in the model json file 
+-i --class_map_images_json_path (str): set a path of json file with images for the class_map, the recognition mode will use them to represent events result
 -c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
 -f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
 
@@ -654,19 +659,19 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 "sml_library_path",
                 "convert_to_in16",
                 "scaling_factor",
-                "classmap_images_json_path",
+                "class_map_images_json_path",
             ],
         )
     except getopt.GetoptError:
         print("Invalid nvalid opt selection!")
         print(options_string)
-        sys.exit()
+        exit_with_delay()
 
     for opt, arg in opts:
         print(opt, arg)
         if opt in ("-h", "--help"):
             print(options_string)
-            sys.exit()
+            exit_with_delay()
         if opt in ("-u", "--host"):
             HOST = arg
         elif opt in ("-p", "--port"):
@@ -696,9 +701,15 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 app.config["MODEL_JSON"] = json.load(open(arg))
             else:
                 print("Model json file was not found!")
-        elif opt in ("-i", "--classmap_images_json_path"):
-            print(f"{C_CLR_OKBLUE}Start saving classmap images:")
+        elif opt in ("-i", "--class_map_images_json_path"):
             if os.path.exists(arg):
+
+                def get_abs_img_path(img_path):
+                    if os.path.isabs(img_path):
+                        return img_path
+                    # use json location as root dir for images
+                    json_path = os.path.abspath(os.path.dirname(arg))
+                    return os.path.join(json_path, img_path)
 
                 images_read = json.load(open(arg))
                 app.config["CLASS_MAP_IMAGES"] = []
@@ -709,16 +720,19 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 for class_name, img_path in images_read.items():
                     try:
                         # save image into the static folder
-                        new_img_name = image_manager.resave_img(img_path, img_name="_".join(class_name.lower().split()))
+                        new_img_name = image_manager.resave_img(
+                            img_path=get_abs_img_path(img_path),
+                            img_name="_".join(class_name.lower().split()),
+                        )
                     except ImageManager.errors as e:
                         print(f"{C_CLR_ERROR}{e}")
-                        sys.exit()
+                        exit_with_delay()
                     else:
                         print(f"{C_CLR_OKBLUE} Saved image for class {class_name}")
                     app.config["CLASS_MAP_IMAGES"].append({ "name": class_name, "img": new_img_name })
             else:
                 print(f"{C_CLR_ERROR} Classmap images json file was not found!")
-                sys.exit()
+                exit_with_delay()
 
         elif opt in ("-c", "--convert_to_int16"):
             app.config["CONVERT_TO_INT16"] = arg
@@ -745,7 +759,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 print(".")
                 time.sleep(1)
         print("Shutting down server!")
-        sys.exit()
+        exit_with_delay(delay=1)
 
 
 if __name__ == "__main__":
