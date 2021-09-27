@@ -38,8 +38,8 @@ from .services import ImageManager
 
 CLASS_MAP_IMG_FLD_NAME = "classmap_img"
 C_CLR_ERROR = "\033[91m"
-C_CLR_OKBLUE = '\033[94m'
-C_CLR_OKGREEN = '\033[92m'
+C_CLR_OKBLUE = "\033[94m"
+C_CLR_OKGREEN = "\033[92m"
 
 app = Flask(
     __name__,
@@ -614,20 +614,31 @@ def delete_cache():
     return jsonify(detail="cache deleted.")
 
 
-@app.route("/class-map-images", methods=["GET",])
+@app.route(
+    "/class-map-images",
+    methods=[
+        "GET",
+    ],
+)
 def class_map_images():
-
     def get_img_path(img_name):
         return f"{CLASS_MAP_IMG_FLD_NAME}/{img_name}"
 
     # todo needs to handle multiple downloads
     res = app.config.get("CLASS_MAP_IMAGES", [])
-    return jsonify([ { "name": item.get("name"), "img": get_img_path(item.get('img')) } for item in res ])
+    return jsonify(
+        [
+            {"name": item.get("name"), "img": get_img_path(item.get("img"))}
+            for item in res
+        ]
+    )
+
 
 def exit_with_delay(delay=3, status_code=1):
     """controled exit from the app """
     time.sleep(delay)
     sys.exit(status_code)
+
 
 def main():
 
@@ -641,6 +652,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
 -i --class_map_images_json_path (str): set a path of json file with images for the class_map, the recognition mode will use them to represent events result
 -c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
 -f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
+-b --hide_ui (int): do not luanch the UI interface when starting the application
 
 """
     HOST = os.environ.get("SERVER_HOST", "localhost")
@@ -651,7 +663,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hu:p:s:c:f:m:i:",
+            "hu:p:s:c:f:m:i:b",
             [
                 "help",
                 "host",
@@ -660,15 +672,19 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 "convert_to_in16",
                 "scaling_factor",
                 "class_map_images_json_path",
+                "hide_ui",
             ],
         )
     except getopt.GetoptError:
-        print("Invalid nvalid opt selection!")
+        print("Invalid opt selection!")
         print(options_string)
         exit_with_delay()
 
+    HIDE_UI = False
     for opt, arg in opts:
         print(opt, arg)
+        if opt in ("-b", "--hide_ui"):
+            HIDE_UI = True
         if opt in ("-h", "--help"):
             print(options_string)
             exit_with_delay()
@@ -713,7 +729,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
 
                 images_read = json.load(open(arg))
                 app.config["CLASS_MAP_IMAGES"] = []
-                dir_to_save  = os.path.join(app.static_folder, CLASS_MAP_IMG_FLD_NAME)
+                dir_to_save = os.path.join(app.static_folder, CLASS_MAP_IMG_FLD_NAME)
 
                 image_manager = ImageManager(dir_to_save=dir_to_save)
 
@@ -729,7 +745,9 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                         exit_with_delay()
                     else:
                         print(f"{C_CLR_OKBLUE} Saved image for class {class_name}")
-                    app.config["CLASS_MAP_IMAGES"].append({ "name": class_name, "img": new_img_name })
+                    app.config["CLASS_MAP_IMAGES"].append(
+                        {"name": class_name, "img": new_img_name}
+                    )
             else:
                 print(f"{C_CLR_ERROR} Classmap images json file was not found!")
                 exit_with_delay()
@@ -740,15 +758,18 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
             print("setting scaling factor", arg)
             app.config["SCALING_FACTOR"] = int(arg)
 
-
     if os.path.exists(os.path.join(basedir, ".config.cache")):
         app.config.update(json.load(open(os.path.join(basedir, ".config.cache"), "r")))
 
-    # print(app.config)
-
     try:
-        Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
+        if not HIDE_UI:
+            Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
+        print("Starting application at {host}:{port}.".format(host=HOST, port=PORT))
         app.run(HOST, PORT)
+    except OSError as e:
+        print("Starting application at {host}:{port}.".format(host=HOST, port=PORT))
+        print(e)
+        print("Try loading the application on a different port. -p XXXX")
     except KeyboardInterrupt:
         print("Keyboard Interupt Detected. Shutting down server!")
     finally:
@@ -759,7 +780,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 print(".")
                 time.sleep(1)
         print("Shutting down server!")
-        exit_with_delay(delay=1)
+        exit_with_delay(delay=5)
 
 
 if __name__ == "__main__":
