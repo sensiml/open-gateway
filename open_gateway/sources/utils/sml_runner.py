@@ -1,7 +1,9 @@
 import os
 import json
 import ctypes
-from ctypes import Array, CDLL, WinDLL
+from ctypes import Array, CDLL
+if os.name == "nt":
+    from ctypes import WinDLL
 
 
 class ImportPathException(Exception):
