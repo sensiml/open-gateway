@@ -1,9 +1,12 @@
-import { Grid } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Grid, Box, Paper } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import { SensorStream } from "../SensorStream";
 import { Results } from "../Results";
 import { Record } from "../Record";
+
+import { useSelector } from "react-redux";
+import { selectClassImage } from "../../redux/selectors/classes"; 
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,15 +24,36 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
 
+  classImageWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "1rem",
+    marginTop: "1rem",
+    minHeight: "350px",
+  },
+
+  classImage: {
+    width: "90%",
+  },
+
   section1: {
     margin: theme.spacing(3, 2),
   },
 }));
 
 const TestMode = (props) => {
+  const classes = useStyles();
+  const [currentClass, setCurrentClass] = useState("");
+  const classImage = useSelector(selectClassImage(currentClass));
+
+  const handleLastValue = (value) => {
+    setCurrentClass(value?.Classification || "");
+  };
+
   return (
     <Grid container rows spacing={6}>
-      {props.streamingMode != "recognition" ? (
+      {props.streamingMode !== "recognition" ? (
         <Grid item xs={8}>
           <SensorStream
             columns={props.columns}
@@ -39,7 +63,9 @@ const TestMode = (props) => {
         </Grid>
       ) : (
         <Grid item xs={6}>
-          <Results />
+          <Results
+            setLastValue={handleLastValue}
+          />
         </Grid>
       )}
       <Grid item xs={4}>
@@ -47,6 +73,14 @@ const TestMode = (props) => {
           isCameraConnected={props.isCameraConnected}
           isRecording={props.isRecording}
         />
+        <Paper className={classes.imageWrapperCard}>
+          <Box className={classes.classImageWrapper}>
+            { classImage ?
+              <img  className={classes.classImage} src={classImage} alt={ currentClass }/>
+              : currentClass ? `No Image for ${currentClass}` : ""
+            }
+          </Box>
+        </Paper>
       </Grid>
     </Grid>
   );

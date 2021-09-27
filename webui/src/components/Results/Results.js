@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+import _ from "lodash";
 import { Button, Grid, Typography } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -5,7 +7,6 @@ import Divider from "@material-ui/core/Divider";
 import Slider from "@material-ui/core/Slider";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DataGrid } from "@material-ui/data-grid";
-import React from "react";
 import ResultsFilter from "./ResultsFilter";
 
 var id_counter = 0;
@@ -115,9 +116,14 @@ const Results = (props) => {
   const theme = useTheme();
 
   const handleFilterLengthSliderChange = (event, newValue) => {
-    console.log(newValue);
     setfilterLength(newValue);
   };
+
+  useEffect(() => {
+    props.setLastValue(_.last(deviceRows));
+  }, [deviceRows]);
+
+  // props.setLastValue(newValue);
 
   return (
     <Card>

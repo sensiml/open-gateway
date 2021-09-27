@@ -1,4 +1,5 @@
 import os
+import cv2
 import json
 import sys
 import shutil
@@ -33,7 +34,12 @@ from open_gateway.errors import errors
 from open_gateway.video_sources import get_video_source, get_video_source_list
 import zipfile
 from open_gateway import basedir, ensure_folder_exists, config
+from .services import ImageManager
 
+CLASS_MAP_IMG_FLD_NAME = "classmap_img"
+C_CLR_ERROR = "\033[91m"
+C_CLR_OKBLUE = '\033[94m'
+C_CLR_OKGREEN = '\033[92m'
 
 app = Flask(
     __name__,
@@ -57,7 +63,7 @@ app.config["DEVICE_SOURCE"] = None
 app.config["MODE"] = ""
 app.config["VIDEO_SOURCE"] = None
 app.config["LOOP"] = loop
-
+app.config["CLASS_MAP_IMAGES"] = []
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
@@ -608,15 +614,31 @@ def delete_cache():
     return jsonify(detail="cache deleted.")
 
 
+@app.route("/class-map-images", methods=["GET",])
+def class_map_images():
+
+    def get_img_path(img_name):
+        return f"{CLASS_MAP_IMG_FLD_NAME}/{img_name}"
+
+    # todo needs to handle multiple downloads
+    res = app.config.get("CLASS_MAP_IMAGES", [])
+    return jsonify([ { "name": item.get("name"), "img": get_img_path(item.get('img')) } for item in res ])
+
+def exit_with_delay(delay=3, status_code=1):
+    """controled exit from the app """
+    time.sleep(delay)
+    sys.exit(status_code)
+
 def main():
 
     options_string = """
-python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <True/False> -f <scaling-factor> 
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <True/False> -f <scaling-factor> -i <classmap-images-json-file>
 
 -u --host (str) : select the host address for the gateway to launch on
 -p --port (int) : select the port address for the gateway to launch on
 -s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file 
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the class_map described in the model json file 
+-i --class_map_images_json_path (str): set a path of json file with images for the class_map, the recognition mode will use them to represent events result
 -c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
 -f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
 
@@ -629,7 +651,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hu:p:s:c:f:m:",
+            "hu:p:s:c:f:m:i:",
             [
                 "help",
                 "host",
@@ -637,18 +659,19 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 "sml_library_path",
                 "convert_to_in16",
                 "scaling_factor",
+                "class_map_images_json_path",
             ],
         )
     except getopt.GetoptError:
         print("Invalid nvalid opt selection!")
         print(options_string)
-        sys.exit()
+        exit_with_delay()
 
     for opt, arg in opts:
         print(opt, arg)
         if opt in ("-h", "--help"):
             print(options_string)
-            sys.exit()
+            exit_with_delay()
         if opt in ("-u", "--host"):
             HOST = arg
         elif opt in ("-p", "--port"):
@@ -678,11 +701,45 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 app.config["MODEL_JSON"] = json.load(open(arg))
             else:
                 print("Model json file was not found!")
+        elif opt in ("-i", "--class_map_images_json_path"):
+            if os.path.exists(arg):
+
+                def get_abs_img_path(img_path):
+                    if os.path.isabs(img_path):
+                        return img_path
+                    # use json location as root dir for images
+                    json_path = os.path.abspath(os.path.dirname(arg))
+                    return os.path.join(json_path, img_path)
+
+                images_read = json.load(open(arg))
+                app.config["CLASS_MAP_IMAGES"] = []
+                dir_to_save  = os.path.join(app.static_folder, CLASS_MAP_IMG_FLD_NAME)
+
+                image_manager = ImageManager(dir_to_save=dir_to_save)
+
+                for class_name, img_path in images_read.items():
+                    try:
+                        # save image into the static folder
+                        new_img_name = image_manager.resave_img(
+                            img_path=get_abs_img_path(img_path),
+                            img_name="_".join(class_name.lower().split()),
+                        )
+                    except ImageManager.errors as e:
+                        print(f"{C_CLR_ERROR}{e}")
+                        exit_with_delay()
+                    else:
+                        print(f"{C_CLR_OKBLUE} Saved image for class {class_name}")
+                    app.config["CLASS_MAP_IMAGES"].append({ "name": class_name, "img": new_img_name })
+            else:
+                print(f"{C_CLR_ERROR} Classmap images json file was not found!")
+                exit_with_delay()
+
         elif opt in ("-c", "--convert_to_int16"):
             app.config["CONVERT_TO_INT16"] = arg
         elif opt in ("-f", "--scaling_factor"):
             print("setting scaling factor", arg)
             app.config["SCALING_FACTOR"] = int(arg)
+
 
     if os.path.exists(os.path.join(basedir, ".config.cache")):
         app.config.update(json.load(open(os.path.join(basedir, ".config.cache"), "r")))
@@ -702,7 +759,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 print(".")
                 time.sleep(1)
         print("Shutting down server!")
-        sys.exit()
+        exit_with_delay(delay=1)
 
 
 if __name__ == "__main__":

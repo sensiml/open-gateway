@@ -76,11 +76,12 @@ In the Gateway Status screen you can start and stop a video source. If you start
 Useful configuration commands when launching the open-gateway
 
 ```bash
-python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file>
+python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -i  <classmap-images-json-file>
 
 -u --host : select the host address for the gateway to launch on
 -p --port : select the port address for the gateway to launch on
 -s --sml_library_path: set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-i --classmap_images_json_path (str): set a path of json file with the images for classmap, the recognition mode will use them to represent events result
 -m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file
 ```
 
@@ -98,6 +99,18 @@ For more complicated model hierarchies you can copy the dictionary directly from
 ```python
 # replace this with the dictionary in the model.json file
 MODEL_JSON = None
+```
+### Configuring the Images for Class Map
+
+Extracts images for each class to show them according to recognized class on test mode screen.
+
+JSON file format
+
+```json
+{
+    "ClassName1": "./class_image/class_name1.png",
+    "ClassName2": "./class_image/class_name2.png"
+ }
 ```
 
 ### Running a knowledge pack on the gateway

@@ -9,7 +9,7 @@ import { TestMode } from "../TestMode";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
-import { STOP_STREAM_SENSOR_SAGA } from "../../redux/actions/actionTypes";
+import { STOP_STREAM_SENSOR_SAGA, FETCH_CLASS_MAP_IMAGES } from "../../redux/actions/actionTypes";
 import axios from "axios";
 
 const Main = () => {
@@ -77,6 +77,11 @@ const Main = () => {
     [dispatch]
   );
 
+  const fetchClassMapImages = useCallback(
+    () => dispatch({ type: FETCH_CLASS_MAP_IMAGES }),
+    [dispatch]
+  );
+
   // before leave handler
   useEffect(() => {
     if (isStreamingSensor) {
@@ -102,6 +107,7 @@ const Main = () => {
       mapdata(response.data);
       console.log(response.data)
     });
+    fetchClassMapImages();
   }, [activeView]);
 
   useLayoutEffect(() => {
