@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useLayoutEffect } from "react";
 import { Header, NavBar } from "../Layout";
 import useStyles from "./MainStyles";
 import { Grid } from "@material-ui/core";
-import { Status } from "../Status";
 import { Configure } from "../Configure";
 import { TestMode } from "../TestMode";
 import CssBaseline from "@material-ui/core/CssBaseline";

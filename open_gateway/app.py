@@ -46,7 +46,7 @@ app = Flask(
     static_folder=os.path.join(os.path.dirname(__file__), "..", "webui", "build"),
     static_url_path="/",
 )
-# app.register_blueprint(errors)
+app.register_blueprint(errors)
 CORS(app, resources={r"/*": {"origins": "*"}})
 loop = asyncio.get_event_loop()
 app.config.update(config)
@@ -70,14 +70,14 @@ wsgi_app = app.wsgi_app
 
 def cache_config(config):
     tmp = {
-        "CONFIG_SAMPLE_RATE": app.config["CONFIG_SAMPLE_RATE"],
-        "DATA_SOURCE": app.config["DATA_SOURCE"],
-        "CONFIG_COLUMNS": app.config["CONFIG_COLUMNS"],
-        "DEVICE_ID": app.config["DEVICE_ID"],
-        "MODE": app.config["MODE"],
-        "SOURCE_SAMPLES_PER_PACKET": app.config["SOURCE_SAMPLES_PER_PACKET"],
-        "DATA_TYPE": app.config["DATA_TYPE"],
-        "BAUD_RATE": app.config["BAUD_RATE"],
+        "CONFIG_SAMPLE_RATE": config["CONFIG_SAMPLE_RATE"],
+        "DATA_SOURCE": config["DATA_SOURCE"],
+        "CONFIG_COLUMNS": config["CONFIG_COLUMNS"],
+        "DEVICE_ID": config["DEVICE_ID"],
+        "MODE": config["MODE"],
+        "SOURCE_SAMPLES_PER_PACKET": config["SOURCE_SAMPLES_PER_PACKET"],
+        "DATA_TYPE": config["DATA_TYPE"],
+        "BAUD_RATE": config["BAUD_RATE"],
     }
     json.dump(tmp, open(os.path.join(basedir, ".config.cache"), "w"))
 

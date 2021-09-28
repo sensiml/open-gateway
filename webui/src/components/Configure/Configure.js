@@ -1,4 +1,4 @@
-import { Grid, Paper, Typography, Divider } from "@material-ui/core";
+import { Grid, Typography, Divider } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -10,7 +10,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Status } from "../Status";
 import Scan from "./Scan";
 import { WebCamera } from "../WebCamera";
@@ -53,7 +53,6 @@ const Configure = (props) => {
 
   const [configuring, setIsConfiguring] = React.useState(false);
 
-  let [deviceDisabled, setDeviceDisabled] = useState(false);
 
   const handleRadioChange = (event) => {
     console.log("handle radio");
@@ -93,19 +92,28 @@ const Configure = (props) => {
     }
     console.log(source);
     console.log(deviceID);
+    let data = {
+      device_id: deviceID,
+      source: source.toLowerCase(),
+      mode: mode,
+    }
+    if (source === 'SERIAL') {
+      data.baudRate = props.baudRate
+    }
     axios
-      .post(`${process.env.REACT_APP_API_URL}config`, {
-        device_id: deviceID,
-        source: source.toLowerCase(),
-        mode: mode,
-        baud_rate: source == 'SERIAL' ? props.baudRate : null,
-      })
+      .post(`${process.env.REACT_APP_API_URL}config`, data)
       .then((response) => {
         mapdata(response.data);
-        setHelperText("Gateway Connected to device, now ready to stream.");
+        if (response.data.streaming == false) {
+          setHelperText("Error starting device, check the logs in the terminal for details for additional details");
+        }
+        else {
+          setHelperText("Device Connected");
+        }
         setIsConfiguring(false);
       })
       .catch(function (error) {
+        debugger;
         setIsConfiguring(false);
         if (error.response) {
           setHelperText(error.response.data.detail.join(", "));
@@ -118,16 +126,15 @@ const Configure = (props) => {
         } else {
           // Something happened in setting up the request that triggered an Error
           console.log("Error", error.detail);
+          setHelperText(error.response.data.detail.join(", "));
         }
       });
   };
 
   const handleDisconnectRequest = (event) => {
-    setDeviceDisabled(true);
     axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
       console.log(res.data);
       mapdata(res.data);
-      setDeviceDisabled(false);
     });
   };
 
@@ -312,6 +319,8 @@ const Configure = (props) => {
                         </Grid>
                       </Grid>
                     </div>
+                    <div className={classes.section1}></div>
+                    <Typography> {helperText}</Typography>
                   </FormControl>
                 </form>
               </React.Fragment>

@@ -51,7 +51,7 @@ class StreamReader {
       @param {number} maxLength - max length of redux streamed array
     * */
     console.log('DATA TYPE IS ' + dataType);
-    const arrayType = dataType == 'float'? Float32Array: Int16Array;
+    const arrayType = dataType === 'float' ? Float32Array : Int16Array;
     while (true) {
       const { value, done } = await this.reader.read();
       if (done) break;
