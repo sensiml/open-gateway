@@ -215,6 +215,12 @@ def config():
     if request.method == "POST":
         disconnect()
 
+        if (
+            form.data.get("baud_rate", None) is not None
+            and form.data["source"].upper() == "SERIAL"
+        ):
+            app.config["BAUD_RATE"] = form.data["baud_rate"]
+
         source = get_source(
             app.config,
             data_source=form.data["source"].upper(),
@@ -652,7 +658,8 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
 -i --class_map_images_json_path (str): set a path of json file with images for the class_map, the recognition mode will use them to represent events result
 -c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
 -f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
--b --hide_ui (int): do not luanch the UI interface when starting the application
+-z --hide_ui (int): do not luanch the UI interface when starting the application
+-b --baud (int): set the serial baud rate
 
 """
     HOST = os.environ.get("SERVER_HOST", "localhost")
@@ -663,7 +670,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hu:p:s:c:f:m:i:b",
+            "hu:p:s:c:f:m:i:b:z",
             [
                 "help",
                 "host",
@@ -680,10 +687,13 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
         print(options_string)
         exit_with_delay()
 
+    if os.path.exists(os.path.join(basedir, ".config.cache")):
+        app.config.update(json.load(open(os.path.join(basedir, ".config.cache"), "r")))
+
     HIDE_UI = False
     for opt, arg in opts:
         print(opt, arg)
-        if opt in ("-b", "--hide_ui"):
+        if opt in ("-z", "--hide_ui"):
             HIDE_UI = True
         if opt in ("-h", "--help"):
             print(options_string)
@@ -757,9 +767,9 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
         elif opt in ("-f", "--scaling_factor"):
             print("setting scaling factor", arg)
             app.config["SCALING_FACTOR"] = int(arg)
-
-    if os.path.exists(os.path.join(basedir, ".config.cache")):
-        app.config.update(json.load(open(os.path.join(basedir, ".config.cache"), "r")))
+        elif opt in ("-b", "--baud"):
+            print("setting baud rate", arg)
+            app.config["BAUD_RATE"] = int(arg)
 
     try:
         if not HIDE_UI:

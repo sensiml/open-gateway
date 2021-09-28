@@ -22,6 +22,7 @@ const Main = () => {
   const [isConnected, setIsConnected] = React.useState(false);
   const [isCameraConnected, setIsCameraConnected] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
+  const [baudRate, setBaudRate] = React.useState(null);
   const [config, setConfig] = React.useState({});
   const [firstLoad, setFirstLoad] = React.useState(null);
   const [dataType, setDataType] = React.useState('int16');
@@ -45,18 +46,19 @@ const Main = () => {
     setStreamingSource(data.source?.toUpperCase());
     setDeviceID(data.device_id);
     setIsCameraConnected(data.camera_on);
-    
-    switch (data.data_type){
-      case('int16'):
+    setBaudRate(data.baud_rate);
+
+    switch (data.data_type) {
+      case ('int16'):
         setDataType('int16');
         break;
-      case('float'):
+      case ('float'):
         setDataType('float');
         break;
       default:
         setDataType('int16');
     }
-    
+
     data.column_location =
       "column_location" in data
         ? Object.keys(data.column_location).sort().join(", ")
@@ -144,6 +146,8 @@ const Main = () => {
               config={config}
               setConfig={setConfig}
               streamingSource={streamingSource}
+              baudRate={baudRate}
+              setBaudRate={setBaudRate}
             />
           ) : null}
           {activeView === 1 ? (

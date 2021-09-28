@@ -42,6 +42,7 @@ const Configure = (props) => {
   const [source, setSource] = React.useState(
     props.streamingSource ? props.streamingSource : "SERIAL"
   );
+
   const [mode, setMode] = React.useState(
     props.streamingMode === "recognition" ? "RECOGNITION" : "DATA_CAPTURE"
   );
@@ -58,6 +59,12 @@ const Configure = (props) => {
     console.log("handle radio");
     setSource(event.target.value);
   };
+
+  const handleDeviceBaudRate = (event) => {
+    console.log("handle radio");
+    props.setBaudRate(event.target.value);
+  };
+
 
   const handleModeChange = (event) => {
     console.log("handle mode");
@@ -91,6 +98,7 @@ const Configure = (props) => {
         device_id: deviceID,
         source: source.toLowerCase(),
         mode: mode,
+        baud_rate: source == 'SERIAL' ? props.baudRate : null,
       })
       .then((response) => {
         mapdata(response.data);
@@ -133,6 +141,7 @@ const Configure = (props) => {
     props.setStreamingSource(data.source);
     props.setDeviceID(data.device_id);
     props.setIsCameraConnected(data.camera_on);
+    props.setBaudRate(data.baud_rate);
     data.column_location =
       "column_location" in data
         ? Object.keys(data.column_location).sort().join(", ")
@@ -268,6 +277,22 @@ const Configure = (props) => {
                       />
                     </div>
 
+                    <div className={classes.section1}></div>
+
+                    {source === 'SERIAL' ?
+                      <div>
+                        <FormLabel component="legend">Baud Rate:</FormLabel>
+                        <TextField
+                          id="outlined-basic"
+                          variant="outlined"
+                          value={props.baudRate}
+                          onChange={handleDeviceBaudRate}
+                          fullWidth={true}
+                        />
+                      </div>
+                      : <div />}
+
+
 
                     <div className={classes.section1}></div>
                     <div>
@@ -304,7 +329,7 @@ const Configure = (props) => {
           </CardContent>
         </Card>
       </Grid>
-    </Grid>
+    </Grid >
   );
 };
 
