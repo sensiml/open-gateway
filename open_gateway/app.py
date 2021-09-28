@@ -55,7 +55,6 @@ app.config.update(config)
 ## Internal Config Settings
 app.config["CONFIG_SAMPLE_RATE"] = None
 app.config["SOURCE_SAMPLES_PER_PACKET"] = None
-app.config["DATA_TYPE"] = "int16"
 app.config["DATA_SOURCE"] = None
 app.config["CONFIG_COLUMNS"] = []
 app.config["DEVICE_ID"] = None
@@ -78,6 +77,7 @@ def cache_config(config):
         "MODE": app.config["MODE"],
         "SOURCE_SAMPLES_PER_PACKET": app.config["SOURCE_SAMPLES_PER_PACKET"],
         "DATA_TYPE": app.config["DATA_TYPE"],
+        "BAUD_RATE": app.config["BAUD_RATE"],
     }
     json.dump(tmp, open(os.path.join(basedir, ".config.cache"), "w"))
 

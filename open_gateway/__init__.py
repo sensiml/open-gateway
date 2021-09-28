@@ -10,7 +10,8 @@ print("captured data stored in {basedir}".format(basedir=basedir))
 
 config = {
     "SECRET_KEY": "any secret string",
-    "BAUD_RATE": "460800",
+    "BAUD_RATE": 460800,
+    "DATA_TYPE": "int16",
     "CLASS_MAP": {65534: "Classification Limit Reached", 0: "Unknown"},
     "MODEL_JSON": None,
     "CONFIG_SAMPLES_PER_PACKET": 1,
