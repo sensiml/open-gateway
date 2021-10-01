@@ -1,3 +1,4 @@
+Unicode True
 !define APP_NAME "Open Gateway"
 !define APP_PUBLISHER "SensiML Corporation"
 
@@ -46,7 +47,7 @@ VIAddVersionKey InternalName     "dcl"
 !insertmacro INTERACTIVE_UNINSTALL
 
 Name "${APP_NAME}"
-OutFile "SensiML_OpenGateway_Setup.exe"
+OutFile "dist/SensiML_OpenGateway_Setup_${VERSION_STRING}.exe"
 
 InstallDir "$PROGRAMFILES64\${APP_PUBLISHER}\${APP_NAME}"
 InstallDirRegKey ${INSTDIR_REG_ROOT} "${INSTDIR_REG_KEY}" "InstallDir"
@@ -111,7 +112,7 @@ Section "Open Gateway" SecOGW
 
   !insertmacro UNINSTALL.LOG_OPEN_INSTALL
   ;START FILES
-  File /r dist\*
+  File /r /x SensiML_OpenGateway_Setup.exe dist\*
   ;END FILES
   !insertmacro UNINSTALL.LOG_CLOSE_INSTALL
 
