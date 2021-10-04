@@ -47,7 +47,7 @@ VIAddVersionKey InternalName     "ogw"
 !insertmacro INTERACTIVE_UNINSTALL
 
 Name "${APP_NAME}"
-OutFile "dist/SensiML_OpenGateway_Setup_${VERSION_STRING}.exe"
+OutFile "dist/SensiML_OpenGateway_Setup.exe"
 
 InstallDir "$PROGRAMFILES64\${APP_PUBLISHER}\${APP_NAME}"
 InstallDirRegKey ${INSTDIR_REG_ROOT} "${INSTDIR_REG_KEY}" "InstallDir"
