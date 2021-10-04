@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.vscode/
 
 # C extensions
 *.so
@@ -9,6 +10,7 @@ __pycache__/
 *.h
 *.a
 *.o
+*.exe
 
 # Distribution / packaging
 .Python
