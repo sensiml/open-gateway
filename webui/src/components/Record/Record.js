@@ -63,11 +63,11 @@ const Record = (props) => {
       })
       .then((response) => {
         console.log(response.data);
-        if (event == "record-start") {
+        if (event === "record-start") {
           setRecording(true);
           console.log(event);
         }
-        if (event == "record-stop") {
+        if (event === "record-stop") {
           setRecording(false);
           console.log(event);
         }
@@ -157,22 +157,22 @@ const Record = (props) => {
                 </Button>
               </Tooltip>
             ) : (
-                <Button
-                  aria-label="Stop "
-                  variant="contained"
-                  fullWidth={true}
-                  disabled={recordDistabled}
-                  onClick={() => {
-                    handleRecordRequest(
-                      "record-stop",
-                      props.isCameraConnected ? "record" : "record-device",
-                      setRecording
-                    );
-                  }}
-                >
-                  Stop Recording
-                </Button>
-              )}
+              <Button
+                aria-label="Stop "
+                variant="contained"
+                fullWidth={true}
+                disabled={recordDistabled}
+                onClick={() => {
+                  handleRecordRequest(
+                    "record-stop",
+                    props.isCameraConnected ? "record" : "record-device",
+                    setRecording
+                  );
+                }}
+              >
+                Stop Recording
+              </Button>
+            )}
           </Grid>
 
           <Grid item xs={6}>

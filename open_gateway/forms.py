@@ -7,6 +7,7 @@ class DeviceConfigureForm(FlaskForm):
     device_id = StringField(u"Device ID", validators=[validators.input_required()])
     source = StringField(u"Source", validators=[validators.input_required()])
     mode = StringField(u"MODE", validators=[validators.input_required()])
+    baud_rate = IntegerField(u"Baud Rate", validators=[validators.Optional()])
     submit = SubmitField("Submit")
 
 

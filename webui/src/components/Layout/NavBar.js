@@ -1,6 +1,5 @@
 import { Grid, Typography } from "@material-ui/core";
-import { green, red, grey } from '@material-ui/core/colors';
-import Button from "@material-ui/core/Button";
+import { green, grey } from '@material-ui/core/colors';
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -9,7 +8,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import AssessmentIcon from "@material-ui/icons/Assessment";
-import InfoIcon from "@material-ui/icons/Info";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import HomeIcon from "@material-ui/icons/Home";
 import React from "react";
@@ -59,10 +57,10 @@ const Connected = (props) => {
   return (
     <Grid>
       {props.isConnected ? (
-        <Typography> <FiberManualRecordIcon   style={{  fontSize: 16, color: green[500] }}></FiberManualRecordIcon> Connected  </Typography> 
-        
+        <Typography> <FiberManualRecordIcon style={{ fontSize: 16, color: green[500] }}></FiberManualRecordIcon> Connected  </Typography>
+
       ) : (
-        <Typography> <FiberManualRecordIcon   style={{  fontSize: 16, color: grey[500] }}> </FiberManualRecordIcon>  Not Connected </Typography>  
+        <Typography> <FiberManualRecordIcon style={{ fontSize: 16, color: grey[500] }}> </FiberManualRecordIcon>  Not Connected </Typography>
       )}
     </Grid>
   );

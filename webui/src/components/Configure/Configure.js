@@ -1,4 +1,4 @@
-import { Grid, Paper, Typography, Divider } from "@material-ui/core";
+import { Grid, Typography, Divider } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -10,7 +10,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Status } from "../Status";
 import Scan from "./Scan";
 import { WebCamera } from "../WebCamera";
@@ -42,6 +42,7 @@ const Configure = (props) => {
   const [source, setSource] = React.useState(
     props.streamingSource ? props.streamingSource : "SERIAL"
   );
+
   const [mode, setMode] = React.useState(
     props.streamingMode === "recognition" ? "RECOGNITION" : "DATA_CAPTURE"
   );
@@ -52,12 +53,17 @@ const Configure = (props) => {
 
   const [configuring, setIsConfiguring] = React.useState(false);
 
-  let [deviceDisabled, setDeviceDisabled] = useState(false);
 
   const handleRadioChange = (event) => {
     console.log("handle radio");
     setSource(event.target.value);
   };
+
+  const handleDeviceBaudRate = (event) => {
+    console.log("handle radio");
+    props.setBaudRate(event.target.value);
+  };
+
 
   const handleModeChange = (event) => {
     console.log("handle mode");
@@ -86,18 +92,28 @@ const Configure = (props) => {
     }
     console.log(source);
     console.log(deviceID);
+    let data = {
+      device_id: deviceID,
+      source: source.toLowerCase(),
+      mode: mode,
+    }
+    if (source === 'SERIAL') {
+      data.baudRate = props.baudRate
+    }
     axios
-      .post(`${process.env.REACT_APP_API_URL}config`, {
-        device_id: deviceID,
-        source: source.toLowerCase(),
-        mode: mode,
-      })
+      .post(`${process.env.REACT_APP_API_URL}config`, data)
       .then((response) => {
         mapdata(response.data);
-        setHelperText("Gateway Connected to device, now ready to stream.");
+        if (response.data.streaming == false) {
+          setHelperText("Error starting device, check the logs in the terminal for details for additional details");
+        }
+        else {
+          setHelperText("Device Connected");
+        }
         setIsConfiguring(false);
       })
       .catch(function (error) {
+        debugger;
         setIsConfiguring(false);
         if (error.response) {
           setHelperText(error.response.data.detail.join(", "));
@@ -110,16 +126,15 @@ const Configure = (props) => {
         } else {
           // Something happened in setting up the request that triggered an Error
           console.log("Error", error.detail);
+          setHelperText(error.response.data.detail.join(", "));
         }
       });
   };
 
   const handleDisconnectRequest = (event) => {
-    setDeviceDisabled(true);
     axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
       console.log(res.data);
       mapdata(res.data);
-      setDeviceDisabled(false);
     });
   };
 
@@ -133,6 +148,7 @@ const Configure = (props) => {
     props.setStreamingSource(data.source);
     props.setDeviceID(data.device_id);
     props.setIsCameraConnected(data.camera_on);
+    props.setBaudRate(data.baud_rate);
     data.column_location =
       "column_location" in data
         ? Object.keys(data.column_location).sort().join(", ")
@@ -268,6 +284,22 @@ const Configure = (props) => {
                       />
                     </div>
 
+                    <div className={classes.section1}></div>
+
+                    {source === 'SERIAL' ?
+                      <div>
+                        <FormLabel component="legend">Baud Rate:</FormLabel>
+                        <TextField
+                          id="outlined-basic"
+                          variant="outlined"
+                          value={props.baudRate}
+                          onChange={handleDeviceBaudRate}
+                          fullWidth={true}
+                        />
+                      </div>
+                      : <div />}
+
+
 
                     <div className={classes.section1}></div>
                     <div>
@@ -287,6 +319,8 @@ const Configure = (props) => {
                         </Grid>
                       </Grid>
                     </div>
+                    <div className={classes.section1}></div>
+                    <Typography> {helperText}</Typography>
                   </FormControl>
                 </form>
               </React.Fragment>
@@ -304,7 +338,7 @@ const Configure = (props) => {
           </CardContent>
         </Card>
       </Grid>
-    </Grid>
+    </Grid >
   );
 };
 

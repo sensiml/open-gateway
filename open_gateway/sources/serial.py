@@ -20,10 +20,11 @@ class SerialReader(BaseReader):
     name = "SERIAL"
 
     def __init__(self, config, device_id, **kwargs):
-        self._port = device_id
-        self._baud_rate = config.get("BAUD_RATE", BAUD_RATE)
 
         super(SerialReader, self).__init__(config, device_id, **kwargs)
+        self._port = device_id
+        self._baud_rate = config.get("BAUD_RATE", BAUD_RATE)
+        print("BAUD rate set to", self._baud_rate)
 
     @property
     def port(self):
@@ -31,7 +32,7 @@ class SerialReader(BaseReader):
 
     @property
     def baud_rate(self):
-        return BAUD_RATE
+        return self._baud_rate
 
     def _write(self, command):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
