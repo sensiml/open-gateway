@@ -26,7 +26,7 @@ VIAddVersionKey LegalCopyright   "2021 ${APP_PUBLISHER}"
 VIAddVersionKey FileDescription  "Installer for SensiML Open Gateway"
 VIAddVersionKey FileVersion      1
 VIAddVersionKey ProductVersion   1
-VIAddVersionKey InternalName     "dcl"
+VIAddVersionKey InternalName     "ogw"
 
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_TEXT "Start Open Gateway"
