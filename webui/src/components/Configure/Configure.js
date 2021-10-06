@@ -98,7 +98,7 @@ const Configure = (props) => {
       mode: mode,
     }
     if (source === 'SERIAL') {
-      data.baudRate = props.baudRate
+      data.baud_rate = props.baudRate
     }
     axios
       .post(`${process.env.REACT_APP_API_URL}config`, data)
