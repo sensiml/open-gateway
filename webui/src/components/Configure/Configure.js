@@ -113,7 +113,6 @@ const Configure = (props) => {
         setIsConfiguring(false);
       })
       .catch(function (error) {
-        debugger;
         setIsConfiguring(false);
         if (error.response) {
           setHelperText(error.response.data.detail.join(", "));
