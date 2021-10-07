@@ -8,10 +8,12 @@ import { TestMode } from "../TestMode";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
-import { STOP_STREAM_SENSOR_SAGA, FETCH_CLASS_MAP_IMAGES } from "../../redux/actions/actionTypes";
+import { STOP_STREAM_SENSOR_SAGA, FETCH_CLASS_MAP_IMAGES, CHECK_CLOUD_VERSION } from "../../redux/actions/actionTypes";
 import axios from "axios";
 
-const Main = () => {
+
+const Main = (props) => {
+
   const dispatch = useDispatch();
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState('DATA_CAPTURE');
@@ -25,6 +27,9 @@ const Main = () => {
   const [config, setConfig] = React.useState({});
   const [firstLoad, setFirstLoad] = React.useState(null);
   const [dataType, setDataType] = React.useState('int16');
+  const [gWVersion] = props.gwVersion;
+
+
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { isStreamingSensor } = useSelector((state) => state.stream);
@@ -83,6 +88,13 @@ const Main = () => {
     [dispatch]
   );
 
+  const checkCloudVersion = useCallback(
+      data => dispatch({type: CHECK_CLOUD_VERSION }),
+      [dispatch],
+  );
+
+
+
   // before leave handler
   useEffect(() => {
     if (isStreamingSensor) {
@@ -117,17 +129,21 @@ const Main = () => {
     });
   }, []);
 
-
   const classes = useStyles();
+
   return (
     <div className={classes.root}>
       <CssBaseline />
       <Grid container direction="column" justify="center" alignItems="center">
-        <Header />
+        <Header
+          gWVersion={props.gwVersion}
+        />
         <NavBar
           onChange={handleChange}
           isConnected={isConnected}
           isCameraConnected={isCameraConnected}
+          cloudVersion={props.cloudVersion}
+          showUpdateLink={props.showUpdateButton}
         />
         <main className={classes.content}>
           {activeView === 0 ? (

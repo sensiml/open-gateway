@@ -10,6 +10,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
+    "http-proxy-middleware": "^2.0.1",
     "notistack": "^1.0.4",
     "plotly.js": "^1.58.4",
     "react": "^17.0.1",
@@ -46,5 +47,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "packageManager": "yarn@3.0.2"
 }

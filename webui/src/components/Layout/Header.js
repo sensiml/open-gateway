@@ -1,4 +1,5 @@
-import { AppBar, Toolbar, Typography } from "@material-ui/core";
+import { AppBar, Button, Toolbar, Typography, Divider } from "@material-ui/core";
+import { Update } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import * as React from "react";
 
@@ -20,6 +21,7 @@ const useStyles = () =>
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
     },
+
   }))();
 
 const navLinks = [
@@ -27,13 +29,16 @@ const navLinks = [
   { title: `contact`, path: `/contact` },
 ];
 
-const Header = () => {
+
+
+const Header = (props) => {
   const classes = useStyles();
+  console.log(props.showUpdateLink)
 
   return (
     <AppBar position="static" className={classes.appBar}>
       <Toolbar>
-        <Typography variant="h6">SensiML Gateway</Typography>
+        <Typography variant="h6">SensiML Gateway {props.gWVersion}</Typography>
       </Toolbar>
     </AppBar>
   );
