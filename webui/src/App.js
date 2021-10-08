@@ -19,7 +19,7 @@ initStreamSensorReader();
 
 
 const App = (props) => {
-    props.versionCheck.checkUpdate()
+    props.versionCheck.checkUpdate();
     return (
         <LightTheme>
             <Provider store={store}>
@@ -30,11 +30,7 @@ const App = (props) => {
                     }}
                     autoHideDuration={2000}
                 >
-                    <Main
-                        gwVersion={props.versionCheck.localVersion}
-                        cloudVersion={props.versionCheck.cloudVersion}
-                        showUpdateButton={props.versionCheck.updateAvailable}
-                    />
+                    <Main />
                 </SnackbarProvider>
             </Provider>
         </LightTheme>

@@ -31,14 +31,12 @@ const navLinks = [
 
 
 
-const Header = (props) => {
+const Header = () => {
   const classes = useStyles();
-  console.log(props.showUpdateLink)
-
   return (
     <AppBar position="static" className={classes.appBar}>
       <Toolbar>
-        <Typography variant="h6">SensiML Gateway {props.gWVersion}</Typography>
+        <Typography variant="h6">SensiML Gateway</Typography>
       </Toolbar>
     </AppBar>
   );

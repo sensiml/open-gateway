@@ -1,7 +1,8 @@
 import axios from "axios";
-import store from "../../redux/store";
 import {BaseStreamHttpError} from "../StreamReader";
-import {createProxyMiddleware} from "http-proxy-middleware";
+import store from "../../redux/store";
+import { useDispatch, connect } from "react-redux";
+import {UPDATE_AVAILABLE, UPDATE_CLOUD_VERSION, UPDATE_LOCAL_VERSION} from "../../redux/actions/actionTypes";
 
 export class VersionCheck {
     constructor(baseURL, cloudURL) {
@@ -10,6 +11,7 @@ export class VersionCheck {
         this.localVersion = "";
         this.cloudVersion = "";
         this.updateAvailable = false;
+
     }
 
     async checkUpdate() {
@@ -28,28 +30,25 @@ export class VersionCheck {
                 detail: localResponse.statusText,
             });
         }
-        this.localVersion = localResponse.data;
+        store.dispatch({type: UPDATE_LOCAL_VERSION, payload: localResponse.data});
 
         try {
             let url = `${this.cloudurl}version/?format=json`
             response = await axios.get(url, {
-                headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                crossdomain:true,
-                proxy: createProxyMiddleware({target: `${this.cloudurl}`, changeOrigin: true})
+                headers: {'Content-Type': 'application/json'},
             });
         } catch (error) {
             console.log(error);
-            this.cloudVersion = "";
             return;
         }
         if (response.statusText !== "OK") {
-            this.cloudVersion = "";
             return;
         }
-        var cloudjson = response.data;
-        if(cloudjson.SensiML_Open_Gateway_Windows) {
-            this.cloudVersion = cloudjson.SensiML_Open_Gateway_Windows;
+        let cloudResp = response.data;
+        if(cloudResp.SensiML_Open_Gateway_Windows) {
+            store.dispatch({type: UPDATE_CLOUD_VERSION, payload: cloudResp.SensiML_Open_Gateway_Windows});
+            store.dispatch({type: UPDATE_AVAILABLE, payload: (store.getState().localVersion < store.getState().cloudVersion)});
         }
-        this.updateAvailable = this.localVersion < this.cloudVersion;
+
     }
 }
