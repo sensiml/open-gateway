@@ -11,7 +11,6 @@ export class VersionCheck {
         this.localVersion = "";
         this.cloudVersion = "";
         this.updateAvailable = false;
-
     }
 
     async checkUpdate() {
@@ -30,6 +29,7 @@ export class VersionCheck {
                 detail: localResponse.statusText,
             });
         }
+        this.localVersion = localResponse.data
         store.dispatch({type: UPDATE_LOCAL_VERSION, payload: localResponse.data});
 
         try {
@@ -46,8 +46,9 @@ export class VersionCheck {
         }
         let cloudResp = response.data;
         if(cloudResp.SensiML_Open_Gateway_Windows) {
+            this.cloudVersion = cloudResp.SensiML_Open_Gateway_Windows;
             store.dispatch({type: UPDATE_CLOUD_VERSION, payload: cloudResp.SensiML_Open_Gateway_Windows});
-            store.dispatch({type: UPDATE_AVAILABLE, payload: (store.getState().localVersion < store.getState().cloudVersion)});
+            store.dispatch({type: UPDATE_AVAILABLE, payload: (this.localVersion < this.cloudVersion)});
         }
 
     }
