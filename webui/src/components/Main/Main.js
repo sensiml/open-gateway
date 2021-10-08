@@ -7,11 +7,13 @@ import { Configure } from "../Configure";
 import { TestMode } from "../TestMode";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { useSnackbar } from "notistack";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, } from "react-redux";
 import { STOP_STREAM_SENSOR_SAGA, FETCH_CLASS_MAP_IMAGES } from "../../redux/actions/actionTypes";
 import axios from "axios";
 
-const Main = () => {
+
+const Main = (props) => {
+
   const dispatch = useDispatch();
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState('DATA_CAPTURE');
@@ -117,8 +119,8 @@ const Main = () => {
     });
   }, []);
 
-
   const classes = useStyles();
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -128,6 +130,7 @@ const Main = () => {
           onChange={handleChange}
           isConnected={isConnected}
           isCameraConnected={isCameraConnected}
+
         />
         <main className={classes.content}>
           {activeView === 0 ? (

@@ -34,6 +34,7 @@ from open_gateway.errors import errors
 from open_gateway.video_sources import get_video_source, get_video_source_list
 import zipfile
 from open_gateway import basedir, ensure_folder_exists, config
+from open_gateway import __version__ as v
 from .services import ImageManager
 
 CLASS_MAP_IMG_FLD_NAME = "classmap_img"
@@ -206,6 +207,9 @@ def disconnect():
 
     return get_config()
 
+@app.route("/version")
+def version():
+    return v
 
 @app.route("/config-device", methods=["GET", "POST"])
 @app.route("/config", methods=["GET", "POST"])
@@ -654,7 +658,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
 -u --host (str) : select the host address for the gateway to launch on
 -p --port (int) : select the port address for the gateway to launch on
 -s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the class_map described in the model json file 
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the class_map described in the model json file
 -i --class_map_images_json_path (str): set a path of json file with images for the class_map, the recognition mode will use them to represent events result
 -c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
 -f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float

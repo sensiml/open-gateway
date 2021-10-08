@@ -5,7 +5,7 @@ import {
 } from "../../actions/actionTypes";
 
 const initialState = {
-  sensorSimpleData: new Int16Array(),
+  localVersion: new Int16Array(),
   sensorRecordedData: new Int16Array(),
 };
 

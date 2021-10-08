@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@material-ui/core";
+import { Button, Grid, Link, Typography } from "@material-ui/core";
 import { green, grey } from '@material-ui/core/colors';
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
@@ -13,6 +13,9 @@ import HomeIcon from "@material-ui/icons/Home";
 import React from "react";
 import Divider from "@material-ui/core/Divider";
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import { Update } from "@material-ui/icons";
+import { connect } from "react-redux";
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -40,6 +43,14 @@ const useStyles = makeStyles((theme) => ({
   section1: {
     margin: theme.spacing(2, 1),
   },
+  update_available_button: {
+    color: 'primary',
+    borderColor: 'primary',
+    variant: 'outlined',
+  },
+  no_update_available_button: {
+    visibility: `hidden`
+  },
 }));
 
 const InconSelector = (props) => {
@@ -57,22 +68,40 @@ const Connected = (props) => {
   return (
     <Grid>
       {props.isConnected ? (
-        <Typography> <FiberManualRecordIcon style={{ fontSize: 16, color: green[500] }}></FiberManualRecordIcon> Connected  </Typography>
+        <Typography> <FiberManualRecordIcon
+          style={{ fontSize: 16, color: green[500] }}></FiberManualRecordIcon> Connected </Typography>
 
       ) : (
-        <Typography> <FiberManualRecordIcon style={{ fontSize: 16, color: grey[500] }}> </FiberManualRecordIcon>  Not Connected </Typography>
+        <Typography> <FiberManualRecordIcon
+          style={{ fontSize: 16, color: grey[500] }}> </FiberManualRecordIcon> Not Connected </Typography>
       )}
     </Grid>
   );
 };
 
+const localprops = {
+  localVersion: "",
+  cloudVersion: "",
+  updateAvailable: false,
+};
+
+const mapStateToProps = (state) => ({
+  localVersion: state.versionData.localVersion,
+  cloudVersion: state.versionData.cloudVersion,
+  updateAvailable: state.versionData.updateAvailable,
+});
+
+function updateClicked() {
+  window.open('https://github.com/sensiml/open-gateway/releases', '_blank');
+}
+
 const NavBar = (props) => {
   const classes = useStyles();
+  console.log(props);
 
   const handleMenu = (viewId) => (event) => {
     props.onChange(viewId);
   };
-
   return (
     <Drawer
       className={classes.drawer}
@@ -113,10 +142,22 @@ const NavBar = (props) => {
               isConnected={props.isCameraConnected}
             ></Connected>
           </ListItem>
+          <ListItem>
+            <Typography color='primary'>Version</Typography>
+          </ListItem>
+          <ListItem>
+            <Typography color='black'>{props.localVersion}</Typography>
+          </ListItem>
+          <ListItem><Button
+            aria-multiline={true} startIcon={<Update />} onClick={updateClicked}
+            className={props.updateAvailable ? classes.update_available_button : classes.no_update_available_button}>Update
+            Available: {props.cloudVersion}</Button>
+          </ListItem>
         </List>
+
       </div>
     </Drawer>
   );
 };
-
-export default NavBar;
+const nb = connect(mapStateToProps)(NavBar)
+export default nb;
