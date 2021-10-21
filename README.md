@@ -78,11 +78,16 @@ Useful configuration commands when launching the open-gateway
 ```bash
 python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -i  <classmap-images-json-file>
 
--u --host : select the host address for the gateway to launch on
--p --port : select the port address for the gateway to launch on
--s --sml_library_path: set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
--i --classmap_images_json_path (str): set a path of json file with the images for classmap, the recognition mode will use them to represent events result
--m --model_json_path: set to the path of them model.json from the knowledgepack and this will use the classmap described in the model json file
+-u --host (str) : select the host address for the gateway to launch on
+-p --port (int) : select the port address for the gateway to launch on
+-s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
+-m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the class_map described in the model json file
+-i --class_map_images_json_path (str): set a path of json file with images for the class_map, the recognition mode will use them to represent events result
+-c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
+-f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
+-z --hide_ui (int): do not luanch the UI interface when starting the application
+-b --baud (int): set the serial baud rate
+
 ```
 
 ### Configuring the Model Class Map
