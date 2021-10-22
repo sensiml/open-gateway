@@ -406,12 +406,14 @@ class BaseResultReaderMixin(object):
                             result = json.loads(result)
                         except Exception as e:
                             print("ResultReader: Failed to read result as a json.")
+                            print(result)
                             print(e)
                             continue
                         try:
                             result = self._map_classification(result)
                         except Exception as e:
                             print("ResultReader: Failed map the classification.")
+                            print(result)
                             print(e)
                             continue
                         result["timestap"] = time.time()
