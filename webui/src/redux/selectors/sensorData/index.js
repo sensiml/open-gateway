@@ -17,13 +17,13 @@ export const sensorDataForChart = (column, calibration) => (state) => {
 
   // fill result array
   let sum = 0;
-  let conversion = 0.05850 * .1; //  calculated_slope * kg conversion
+  const conversion = 0.05850 * .1; //  calculated_slope * kg conversion
   sensorSimpleData.forEach((el, i) => {
 
     let index = i % (column.length - 1);
 
     result[index].x.push(Math.floor(i / (column.length - 1)));
-    result[index].y.push((el - calibration[index]) * conversion);
+    result[index].y.push(el - calibration[index]);
 
     if (index == column.length - 2) {
       sum += el - calibration[calibration.length - 1];

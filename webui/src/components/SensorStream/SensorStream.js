@@ -128,7 +128,7 @@ const SensorStream = (props) => {
             <Box className={!isStreamingSensor && classes.zeroOpacity}>
 
               <Switch
-                checked={!isSplitCharts}
+                checked={isSplitCharts}
                 onChange={() => switchSplitChart()}
                 inputProps={{ "aria-label": "secondary checkbox" }}
               />Show Individual Sensors
