@@ -1,6 +1,7 @@
 {
   "files": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "main.css": "/static/css/main.a617e044.chunk.css",
     "main.js": "/static/js/main.c9371607.chunk.js",
     "main.js.map": "/static/js/main.c9371607.chunk.js.map",
@@ -12,16 +13,25 @@
     "main.css": "/static/css/main.8c8b27cf.chunk.css",
     "main.js": "/static/js/main.54c3f285.chunk.js",
     "main.js.map": "/static/js/main.54c3f285.chunk.js.map",
+=======
+    "main.css": "/static/css/main.8c8b27cf.chunk.css",
+    "main.js": "/static/js/main.d68dd6ba.chunk.js",
+    "main.js.map": "/static/js/main.d68dd6ba.chunk.js.map",
+>>>>>>> bf1e6bf... updating chart to use as a scale
     "runtime-main.js": "/static/js/runtime-main.d434e6d3.js",
     "runtime-main.js.map": "/static/js/runtime-main.d434e6d3.js.map",
     "static/js/2.80d060a4.chunk.js": "/static/js/2.80d060a4.chunk.js",
     "static/js/2.80d060a4.chunk.js.map": "/static/js/2.80d060a4.chunk.js.map",
+<<<<<<< HEAD
 >>>>>>> 602ef66... updating chart to use as a scale
+=======
+>>>>>>> bf1e6bf... updating chart to use as a scale
     "index.html": "/index.html",
     "static/css/main.8c8b27cf.chunk.css.map": "/static/css/main.8c8b27cf.chunk.css.map",
     "static/js/2.80d060a4.chunk.js.LICENSE.txt": "/static/js/2.80d060a4.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
+<<<<<<< HEAD
 <<<<<<< HEAD
     "static/js/runtime-main.2084749a.js",
     "static/js/2.85b044da.chunk.js",
@@ -37,5 +47,11 @@
 =======
     "static/js/main.54c3f285.chunk.js"
 >>>>>>> ef06ab9... fix small issue with cchart
+=======
+    "static/js/runtime-main.d434e6d3.js",
+    "static/js/2.80d060a4.chunk.js",
+    "static/css/main.8c8b27cf.chunk.css",
+    "static/js/main.d68dd6ba.chunk.js"
+>>>>>>> bf1e6bf... updating chart to use as a scale
   ]
 }
