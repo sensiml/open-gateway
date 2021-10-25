@@ -139,13 +139,13 @@ class SerialResultReader(SerialReader, BaseResultReaderMixin):
 
                 try:
                     value = ser.readline()
-                    data = value.decode("ascii")
+                    data = [value.decode("ascii")]
                 except Exception as e:
                     print(e,)
                     print("read value", value)
                     continue
 
-                self.rbuffer.update_buffer([data])
+                self.rbuffer.update_buffer(data)
 
 
 if __name__ == "__main__":
