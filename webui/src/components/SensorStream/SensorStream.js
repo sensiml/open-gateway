@@ -126,14 +126,21 @@ const SensorStream = (props) => {
         <Box className={classes.dataWrapper}>
           <Box className={classes.chartWrapper}>
             <Box className={!isStreamingSensor && classes.zeroOpacity}>
+
               <Switch
-                checked={!isSplitCharts}
+                checked={isSplitCharts}
                 onChange={() => switchSplitChart()}
                 inputProps={{ "aria-label": "secondary checkbox" }}
               />Show Individual Sensors
 
             </Box>
-            {sensorData && sensorData.length && isSplitCharts ? (
+            <SensorDataChart
+              title={sensorData[sensorData.length - 1].name}
+              countSamples={COUNT_SAMPLES}
+              sensorData={[sensorData[sensorData.length - 1]]}
+              isStreamingSensor={isStreamingSensor}
+            />
+            {sensorData && sensorData.length && !isSplitCharts ? (
               <div></div>
             ) : (
               <SensorDataChart
@@ -142,12 +149,7 @@ const SensorStream = (props) => {
                 isStreamingSensor={isStreamingSensor}
               />
             )}
-            <SensorDataChart
-              title={sensorData[sensorData.length - 1].name}
-              countSamples={COUNT_SAMPLES}
-              sensorData={[sensorData[sensorData.length - 1]]}
-              isStreamingSensor={isStreamingSensor}
-            />
+
           </Box>
           <Box className={classes.buttonWrapper}>
             <Button
