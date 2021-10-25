@@ -143,6 +143,7 @@ class SerialResultReader(SerialReader, BaseResultReaderMixin):
                 except Exception as e:
                     print(e,)
                     print("read value", value)
+                    continue
 
                 self.rbuffer.update_buffer([data])
 
