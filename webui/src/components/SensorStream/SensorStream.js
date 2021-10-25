@@ -53,7 +53,8 @@ const SensorStream = (props) => {
   const { isStreamingSensor, isStreamingSensorRecording } = useSelector(
     (state) => state.stream
   );
-  const sensorData = useSelector(sensorDataForChart(columns));
+  const [calibration, setCalibration] = useState(Array(columns.length).fill(0));
+  const sensorData = useSelector(sensorDataForChart(columns, calibration));
 
   const startSensorStreaming = useCallback(
     // max array is COUNT_SAMPLES * count of data types
@@ -67,6 +68,14 @@ const SensorStream = (props) => {
       }),
     [dispatch]
   );
+
+  const calculateCalibration = () => {
+    let c = sensorData.map((data) => data.y.reduce((a, b) => (a + b)) / data.y.length);
+    c[c.length - 1] = c.slice(0, c.length - 1).reduce((a, b) => (a + b))
+    setCalibration(c);
+    console.log(calibration);
+  };
+
 
   const stopSensorStreaming = useCallback(
     () => dispatch({ type: STOP_STREAM_SENSOR_SAGA }),
@@ -88,7 +97,15 @@ const SensorStream = (props) => {
       stopSensorStreaming();
     } else {
       setClearStream();
+      setCalibration(Array(columns.length).fill(0));
       startSensorStreaming();
+    }
+  };
+
+  const calibrateWeight = () => {
+    console.log("calibrate", isStreamingSensor);
+    if (isStreamingSensor) {
+      calculateCalibration();
     }
   };
 
@@ -110,21 +127,14 @@ const SensorStream = (props) => {
           <Box className={classes.chartWrapper}>
             <Box className={!isStreamingSensor && classes.zeroOpacity}>
               <Switch
-                checked={isSplitCharts}
+                checked={!isSplitCharts}
                 onChange={() => switchSplitChart()}
                 inputProps={{ "aria-label": "secondary checkbox" }}
-              />{" "}
-              Split charts
+              />Show Individual Sensors
+
             </Box>
             {sensorData && sensorData.length && isSplitCharts ? (
-              sensorData.map((data) => (
-                <SensorDataChart
-                  title={data.name}
-                  countSamples={COUNT_SAMPLES}
-                  sensorData={[data]}
-                  isStreamingSensor={isStreamingSensor}
-                />
-              ))
+              <div></div>
             ) : (
               <SensorDataChart
                 countSamples={COUNT_SAMPLES}
@@ -132,6 +142,12 @@ const SensorStream = (props) => {
                 isStreamingSensor={isStreamingSensor}
               />
             )}
+            <SensorDataChart
+              title={sensorData[sensorData.length - 1].name}
+              countSamples={COUNT_SAMPLES}
+              sensorData={[sensorData[sensorData.length - 1]]}
+              isStreamingSensor={isStreamingSensor}
+            />
           </Box>
           <Box className={classes.buttonWrapper}>
             <Button
@@ -142,10 +158,19 @@ const SensorStream = (props) => {
             >
               {isStreamingSensor ? "Stop" : "View"}
             </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              onClick={() => calibrateWeight()}
+              disabled={!isStreamingSensor}
+            >
+              Zero Scale
+            </Button>
           </Box>
         </Box>
       </CardContent>
-    </Card>
+    </Card >
   );
 };
 
