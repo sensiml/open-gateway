@@ -134,8 +134,18 @@ class SerialResultReader(SerialReader, BaseResultReaderMixin):
 
         self.streaming = True
         while self.streaming:
-            data = self._read_line()
-            self.rbuffer.update_buffer([data])
+
+            with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
+
+                try:
+                    value = ser.readline()
+                    data = [value.decode("ascii")]
+                except Exception as e:
+                    print(e,)
+                    print("read value", value)
+                    continue
+
+                self.rbuffer.update_buffer(data)
 
 
 if __name__ == "__main__":
