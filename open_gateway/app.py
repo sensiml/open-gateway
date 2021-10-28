@@ -575,7 +575,7 @@ def download_filename(filename):
 
     return send_from_directory(
         directory=os.path.join(basedir, "cache"),
-        # path="{}.zip".format(filename),
+        path="{}.zip".format(filename),
         filename="{}.zip".format(filename),
         mimetype="application/zip",
         as_attachment=True,
@@ -606,7 +606,7 @@ def download():
 
     return send_from_directory(
         directory=os.path.join(basedir, "cache"),
-        # path="data.zip",
+        path="data.zip",
         filename="data.zip",
         mimetype="application/zip",
         as_attachment=True,

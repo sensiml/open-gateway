@@ -24,7 +24,8 @@ class TestReader(BaseReader):
                 "device_id": "Test IMU 6-axis Float",
             },
             {"id": 4, "name": "Test Acc", "device_id": "Test IMU 3-axis"},
-            {"id": 5, "name": " Test IMU 9-axis", "device_id": "Test IMU 9-axis float"},
+            {"id": 5, "name": "Test IMU 9-axis", "device_id": "Test IMU 9-axis float"},
+            {"id": 6, "name": "Test Weight Scale", "device_id": "Test Weight Scale"}
         ]
 
 
@@ -63,6 +64,8 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
                 )
 
         return bytes(sample_data), len(x)
+
+        
 
     def _pack_data(self, data, data_len, num_columns, samples_per_packet, start_index):
 
@@ -210,6 +213,18 @@ def get_test_device_configs(device_id):
             "Z": 8,
         }
         config["sample_rate"] = 119
+        config["samples_per_packet"] = 6
+        config["data_type"] = "float"
+
+
+    elif device_id == "Test Weight Scale":
+        config["column_location"] = {
+            "Left Front Load Cell": 0,
+            "Right Front Load Cell": 1,
+            "Right Rear Load Cell": 2,
+            "Left Rear Load Cell": 3,
+        }
+        config["sample_rate"] = 100
         config["samples_per_packet"] = 6
         config["data_type"] = "float"
 
