@@ -1,6 +1,6 @@
 setup(
     name="open-gateway",
-    version="2021.10.21",
+    version="2021.12.23",
     description="SensiML Open Gateway allows connection to IoT devices for streaming/recording sensor data and video.",
     long_description="README.md",
     long_description_content_type="text/markdown",
