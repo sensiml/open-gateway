@@ -101,8 +101,8 @@ export default function AlertDialog(props) {
             <DataGrid
               rows={deviceRows}
               columns={deviceColumns}
-              onRowSelected={props.handleRowSelection}
-              pageSize={10}
+              onRowClick={props.handleRowSelection}
+
             />
           </div>
         </DialogContent>

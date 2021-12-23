@@ -78,8 +78,8 @@ const Configure = (props) => {
   };
 
   const handleRowSelection = (event) => {
-    console.log(event.data.device_id);
-    setDeviceID(event.data.device_id);
+    console.log(event.row.device_id);
+    setDeviceID(event.row.device_id);
   };
 
   const handleSubmit = (event) => {
@@ -104,7 +104,7 @@ const Configure = (props) => {
       .post(`${process.env.REACT_APP_API_URL}config`, data)
       .then((response) => {
         mapdata(response.data);
-        if (response.data.streaming == false) {
+        if (response.data.streaming === false) {
           setHelperText("Error starting device, check the logs in the terminal for details for additional details");
         }
         else {
