@@ -15,26 +15,35 @@ export const sensorDataForChart = (column, calibration) => (state) => {
     };
   });
 
+
+
+
   // fill result array
   let sum = 0;
-  const conversion = 0.05850 * .1; //  calculated_slope * kg conversion
+  const conversion = [0.005473429951690822, // LoadCel_LF
+                        0.00551487290427258, //'LoadCel_LR':'
+                        0.005473429951690822, //'LoadCel_RR':
+                      0.0054911147011308566, //'LoadCel_RF':
+                  ];
+
+                      //  calculated_slope * kg
   sensorSimpleData.forEach((el, i) => {
 
     let index = i % (column.length - 1);
+    const weight_index=column.length-1
+    let array_index=Math.floor(i / (column.length - 1));
+    let val =(el - calibration[index])*conversion[index];
 
-    result[index].x.push(Math.floor(i / (column.length - 1)));
-    result[index].y.push(el - calibration[index]);
+    result[index].x.push(array_index);
+    result[index].y.push(val);
 
-    if (index == column.length - 2) {
-      sum += el - calibration[calibration.length - 1];
-      sum *= conversion;
-      result[column.length - 1].x.push(Math.floor(i / (column.length - 1)));
-      result[column.length - 1].y.push(parseInt(sum));
+    sum += val;
+
+    if (index === column.length - 2) {
+      result[weight_index].x.push(array_index);
+      result[weight_index].y.push(parseInt(sum));
       sum = 0;
       //debugger;
-    }
-    else {
-      sum += el;
     }
 
   });

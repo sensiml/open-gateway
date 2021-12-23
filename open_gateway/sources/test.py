@@ -65,7 +65,7 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
 
         return bytes(sample_data), len(x)
 
-        
+
 
     def _pack_data(self, data, data_len, num_columns, samples_per_packet, start_index):
 
@@ -215,6 +215,7 @@ def get_test_device_configs(device_id):
         config["sample_rate"] = 119
         config["samples_per_packet"] = 6
         config["data_type"] = "float"
+
 
 
     elif device_id == "Test Weight Scale":
