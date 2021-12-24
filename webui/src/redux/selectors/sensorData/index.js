@@ -27,17 +27,23 @@ export const sensorDataForChart = (column, calibration) => (state) => {
                   ];
 
                       //  calculated_slope * kg
+
+  let callibrations = [1,100,200,300,-1];
+  let val = 0
+  let index =0
+  const weight_index=column.length-1
+  let array_index=0
+
   sensorSimpleData.forEach((el, i) => {
 
-    let index = i % (column.length - 1);
-    const weight_index=column.length-1
-    let array_index=Math.floor(i / (column.length - 1));
-    let val =(el - calibration[index])*conversion[index];
 
+    index = i % (column.length - 1);
+
+    array_index=Math.floor(i / (column.length - 1));
+    val=(el - callibrations[index])*conversion[index];
+    sum += val;
     result[index].x.push(array_index);
     result[index].y.push(val);
-
-    sum += val;
 
     if (index === column.length - 2) {
       result[weight_index].x.push(array_index);
