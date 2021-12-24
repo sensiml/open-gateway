@@ -72,8 +72,8 @@ const SensorStream = (props) => {
   const calculateCalibration = () => {
     let c = sensorData.map((data) => data.y.reduce((a, b) => (a + b)) / data.y.length);
     c[c.length - 1] = c.slice(0, c.length - 1).reduce((a, b) => (a + b))
+    console.log(c)
     setCalibration(c);
-    console.log(calibration);
   };
 
 
