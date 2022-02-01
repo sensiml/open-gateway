@@ -207,9 +207,11 @@ def disconnect():
 
     return get_config()
 
+
 @app.route("/version")
 def version():
     return v
+
 
 @app.route("/config-device", methods=["GET", "POST"])
 @app.route("/config", methods=["GET", "POST"])
@@ -279,6 +281,18 @@ def scan_video():
     return Response(
         dumps({"video_sources": video_source_list}), mimetype="application/json"
     )
+
+
+@app.route("/config-model-json", methods=["POST"])
+def config_model_json():
+    """Post a model JSON to use when showing classification results"""
+
+    app.config["MODEL_JSON"] = request.json
+
+    if app.config["DEVICE_SOURCE"]:
+        app.config["DEVICE_SOURCE"].model_json = app.config["MODEL_JSON"]
+
+    return Response(dumps( app.config["MODEL_JSON"]), mimetype="application/json")
 
 
 @app.route("/config-video", methods=["GET", "POST"])
@@ -645,7 +659,7 @@ def class_map_images():
 
 
 def exit_with_delay(delay=3, status_code=1):
-    """controled exit from the app """
+    """controled exit from the app"""
     time.sleep(delay)
     sys.exit(status_code)
 
