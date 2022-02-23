@@ -3,7 +3,6 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Switch,
   Typography,
 } from "@material-ui/core";
@@ -15,10 +14,7 @@ import {
   START_STREAM_SENSOR_SAGA,
   STOP_STREAM_SENSOR_SAGA,
 } from "../../redux/actions/actionTypes";
-import {
-  sensorDataForChart,
-  sensorRecordedDataToCsv,
-} from "../../redux/selectors/sensorData";
+import { sensorDataForChart } from "../../redux/selectors/sensorData";
 import SensorDataChart from "./SensorDataChart";
 
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +58,7 @@ const SensorStream = (props) => {
         type: START_STREAM_SENSOR_SAGA,
         payload: {
           countSamples: COUNT_SAMPLES * ((columns && columns?.length) || 1),
-          dataType: props.dataType
+          dataType: props.dataType,
         },
       }),
     [dispatch]
@@ -97,7 +93,6 @@ const SensorStream = (props) => {
       stopSensorStreaming();
       setClearStream();
     }
-
   }, []);
 
   return (
@@ -120,14 +115,12 @@ const SensorStream = (props) => {
               sensorData.map((data) => (
                 <SensorDataChart
                   title={data.name}
-                  countSamples={COUNT_SAMPLES}
                   sensorData={[data]}
                   isStreamingSensor={isStreamingSensor}
                 />
               ))
             ) : (
               <SensorDataChart
-                countSamples={COUNT_SAMPLES}
                 sensorData={sensorData}
                 isStreamingSensor={isStreamingSensor}
               />

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 
 const SensorDataChart = (props) => {
-  const { sensorData, countSamples, title } = props;
+  const { sensorData, title } = props;
   const [revision, setRevision] = useState(0);
-  const [opacity, setOpacity] = useState("1");
+  let opacity = "1";
 
   useEffect(() => {
     setRevision(revision + 1);
@@ -12,6 +12,7 @@ const SensorDataChart = (props) => {
       if (sensorData[0].x && sensorData[0].x.length) {
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sensorData]);
 
   return (

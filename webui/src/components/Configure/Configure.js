@@ -53,7 +53,6 @@ const Configure = (props) => {
 
   const [configuring, setIsConfiguring] = React.useState(false);
 
-
   const handleRadioChange = (event) => {
     console.log("handle radio");
     setSource(event.target.value);
@@ -63,7 +62,6 @@ const Configure = (props) => {
     console.log("handle radio");
     props.setBaudRate(event.target.value);
   };
-
 
   const handleModeChange = (event) => {
     console.log("handle mode");
@@ -96,18 +94,19 @@ const Configure = (props) => {
       device_id: deviceID,
       source: source.toLowerCase(),
       mode: mode,
-    }
-    if (source === 'SERIAL') {
-      data.baud_rate = props.baudRate
+    };
+    if (source === "SERIAL") {
+      data.baud_rate = props.baudRate;
     }
     axios
       .post(`${process.env.REACT_APP_API_URL}config`, data)
       .then((response) => {
         mapdata(response.data);
         if (response.data.streaming === false) {
-          setHelperText("Error starting device, check the logs in the terminal for details for additional details");
-        }
-        else {
+          setHelperText(
+            "Error starting device, check the logs in the terminal for details for additional details"
+          );
+        } else {
           setHelperText("Device Connected");
         }
         setIsConfiguring(false);
@@ -137,7 +136,6 @@ const Configure = (props) => {
     });
   };
 
-
   function mapdata(data) {
     if (data.mode) {
       props.setStreamingMode(data.mode);
@@ -156,12 +154,11 @@ const Configure = (props) => {
     props.setConfig(data);
   }
 
-
   useEffect(() => {
     setDeviceID(props.deviceID);
     setSource(props.streamingSource);
     setMode(props.streamingMode.toUpperCase());
-  }, [props.deviceID, props.streamingMode])
+  }, [props.deviceID, props.streamingMode]);
 
   return (
     <Grid container columns>
@@ -285,7 +282,7 @@ const Configure = (props) => {
 
                     <div className={classes.section1}></div>
 
-                    {source === 'SERIAL' ?
+                    {source === "SERIAL" ? (
                       <div>
                         <FormLabel component="legend">Baud Rate:</FormLabel>
                         <TextField
@@ -296,14 +293,13 @@ const Configure = (props) => {
                           fullWidth={true}
                         />
                       </div>
-                      : <div />}
-
-
+                    ) : (
+                      <div />
+                    )}
 
                     <div className={classes.section1}></div>
                     <div>
                       <Grid container columns spacing={2}>
-
                         <Grid item xs={12}>
                           <Button
                             type="submit"
@@ -337,7 +333,7 @@ const Configure = (props) => {
           </CardContent>
         </Card>
       </Grid>
-    </Grid >
+    </Grid>
   );
 };
 

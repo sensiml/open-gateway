@@ -41,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Record = (props) => {
   const classes = useStyles();
-  const theme = useTheme();
   const [recording, setRecording] = React.useState(props.isRecording);
   const [filename, setFilename] = React.useState("filename");
   const [recordDistabled, setRecordDistabled] = React.useState(false);

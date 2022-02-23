@@ -1,6 +1,6 @@
 flask
 flask-wtf
-wtforms
+wtforms>=2.3.3
 flask-cors
 pyserial>=2.6
 opencv-python
