@@ -1,33 +1,9 @@
-import { CardContent, Grid, Typography } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import Card from "@material-ui/core/Card";
+import { Grid } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { SimpleCard } from "../SimpleCard";
-import Divider from "@material-ui/core/Divider";
-
-const useStyles = makeStyles((theme) => ({
-  details: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  content: {
-    flex: "1 0 auto",
-  },
-  controls: {
-    display: "flex",
-    alignItems: "center",
-  },
-  section1: {
-    margin: theme.spacing(2, 0, 2, 0),
-  },
-}));
 
 const Status = (props) => {
-  const classes = useStyles();
-  const theme = useTheme();
-
   return (
     <Grid container rows spacing={4}>
       <Grid item xs={12} container rows spacing={2}>

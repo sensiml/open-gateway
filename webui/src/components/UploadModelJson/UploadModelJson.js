@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Paper, Button, Typography } from "@material-ui/core";
+import { Box, Button, Typography } from "@material-ui/core";
 import axios from "axios";
 
 const UploadModelJson = (props) => {

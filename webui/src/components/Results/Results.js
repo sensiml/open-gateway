@@ -75,7 +75,8 @@ const handleStreamRequest = (
               return;
             }
             var results = bin2String(value);
-            for (var i = 0; i < results.length; i++) {
+
+            for (let i = 0; i < results.length; i++) {
               console.log(results[i]);
               results[i].id = id_counter;
               id_counter += 1;
@@ -114,7 +115,6 @@ const Results = (props) => {
   const [filterLength, setfilterLength] = React.useState(1);
 
   const classes = useStyles();
-  const theme = useTheme();
 
   const handleFilterLengthSliderChange = (event, newValue) => {
     setfilterLength(newValue);
