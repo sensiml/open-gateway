@@ -65,7 +65,7 @@ def list_cameras_windows():
             "-Status",
             "OK",
             "-FriendlyName",
-            "*webcam*",
+            "*webcam*,*camera*",
             "-Class",
             "camera,image",
         ],
