@@ -416,7 +416,7 @@ class BaseResultReaderMixin(object):
                             print(result)
                             print(e)
                             continue
-                        result["timestap"] = time.time()
+                        result["timestamp"] = time.time()
                         print(result)
                         yield json.dumps(result) + "\n"
 
