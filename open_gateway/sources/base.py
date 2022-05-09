@@ -118,12 +118,16 @@ class BaseReader(object):
 
     @staticmethod
     def _validate_results_data(data):
-        try:
-            tmp = json.loads(data)
-            if isinstance(tmp, dict) and tmp:
-                return True
-        except Exception as e:
-            print(e)
+        if not data:
+            return False
+        else:
+            try:
+                tmp = json.loads(data)
+                if isinstance(tmp, dict) and tmp:
+                    return True
+
+            except Exception as e:
+                print(e)
 
         return False
 
