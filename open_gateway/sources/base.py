@@ -377,7 +377,7 @@ class BaseResultReaderMixin(object):
         return {"samples_per_packet": 1}
 
     def read_data(self):
-        """ Genrator to read the result stream out of the buffer """
+        """ Generator to read the result stream out of the buffer """
 
         print("ResultReader: result read starting")
 
@@ -416,7 +416,7 @@ class BaseResultReaderMixin(object):
                             print(result)
                             print(e)
                             continue
-                        result["timestap"] = time.time()
+                        result["timestamp"] = time.time()
                         print(result)
                         yield json.dumps(result) + "\n"
 
