@@ -209,7 +209,7 @@ class BaseReader(object):
     def record_start(self, filename):
 
         if not self.streaming:
-            raise Exception("Must start streaming before begging to record!")
+            raise Exception("Must start streaming before beginning to record!")
 
         if self.recording:
             raise Exception("Only a single recording can occur at one time")
@@ -219,7 +219,7 @@ class BaseReader(object):
 
         if not os.path.exists(os.path.dirname(filename)):
             print(
-                "Base: File directory does not exist,  recording to data directory in gateway location."
+                "Base: File directory does not exist, recording to data directory in gateway location."
             )
             ensure_folder_exists("data")
 
@@ -309,7 +309,7 @@ class BaseStreamReaderMixin(object):
         if self._thread:
             pass
         else:
-            print("StreamReader: establishing a connectiong to the device.")
+            print("StreamReader: establishing a connection to the device.")
             self.connect()
             self.streaming = True
 
