@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import _ from "lodash";
 import { Button, Grid, Typography } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
@@ -8,7 +8,8 @@ import Slider from "@material-ui/core/Slider";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DataGrid } from "@material-ui/data-grid";
 import ResultsFilter from "./ResultsFilter";
-import { UploadModelJson } from "../UploadModelJson";
+import UploadModelJson from "./UploadModelJson";
+import UploadClassImagesJson from "./UploadClassImagesJson";
 
 var id_counter = 0;
 
@@ -102,10 +103,24 @@ function handleStopStreaming(event, reader, setIsStreaming) {
   setIsStreaming(false);
 }
 
+const useCleanup = (val) => {
+  const valRef = useRef(val);
+  useEffect(() => {
+    valRef.current = val;
+  }, [val]);
+
+  useEffect(() => {
+    return () => {
+      valRef.current.cancel();
+    };
+  }, []);
+};
+
 const Results = (props) => {
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [isStreaming, setIsStreaming] = React.useState(false);
   const [reader, setReader] = React.useState();
+
   let deviceColumns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "source", headerName: "Device ID", width: 240 },
@@ -121,8 +136,16 @@ const Results = (props) => {
   };
 
   useEffect(() => {
-    props.setLastValue(_.last(deviceRows));
-  }, [deviceRows]);
+    handleStreamRequest(
+      "clicked",
+      `${process.env.REACT_APP_API_URL}results`,
+      setDeviceRows,
+      setIsStreaming,
+      setReader
+    );
+  }, []);
+
+  useCleanup(reader);
 
   // props.setLastValue(newValue);
 
@@ -144,51 +167,6 @@ const Results = (props) => {
           <div className={classes.section1}>
             <Divider variant="middle" />
           </div>
-
-          <Grid item xs={12}>
-            {isStreaming ? (
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  fullWidth={true}
-                  onClick={() => {
-                    handleStopStreaming(
-                      "stopstreaming",
-                      reader,
-                      setIsStreaming
-                    );
-                  }}
-                >
-                  Stop Stream
-                </Button>
-              </div>
-            ) : (
-              <div className={classes.controls}>
-                <Button
-                  aria-label="disconnect"
-                  color="primary"
-                  variant="contained"
-                  fullWidth={true}
-                  onClick={() => {
-                    handleStreamRequest(
-                      "clicked",
-                      `${process.env.REACT_APP_API_URL}results`,
-                      setDeviceRows,
-                      setIsStreaming,
-                      setReader
-                    );
-                  }}
-                >
-                  Start Stream
-                </Button>
-              </div>
-            )}
-            <div>
-              <UploadModelJson />
-            </div>
-          </Grid>
         </div>
 
         <Grid item alignContent="center" xs={12}>
@@ -245,6 +223,47 @@ const Results = (props) => {
             />
           </div>
         </div>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            {isStreaming ? (
+              <Button
+                aria-label="disconnect"
+                color="primary"
+                variant="contained"
+                fullWidth={true}
+                onClick={() => {
+                  handleStopStreaming("stopstreaming", reader, setIsStreaming);
+                }}
+              >
+                Stop Stream
+              </Button>
+            ) : (
+              <Button
+                aria-label="disconnect"
+                color="primary"
+                variant="contained"
+                fullWidth={true}
+                onClick={() => {
+                  handleStreamRequest(
+                    "clicked",
+                    `${process.env.REACT_APP_API_URL}results`,
+                    setDeviceRows,
+                    setIsStreaming,
+                    setReader
+                  );
+                }}
+              >
+                Start Stream
+              </Button>
+            )}
+          </Grid>
+          <Grid item>
+            <UploadModelJson />
+          </Grid>
+          <Grid item>
+            <UploadClassImagesJson />
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   );

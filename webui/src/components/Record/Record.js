@@ -44,7 +44,6 @@ const Record = (props) => {
   const [recording, setRecording] = React.useState(props.isRecording);
   const [filename, setFilename] = React.useState("filename");
   const [recordDistabled, setRecordDistabled] = React.useState(false);
-  console.log("Connected Camera");
   console.log(props.isCameraConnected);
 
   const handleRecordRequest = (event, url, setRecording, filename) => {

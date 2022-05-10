@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, Typography } from "@material-ui/core";
 import axios from "axios";
 
-const UploadModelJson = (props) => {
+const UploadClassImagesJson = (props) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleFile = (event) => {
@@ -10,6 +10,7 @@ const UploadModelJson = (props) => {
     const reader = new FileReader();
 
     reader.readAsText(uploadedFile);
+    debugger;
 
     reader.onload = function () {
       console.log(reader.result);
@@ -17,13 +18,16 @@ const UploadModelJson = (props) => {
       try {
         json_data = JSON.parse(reader.result);
         axios
-          .post(`${process.env.REACT_APP_API_URL}config-model-json`, json_data)
+          .post(
+            `${process.env.REACT_APP_API_URL}config-class-map-images-json`,
+            json_data
+          )
           .then((response) => {
             console.log(response.data);
             setErrorMessage("");
           })
           .catch((error) => {
-            setErrorMessage(error);
+            setErrorMessage("upload failed");
             console.log(error);
           });
       } catch {}
@@ -36,7 +40,7 @@ const UploadModelJson = (props) => {
   return (
     <Box>
       <Button variant="contained" component="label">
-        Upload Model Json
+        Upload Class Images JSON
         <input type="file" hidden onChange={handleFile} />
       </Button>
       <Typography> {errorMessage}</Typography>
@@ -44,4 +48,4 @@ const UploadModelJson = (props) => {
   );
 };
 
-export default UploadModelJson;
+export default UploadClassImagesJson;

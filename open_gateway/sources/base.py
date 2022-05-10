@@ -1,7 +1,5 @@
 import json
-import copy
 import threading
-import array
 import struct
 import time
 import csv
@@ -9,7 +7,7 @@ import os
 import random
 from open_gateway.sources.utils.sml_runner import SMLRunner
 from open_gateway import basedir, ensure_folder_exists
-
+import random
 
 try:
     from open_gateway.sources.buffers import (
@@ -389,6 +387,8 @@ class BaseResultReaderMixin(object):
 
         index = self.rbuffer.get_latest_buffer()
 
+        rand = random.randint(0, 100)
+
         while self.streaming:
 
             if index is None:
@@ -399,6 +399,8 @@ class BaseResultReaderMixin(object):
             if self.rbuffer.is_buffer_full(index):
                 data = self.rbuffer.read_buffer(index)
                 index = self.rbuffer.get_next_index(index)
+
+                print(data)
 
                 for result in data:
                     if self._validate_results_data(result):
@@ -417,8 +419,9 @@ class BaseResultReaderMixin(object):
                             print(e)
                             continue
                         result["timestamp"] = time.time()
-                        print(result)
+                        print(index, rand, result)
                         yield json.dumps(result) + "\n"
+                        #$import pdb; pdb.set_trace()
 
             else:
                 time.sleep(0.1)

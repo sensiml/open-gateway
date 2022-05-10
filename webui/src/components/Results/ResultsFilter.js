@@ -1,11 +1,24 @@
 import { Typography } from "@material-ui/core";
-import React from "react";
+import React, { useEffect } from "react";
+
+function getDifferenceInSeconds(date1, date2) {
+  const diffInMs = Math.abs(date2 - date1);
+  return diffInMs / 1000;
+}
 
 const ResultsFilter = (props) => {
+  const now = new Date();
+  const [updateTime, setUpdateTime] = React.useState(now);
+  let [time, setTime] = React.useState(now);
+  const [isIdle, setIsIdle] = React.useState(false);
+
   function filterData(data, filter_length) {
+    const now = new Date();
     if (data.length === 0) {
       return "No Results";
     }
+
+    console.log(getDifferenceInSeconds(updateTime, now));
 
     if (filter_length > data.length) {
       filter_length = data.length - 1;
@@ -35,10 +48,47 @@ const ResultsFilter = (props) => {
     return index;
   }
 
+  useEffect(() => {
+    const right_now = new Date();
+    setUpdateTime(right_now);
+    setIsIdle(false);
+  }, [props.data]);
+
+  function checkIdle() {
+    const right_now = new Date();
+    if (getDifferenceInSeconds(updateTime, right_now) > 10) {
+      console.log(
+        "setting idle",
+        getDifferenceInSeconds(updateTime, right_now)
+      );
+      setIsIdle(true);
+    }
+  }
+
+  React.useEffect(() => {
+    console.log(`initializing interval`);
+    const interval = setInterval(() => {
+      checkIdle();
+    }, 1000);
+
+    return () => {
+      console.log(`clearing interval`);
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
-    <Typography align="center" variant="h1" component="h2">
-      {filterData(props.data, props.filter_length)}
-    </Typography>
+    <>
+      {isIdle ? (
+        <Typography align="center" variant="h1" component="h2">
+          IDLE
+        </Typography>
+      ) : (
+        <Typography align="center" variant="h1" component="h2">
+          {filterData(props.data, props.filter_length)}
+        </Typography>
+      )}
+    </>
   );
 };
 
