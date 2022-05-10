@@ -36,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2),
     textAlign: "center",
   },
+  cardBottom: {
+    marginTop: theme.spacing(2),
+  },
 }));
 
 function bin2String(array) {
@@ -150,172 +153,179 @@ const Results = (props) => {
 
   useCleanup(reader);
 
-
-
   return (
-    <Card>
-      <CardContent>
-        <div className={classes.section1}>
-          <Grid item xs={12}>
-            <Typography
-              align="center"
-              component="h2"
-              variant="h2"
-              color="secondary"
-            >
-              Test Mode: Recognition
-            </Typography>
+    <>
+      <Card>
+        <CardContent>
+          <div className={classes.section1}>
+            <Grid item xs={12}>
+              <Typography
+                align="center"
+                component="h2"
+                variant="h2"
+                color="secondary"
+              >
+                Test Mode: Recognition
+              </Typography>
+            </Grid>
+
+            <div className={classes.section1}>
+              <Divider variant="middle" />
+            </div>
+          </div>
+
+          <Grid item alignContent="center" xs={12}>
+            <ResultsFilter
+              data={deviceRows}
+              filter_length={filterLength}
+              setLastValue={props.setLastValue}
+              delay={delay}
+            ></ResultsFilter>
           </Grid>
 
           <div className={classes.section1}>
             <Divider variant="middle" />
           </div>
-        </div>
 
-        <Grid item alignContent="center" xs={12}>
-          <ResultsFilter
-            data={deviceRows}
-            filter_length={filterLength}
-            setLastValue={props.setLastValue}
-            delay={delay}
-          ></ResultsFilter>
-        </Grid>
-
-        <div className={classes.section1}>
-          <Divider variant="middle" />
-        </div>
-
-
-
-        <div className={classes.section1}>
-          <div style={{ height: 600, width: "100%" }}>
-            <DataGrid
-              rows={deviceRows}
-              columns={deviceColumns}
-              pageSize={15}
-              sortModel={[{ field: "id", sort: "desc" }]}
-            />
+          <div className={classes.section1}>
+            <div style={{ height: 600, width: "100%" }}>
+              <DataGrid
+                rows={deviceRows}
+                columns={deviceColumns}
+                pageSize={15}
+                sortModel={[{ field: "id", sort: "desc" }]}
+              />
+            </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
+      <Card className={classes.cardBottom}>
+        <CardContent>
+          <Typography align="left" color="primary" component="h5" variant="h5">
+            Post Processing
+          </Typography>
 
-        <Typography align="left" color="primary" component="h5" variant="h5">
-          Post Processing Settings
-        </Typography>
+          <div className={classes.section1}>
+            <Divider variant="middle" />
+          </div>
 
-        <div className={classes.section1}>
-          <Divider variant="middle" />
-        </div>
+          <Grid container spacing={4} rows alignItems="center">
+            <Grid item xs={4}>
+              <Typography align="center" component="h6" variant="h6">
+                Majority Vote Buffer
+              </Typography>
+            </Grid>
 
-        <Grid container spacing={4} rows alignItems="center">
-          <Grid item xs={4}>
-            <Typography align="center" component="h6" variant="h6">
-              Buffer
-            </Typography>
+            <Grid item xs={6}>
+              <div className={classes.sliderroot}>
+                <Slider
+                  value={typeof filterLength === "number" ? filterLength : 1}
+                  onChange={handleFilterLengthSliderChange}
+                  aria-labelledby="input-slider"
+                  min={1}
+                  max={10}
+                />
+              </div>
+            </Grid>
+
+            <Grid item xs={1}>
+              <Typography align="center" component="h6" variant="h6">
+                {filterLength}
+              </Typography>
+            </Grid>
           </Grid>
 
-          <Grid item xs={6}>
-            <div className={classes.sliderroot}>
-              <Slider
-                value={typeof filterLength === "number" ? filterLength : 1}
-                onChange={handleFilterLengthSliderChange}
-                aria-labelledby="input-slider"
-                min={1}
-                max={10}
-              />
-            </div>
+          <Grid container spacing={4} rows alignItems="center">
+            <Grid item xs={4}>
+              <Typography align="center" component="h6" variant="h6">
+                Idle Delay
+              </Typography>
+            </Grid>
+
+            <Grid item xs={6}>
+              <div className={classes.sliderroot}>
+                <Slider
+                  value={typeof delay === "number" ? delay : 5}
+                  onChange={handleDelayLengthSliderChange}
+                  aria-labelledby="input-slider"
+                  min={1}
+                  max={10}
+                />
+              </div>
+            </Grid>
+
+            <Grid item xs={1}>
+              <Typography align="center" component="h6" variant="h6">
+                {delay}
+              </Typography>
+            </Grid>
           </Grid>
 
-          <Grid item xs={1}>
-            <Typography align="center" component="h6" variant="h6">
-              {filterLength}
-            </Typography>
+          <div className={classes.section1}>
+            <Divider variant="middle" />
+          </div>
+
+          <Typography align="left" color="primary" component="h5" variant="h5">
+            Control
+          </Typography>
+
+          <div className={classes.section1}>
+            <Divider variant="middle" />
+          </div>
+
+          {isStreaming ? (
+            <Button
+              aria-label="disconnect"
+              color="primary"
+              variant="contained"
+              fullWidth={true}
+              onClick={() => {
+                handleStopStreaming("stopstreaming", reader, setIsStreaming);
+              }}
+            >
+              Stop Stream
+            </Button>
+          ) : (
+            <Button
+              aria-label="disconnect"
+              color="primary"
+              variant="contained"
+              fullWidth={true}
+              onClick={() => {
+                handleStreamRequest(
+                  "clicked",
+                  `${process.env.REACT_APP_API_URL}results`,
+                  setDeviceRows,
+                  setIsStreaming,
+                  setReader
+                );
+              }}
+            >
+              Start Stream
+            </Button>
+          )}
+          <div className={classes.section1}>
+            <Divider variant="middle" />
+          </div>
+
+          <Typography align="left" color="primary" component="h5" variant="h5">
+            Mapping
+          </Typography>
+
+          <div className={classes.section1}>
+            <Divider variant="middle" />
+          </div>
+          <Grid container spacing={2}>
+            <Grid item>
+              <UploadModelJson />
+            </Grid>
+            <Grid item>
+              <UploadClassImagesJson />
+            </Grid>
           </Grid>
-        </Grid>
-
-
-        <Grid container spacing={4} rows alignItems="center">
-          <Grid item xs={4}>
-            <Typography align="center" component="h6" variant="h6">
-              Delay
-            </Typography>
-          </Grid>
-
-          <Grid item xs={6}>
-            <div className={classes.sliderroot}>
-              <Slider
-                value={typeof delay === "number" ? delay : 5}
-                onChange={handleDelayLengthSliderChange}
-                aria-labelledby="input-slider"
-                min={1}
-                max={10}
-              />
-            </div>
-          </Grid>
-
-          <Grid item xs={1}>
-            <Typography align="center" component="h6" variant="h6">
-              {delay}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        <div className={classes.section1}>
-          <Divider variant="middle" />
-        </div>
-
-
-        <Typography align="left" color="primary" component="h5" variant="h5">
-          Control Settings
-        </Typography>
-
-
-        <div className={classes.section1}>
-          <Divider variant="middle" />
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            {isStreaming ? (
-              <Button
-                aria-label="disconnect"
-                color="primary"
-                variant="contained"
-                fullWidth={true}
-                onClick={() => {
-                  handleStopStreaming("stopstreaming", reader, setIsStreaming);
-                }}
-              >
-                Stop Stream
-              </Button>
-            ) : (
-              <Button
-                aria-label="disconnect"
-                color="primary"
-                variant="contained"
-                fullWidth={true}
-                onClick={() => {
-                  handleStreamRequest(
-                    "clicked",
-                    `${process.env.REACT_APP_API_URL}results`,
-                    setDeviceRows,
-                    setIsStreaming,
-                    setReader
-                  );
-                }}
-              >
-                Start Stream
-              </Button>
-            )}
-          </Grid>
-          <Grid item>
-            <UploadModelJson />
-          </Grid>
-          <Grid item>
-            <UploadClassImagesJson />
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
