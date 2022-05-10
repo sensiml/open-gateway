@@ -48,7 +48,7 @@ const TestMode = (props) => {
   const classImage = useSelector(selectClassImage(currentClass));
 
   const handleLastValue = (value) => {
-    setCurrentClass(value?.Classification || "");
+    setCurrentClass(value || "");
   };
 
   return (

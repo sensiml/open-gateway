@@ -10,7 +10,6 @@ const UploadClassImagesJson = (props) => {
     const reader = new FileReader();
 
     reader.readAsText(uploadedFile);
-    debugger;
 
     reader.onload = function () {
       console.log(reader.result);

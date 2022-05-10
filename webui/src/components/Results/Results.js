@@ -97,8 +97,6 @@ const handleStreamRequest = (
 };
 
 function handleStopStreaming(event, reader, setIsStreaming) {
-  //debugger;
-  console.log(reader);
   reader.cancel();
   setIsStreaming(false);
 }
@@ -120,6 +118,8 @@ const Results = (props) => {
   const [deviceRows, setDeviceRows] = React.useState([]);
   const [isStreaming, setIsStreaming] = React.useState(false);
   const [reader, setReader] = React.useState();
+  const [delay, setDelay] = React.useState(5);
+  const [filterLength, setfilterLength] = React.useState(1);
 
   let deviceColumns = [
     { field: "id", headerName: "ID", width: 70 },
@@ -127,12 +127,15 @@ const Results = (props) => {
     { field: "ModelNumber", headerName: "Model ID", width: 240 },
     { field: "Classification", headerName: "Classification", width: 240 },
   ];
-  const [filterLength, setfilterLength] = React.useState(1);
 
   const classes = useStyles();
 
   const handleFilterLengthSliderChange = (event, newValue) => {
     setfilterLength(newValue);
+  };
+
+  const handleDelayLengthSliderChange = (event, newValue) => {
+    setDelay(newValue);
   };
 
   useEffect(() => {
@@ -147,7 +150,7 @@ const Results = (props) => {
 
   useCleanup(reader);
 
-  // props.setLastValue(newValue);
+
 
   return (
     <Card>
@@ -173,6 +176,8 @@ const Results = (props) => {
           <ResultsFilter
             data={deviceRows}
             filter_length={filterLength}
+            setLastValue={props.setLastValue}
+            delay={delay}
           ></ResultsFilter>
         </Grid>
 
@@ -180,8 +185,21 @@ const Results = (props) => {
           <Divider variant="middle" />
         </div>
 
+
+
+        <div className={classes.section1}>
+          <div style={{ height: 600, width: "100%" }}>
+            <DataGrid
+              rows={deviceRows}
+              columns={deviceColumns}
+              pageSize={15}
+              sortModel={[{ field: "id", sort: "desc" }]}
+            />
+          </div>
+        </div>
+
         <Typography align="left" color="primary" component="h5" variant="h5">
-          Post Processing
+          Post Processing Settings
         </Typography>
 
         <div className={classes.section1}>
@@ -213,16 +231,48 @@ const Results = (props) => {
             </Typography>
           </Grid>
         </Grid>
+
+
+        <Grid container spacing={4} rows alignItems="center">
+          <Grid item xs={4}>
+            <Typography align="center" component="h6" variant="h6">
+              Delay
+            </Typography>
+          </Grid>
+
+          <Grid item xs={6}>
+            <div className={classes.sliderroot}>
+              <Slider
+                value={typeof delay === "number" ? delay : 5}
+                onChange={handleDelayLengthSliderChange}
+                aria-labelledby="input-slider"
+                min={1}
+                max={10}
+              />
+            </div>
+          </Grid>
+
+          <Grid item xs={1}>
+            <Typography align="center" component="h6" variant="h6">
+              {delay}
+            </Typography>
+          </Grid>
+        </Grid>
+
         <div className={classes.section1}>
-          <div style={{ height: 600, width: "100%" }}>
-            <DataGrid
-              rows={deviceRows}
-              columns={deviceColumns}
-              pageSize={15}
-              sortModel={[{ field: "id", sort: "desc" }]}
-            />
-          </div>
+          <Divider variant="middle" />
         </div>
+
+
+        <Typography align="left" color="primary" component="h5" variant="h5">
+          Control Settings
+        </Typography>
+
+
+        <div className={classes.section1}>
+          <Divider variant="middle" />
+        </div>
+
         <Grid container spacing={2}>
           <Grid item xs={12}>
             {isStreaming ? (
