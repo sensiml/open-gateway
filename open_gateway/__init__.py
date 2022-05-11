@@ -4,7 +4,7 @@ from appdirs import *
 
 appname = "Open Gateway"
 appauthor = "SensiML"
-__version__ = "2022.3.16.0"
+__version__ = "2022.5.11.0"
 basedir = user_data_dir(appname, appauthor)
 print("captured data stored in {basedir}".format(basedir=basedir))
 

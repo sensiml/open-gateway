@@ -136,7 +136,7 @@ const SensorStream = (props) => {
               className={classes.button}
               onClick={() => manageStream()}
             >
-              {isStreamingSensor ? "Stop" : "View"}
+              {isStreamingSensor ? "Pause" : "Resume"}
             </Button>
           </Box>
         </Box>
