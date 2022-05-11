@@ -54,40 +54,50 @@ const TestMode = (props) => {
   return (
     <Grid container rows spacing={6}>
       {props.streamingMode !== "recognition" ? (
-        <Grid item xs={8}>
-          <SensorStream
-            columns={props.columns}
-            isConnected={props.isConnected}
-            dataType={props.dataType}
-          />
-        </Grid>
+        <>
+          <Grid item lg={8} md={12}>
+            <SensorStream
+              columns={props.columns}
+              isConnected={props.isConnected}
+              dataType={props.dataType}
+            />
+          </Grid>
+          <Grid item md={12} lg={4}>
+            <Record
+              isCameraConnected={props.isCameraConnected}
+              isRecording={props.isRecording}
+            />
+          </Grid>
+        </>
       ) : (
-        <Grid item md={12} lg={6}>
-          <Results setLastValue={handleLastValue} />
-        </Grid>
-      )}
-      <Grid item md={12} lg={6}>
-        <Paper className={classes.imageWrapperCard}>
-          <Box className={classes.classImageWrapper}>
-            {classImage ? (
-              <img
-                className={classes.classImage}
-                src={classImage}
-                alt={currentClass}
-              />
-            ) : currentClass ? (
-              `No Image for ${currentClass}`
-            ) : (
-              ""
-            )}
-          </Box>
-        </Paper>
+        <>
+          <Grid item md={12} lg={6}>
+            <Results setLastValue={handleLastValue} />
+          </Grid>
+          <Grid item md={12} lg={6}>
+            <Paper className={classes.imageWrapperCard}>
+              <Box className={classes.classImageWrapper}>
+                {classImage ? (
+                  <img
+                    className={classes.classImage}
+                    src={classImage}
+                    alt={currentClass}
+                  />
+                ) : currentClass ? (
+                  `No Image for ${currentClass}`
+                ) : (
+                  ""
+                )}
+              </Box>
+            </Paper>
 
-        <Record
-          isCameraConnected={props.isCameraConnected}
-          isRecording={props.isRecording}
-        />
-      </Grid>
+            <Record
+              isCameraConnected={props.isCameraConnected}
+              isRecording={props.isRecording}
+            />
+          </Grid>
+        </>
+      )}
     </Grid>
   );
 };

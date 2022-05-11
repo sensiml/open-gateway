@@ -93,6 +93,9 @@ const SensorStream = (props) => {
       stopSensorStreaming();
       setClearStream();
     }
+    if (props.isConnected && !isStreamingSensor) {
+      startSensorStreaming();
+    }
   }, []);
 
   return (
