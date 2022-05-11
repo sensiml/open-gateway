@@ -400,8 +400,6 @@ class BaseResultReaderMixin(object):
                 data = self.rbuffer.read_buffer(index)
                 index = self.rbuffer.get_next_index(index)
 
-                print(data)
-
                 for result in data:
                     if self._validate_results_data(result):
                         try:
@@ -419,7 +417,7 @@ class BaseResultReaderMixin(object):
                             print(e)
                             continue
                         result["timestamp"] = time.time()
-                        print(index, rand, result)
+                        print(index, result)
                         yield json.dumps(result) + "\n"
                         #$import pdb; pdb.set_trace()
 

@@ -38,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
   cardBottom: {
     marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
 }));
 
@@ -197,6 +198,37 @@ const Results = (props) => {
               />
             </div>
           </div>
+          {isStreaming ? (
+            <Button
+              aria-label="disconnect"
+              color="primary"
+              variant="contained"
+              fullWidth={true}
+              onClick={() => {
+                handleStopStreaming("stopstreaming", reader, setIsStreaming);
+              }}
+            >
+              Pause
+            </Button>
+          ) : (
+            <Button
+              aria-label="disconnect"
+              color="primary"
+              variant="contained"
+              fullWidth={true}
+              onClick={() => {
+                handleStreamRequest(
+                  "clicked",
+                  `${process.env.REACT_APP_API_URL}results`,
+                  setDeviceRows,
+                  setIsStreaming,
+                  setReader
+                );
+              }}
+            >
+              Resume
+            </Button>
+          )}
         </CardContent>
       </Card>
       <Card className={classes.cardBottom}>
@@ -260,50 +292,6 @@ const Results = (props) => {
               </Typography>
             </Grid>
           </Grid>
-
-          <div className={classes.section1}>
-            <Divider variant="middle" />
-          </div>
-
-          <Typography align="left" color="primary" component="h5" variant="h5">
-            Control
-          </Typography>
-
-          <div className={classes.section1}>
-            <Divider variant="middle" />
-          </div>
-
-          {isStreaming ? (
-            <Button
-              aria-label="disconnect"
-              color="primary"
-              variant="contained"
-              fullWidth={true}
-              onClick={() => {
-                handleStopStreaming("stopstreaming", reader, setIsStreaming);
-              }}
-            >
-              Stop Stream
-            </Button>
-          ) : (
-            <Button
-              aria-label="disconnect"
-              color="primary"
-              variant="contained"
-              fullWidth={true}
-              onClick={() => {
-                handleStreamRequest(
-                  "clicked",
-                  `${process.env.REACT_APP_API_URL}results`,
-                  setDeviceRows,
-                  setIsStreaming,
-                  setReader
-                );
-              }}
-            >
-              Start Stream
-            </Button>
-          )}
           <div className={classes.section1}>
             <Divider variant="middle" />
           </div>
