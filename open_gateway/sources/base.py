@@ -1,7 +1,5 @@
 import json
-import copy
 import threading
-import array
 import struct
 import time
 import csv
@@ -9,7 +7,7 @@ import os
 import random
 from open_gateway.sources.utils.sml_runner import SMLRunner
 from open_gateway import basedir, ensure_folder_exists
-
+import random
 
 try:
     from open_gateway.sources.buffers import (
@@ -118,12 +116,16 @@ class BaseReader(object):
 
     @staticmethod
     def _validate_results_data(data):
-        try:
-            tmp = json.loads(data)
-            if isinstance(tmp, dict) and tmp:
-                return True
-        except Exception as e:
-            print(e)
+        if not data:
+            return False
+        else:
+            try:
+                tmp = json.loads(data)
+                if isinstance(tmp, dict) and tmp:
+                    return True
+
+            except Exception as e:
+                print(e)
 
         return False
 
@@ -209,7 +211,7 @@ class BaseReader(object):
     def record_start(self, filename):
 
         if not self.streaming:
-            raise Exception("Must start streaming before begging to record!")
+            raise Exception("Must start streaming before beginning to record!")
 
         if self.recording:
             raise Exception("Only a single recording can occur at one time")
@@ -219,7 +221,7 @@ class BaseReader(object):
 
         if not os.path.exists(os.path.dirname(filename)):
             print(
-                "Base: File directory does not exist,  recording to data directory in gateway location."
+                "Base: File directory does not exist, recording to data directory in gateway location."
             )
             ensure_folder_exists("data")
 
@@ -309,7 +311,7 @@ class BaseStreamReaderMixin(object):
         if self._thread:
             pass
         else:
-            print("StreamReader: establishing a connectiong to the device.")
+            print("StreamReader: establishing a connection to the device.")
             self.connect()
             self.streaming = True
 
@@ -377,7 +379,7 @@ class BaseResultReaderMixin(object):
         return {"samples_per_packet": 1}
 
     def read_data(self):
-        """ Genrator to read the result stream out of the buffer """
+        """ Generator to read the result stream out of the buffer """
 
         print("ResultReader: result read starting")
 
@@ -388,6 +390,8 @@ class BaseResultReaderMixin(object):
             self.connect()
 
         index = self.rbuffer.get_latest_buffer()
+
+        rand = random.randint(0, 100)
 
         while self.streaming:
 
@@ -417,8 +421,9 @@ class BaseResultReaderMixin(object):
                             print(e)
                             continue
                         result["timestamp"] = time.time()
-                        print(result)
+                        print(index, result)
                         yield json.dumps(result) + "\n"
+                        #$import pdb; pdb.set_trace()
 
             else:
                 time.sleep(0.1)

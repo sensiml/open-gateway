@@ -295,6 +295,50 @@ def config_model_json():
     return Response(dumps( app.config["MODEL_JSON"]), mimetype="application/json")
 
 
+
+@app.route("/config-class-map-images-json", methods=["POST"])
+def config_class_map_images():
+    """Post an image class map to use when showing classification results"""
+
+    class InvalidPathException(Exception):
+        pass
+
+    def get_abs_img_path(img_path):
+        print(img_path)
+        if os.path.isabs(img_path):
+            return img_path
+        else:
+            raise InvalidPathException("image path no absolute!")
+
+    images_read = request.json
+    app.config["CLASS_MAP_IMAGES"] = []
+    dir_to_save = os.path.join(app.static_folder, CLASS_MAP_IMG_FLD_NAME)
+
+    image_manager = ImageManager(dir_to_save=dir_to_save)
+
+    for class_name, img_path in images_read.items():
+        try:
+            # save image into the static folder
+            new_img_name = image_manager.resave_img(
+                img_path=get_abs_img_path(img_path),
+                img_name="_".join(class_name.lower().split()),
+            )
+        except ImageManager.errors as e:
+            print(f"{C_CLR_ERROR}{e}")
+            continue
+        except InvalidPathException as e:
+            print(e)
+            continue
+        else:
+            print(f"{C_CLR_OKBLUE} Saved image for class {class_name}")
+
+        app.config["CLASS_MAP_IMAGES"].append(
+            {"name": class_name, "img": new_img_name}
+        )
+
+    return Response(dumps( app.config["CLASS_MAP_IMAGES"]), mimetype="application/json")
+
+
 @app.route("/config-video", methods=["GET", "POST"])
 def config_video():
     """Start/Stop Video Source

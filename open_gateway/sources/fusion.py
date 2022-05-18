@@ -215,7 +215,7 @@ class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
                             result = self.sources[index]._map_classification(
                                 json.loads(result)
                             )
-                            result["timestap"] = time.time()
+                            result["timestamp"] = time.time()
                             result["source"] = self.sources[index].device_id
                             result["name"] = self.sources[index].name
                             yield json.dumps(result) + "\n"

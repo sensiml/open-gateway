@@ -149,7 +149,7 @@ class TestResultReader(TestReader, BaseResultReaderMixin):
             # index = random.randint(0, len(result) - 1)
             # result = result[:index] + result[index + 1 :]
             self.rbuffer.update_buffer([result, result])
-            time.sleep(2)
+            time.sleep(random.randint(0, 5))
 
 
 def get_test_device_configs(device_id):
