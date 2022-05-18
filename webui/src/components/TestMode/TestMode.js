@@ -6,7 +6,7 @@ import { Results } from "../Results";
 import { Record } from "../Record";
 
 import { useSelector } from "react-redux";
-import { selectClassImage } from "../../redux/selectors/classes"; 
+import { selectClassImage } from "../../redux/selectors/classes";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     padding: "1rem",
-    marginTop: "1rem",
-    minHeight: "350px",
+    marginBottom: "1rem",
+    minHeight: "450px",
   },
 
   classImage: {
@@ -48,40 +48,56 @@ const TestMode = (props) => {
   const classImage = useSelector(selectClassImage(currentClass));
 
   const handleLastValue = (value) => {
-    setCurrentClass(value?.Classification || "");
+    setCurrentClass(value || "");
   };
 
   return (
     <Grid container rows spacing={6}>
       {props.streamingMode !== "recognition" ? (
-        <Grid item xs={8}>
-          <SensorStream
-            columns={props.columns}
-            isConnected={props.isConnected}
-            dataType={props.dataType}
-          />
-        </Grid>
+        <>
+          <Grid item lg={8} md={12}>
+            <SensorStream
+              columns={props.columns}
+              isConnected={props.isConnected}
+              dataType={props.dataType}
+            />
+          </Grid>
+          <Grid item md={12} lg={4}>
+            <Record
+              isCameraConnected={props.isCameraConnected}
+              isRecording={props.isRecording}
+            />
+          </Grid>
+        </>
       ) : (
-        <Grid item xs={6}>
-          <Results
-            setLastValue={handleLastValue}
-          />
-        </Grid>
+        <>
+          <Grid item md={12} lg={6}>
+            <Results setLastValue={handleLastValue} />
+          </Grid>
+          <Grid item md={12} lg={6}>
+            <Paper className={classes.imageWrapperCard}>
+              <Box className={classes.classImageWrapper}>
+                {classImage ? (
+                  <img
+                    className={classes.classImage}
+                    src={classImage}
+                    alt={currentClass}
+                  />
+                ) : currentClass ? (
+                  `No Image for ${currentClass}`
+                ) : (
+                  ""
+                )}
+              </Box>
+            </Paper>
+
+            <Record
+              isCameraConnected={props.isCameraConnected}
+              isRecording={props.isRecording}
+            />
+          </Grid>
+        </>
       )}
-      <Grid item xs={4}>
-        <Record
-          isCameraConnected={props.isCameraConnected}
-          isRecording={props.isRecording}
-        />
-        <Paper className={classes.imageWrapperCard}>
-          <Box className={classes.classImageWrapper}>
-            { classImage ?
-              <img  className={classes.classImage} src={classImage} alt={ currentClass }/>
-              : currentClass ? `No Image for ${currentClass}` : ""
-            }
-          </Box>
-        </Paper>
-      </Grid>
     </Grid>
   );
 };
