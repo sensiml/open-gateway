@@ -49,6 +49,7 @@ function bin2String(array) {
   return results.map((x) => {
     return JSON.parse(x);
   });
+  // return [];
 }
 
 const handleStreamRequest = (
@@ -175,14 +176,14 @@ const Results = (props) => {
             </div>
           </div>
 
-          <Grid item alignContent="center" xs={12}>
+          {/* <Grid item alignContent="center" xs={12}>
             <ResultsFilter
               data={deviceRows}
               filter_length={filterLength}
               setLastValue={props.setLastValue}
               delay={delay}
             ></ResultsFilter>
-          </Grid>
+          </Grid> */}
 
           <div className={classes.section1}>
             <Divider variant="middle" />

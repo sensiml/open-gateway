@@ -1,11 +1,11 @@
 import React from "react";
 import { blueGrey, deepOrange, lightBlue, red } from "@material-ui/core/colors";
-import { createMuiTheme, MuiThemeProvider, useTheme, } from "@material-ui/core/styles";
+import { createTheme, MuiThemeProvider, useTheme, } from "@material-ui/core/styles";
 
 const LightTheme = (props) => {
   const theme = useTheme();
 
-  const currentTheme = createMuiTheme({
+  const currentTheme = createTheme({
     palette: {
       primary: {
         light: lightBlue[600],

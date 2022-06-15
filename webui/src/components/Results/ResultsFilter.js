@@ -84,7 +84,7 @@ const ResultsFilter = (props) => {
     <>
       {isIdle ? (
         <Typography align="center" variant="h1" component="h2">
-              IDLE
+          IDLE
         </Typography>
       ) : (
         <Typography align="center" variant="h1" component="h2">

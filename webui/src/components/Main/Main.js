@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect } from "react";
 
+import { GameMode } from "components/GameMode";
+
 import { Header, NavBar } from "../Layout";
 import useStyles from "./MainStyles";
 import { Grid } from "@material-ui/core";
@@ -30,6 +32,7 @@ const Main = (props) => {
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { isStreamingSensor } = useSelector((state) => state.stream);
+  const { classMapImages } = useSelector((state) => state.classes);
   const { errorDataMsg } = useSelector((state) => state.errors);
 
   function handleChange(newValue) {
@@ -124,48 +127,50 @@ const Main = (props) => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Grid container direction="column" justify="center" alignItems="center">
-        <Header />
-        <NavBar
-          onChange={handleChange}
-          isConnected={isConnected}
-          isCameraConnected={isCameraConnected}
+      {activeView === 2 ? <GameMode classMapImages={classMapImages} onClose={() => handleChange(1)} /> :
+        <Grid container direction="column" justify="center" alignItems="center">
+          <Header />
+          <NavBar
+            onChange={handleChange}
+            isConnected={isConnected}
+            isCameraConnected={isCameraConnected}
 
-        />
-        <main className={classes.content}>
-          {activeView === 0 ? (
-            <Configure
-              streamingMode={streamingMode}
-              deviceID={deviceID}
-              setStreamingMode={setStreamingMode}
-              setColumns={setColumns}
-              setStreamingSource={setStreamingSource}
-              setDeviceID={setDeviceID}
-              setIsConnected={setIsConnected}
-              isConnected={isConnected}
-              setIsCameraConnected={setIsCameraConnected}
-              isCameraConnected={isCameraConnected}
-              config={config}
-              setConfig={setConfig}
-              streamingSource={streamingSource}
-              baudRate={baudRate}
-              setBaudRate={setBaudRate}
-            />
-          ) : null}
-          {activeView === 1 ? (
-            <TestMode
-              columns={columns}
-              streamingMode={streamingMode}
-              isConnected={isConnected}
-              isRecording={isRecording}
-              isCameraConnected={isCameraConnected}
-              setIsCameraConnected={setIsCameraConnected}
-              samplerate={config.samplerate}
-              dataType={dataType}
-            />
-          ) : null}
-        </main>
-      </Grid>
+          />
+          <main className={classes.content}>
+            {activeView === 0 ? (
+              <Configure
+                streamingMode={streamingMode}
+                deviceID={deviceID}
+                setStreamingMode={setStreamingMode}
+                setColumns={setColumns}
+                setStreamingSource={setStreamingSource}
+                setDeviceID={setDeviceID}
+                setIsConnected={setIsConnected}
+                isConnected={isConnected}
+                setIsCameraConnected={setIsCameraConnected}
+                isCameraConnected={isCameraConnected}
+                config={config}
+                setConfig={setConfig}
+                streamingSource={streamingSource}
+                baudRate={baudRate}
+                setBaudRate={setBaudRate}
+              />
+            ) : null}
+            {activeView === 1 ? (
+              <TestMode
+                columns={columns}
+                streamingMode={streamingMode}
+                isConnected={isConnected}
+                isRecording={isRecording}
+                isCameraConnected={isCameraConnected}
+                setIsCameraConnected={setIsCameraConnected}
+                samplerate={config.samplerate}
+                dataType={dataType}
+              />
+            ) : null}
+          </main>
+        </Grid>
+      }
     </div>
   );
 };

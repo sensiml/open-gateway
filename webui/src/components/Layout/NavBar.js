@@ -1,3 +1,5 @@
+import React from "react";
+
 import { Button, Grid, Typography } from "@material-ui/core";
 import { green, grey } from "@material-ui/core/colors";
 import Drawer from "@material-ui/core/Drawer";
@@ -7,10 +9,13 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import { makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
+
 import AssessmentIcon from "@material-ui/icons/Assessment";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import HomeIcon from "@material-ui/icons/Home";
-import React from "react";
+import SportsEsportsOutlinedIcon from '@material-ui/icons/SportsEsportsOutlined';
+
+
 import Divider from "@material-ui/core/Divider";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import { Update } from "@material-ui/icons";
@@ -59,6 +64,8 @@ const InconSelector = (props) => {
       return <HomeIcon />;
     case 1:
       return <AssessmentIcon />;
+    case 2:
+      return <SportsEsportsOutlinedIcon />;
     default:
       return <InboxIcon />;
   }
@@ -116,7 +123,7 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Home", "Test Mode"].map((text, index) => (
+          {["Home", "Test Mode", "Game Mode"].map((text, index) => (
             <ListItem button key={text} onClick={handleMenu(index)}>
               <ListItemIcon>
                 <InconSelector index={index}> </InconSelector>
