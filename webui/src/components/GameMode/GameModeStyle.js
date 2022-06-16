@@ -107,6 +107,18 @@ const GameModeStyle = makeStyles((theme) => ({
     backgroundPosition: "center",
     margin: "1rem",
   },
+  clsassImageAnimated: {
+    animation: `$classAnimation 500ms ${theme.transitions.easing.easeInOut}`,
+    animationDuration: "500ms",
+  },
+  "@keyframes classAnimation": {
+    "0%": {
+      transform: "scale(1)",
+    },
+    "100%": {
+      transform: "scale(1.15)",
+    },
+  },
   statsWrapper: {
     marginBottom: "2rem",
     padding: "2rem"
@@ -142,6 +154,22 @@ const GameModeStyle = makeStyles((theme) => ({
     flex: "1",
     padding: "1rem"
   },
+
+  scoreItemNumber: {
+    color: theme.palette.primary.main,
+  },
+  scoreItemNumberAnimated: {
+    animation: `$rotateFullY 800ms ${theme.transitions.easing.easeInOut}`,
+    color: theme.palette.primary.main,
+  },
+
+  "@keyframes rotateFullY": {
+    "0%": { 
+      transform: "rotateY(0)"
+     },
+    "100%": { transform: "rotateY(360deg)" }
+  },
+  
 
   resultBox: {
     fontSize: "6rem",

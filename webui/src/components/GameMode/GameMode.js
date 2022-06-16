@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import AudioSuccess from "assets/AudioSuccess.mp3"
 import AudioBoxingBell from "assets/AudioBoxingBell.mp3"
 import AudioFail from "assets/AudioFail.wav"
+import AudioPunch from "assets/AudioPunch.wav"
 
 import logoImg from "assets/logo.png";
 import bellImg from "assets/bell.png";
@@ -44,7 +45,7 @@ export const filterFormatDate = (dateString) => {
   return date.toISOString().substr(14, 5).replace("0", "");
 };
 
-const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerCountThreshold=25 }) => {
+const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=100, winnerCountThreshold=40 }) => {
   const classes = useGameModeStyle();
   const [isStreaming, setIsStreaming] = useState(false);
   const [reader, setReader] = useState();
@@ -52,6 +53,7 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerC
     onplay: () => setPlayingBell(true),
     onend: () => setPlayingBell(false),
   });
+  const [playPunch] = useSound(AudioPunch);
   const [playFail, {stop: stopPlainingFail}] = useSound(AudioFail);
   const [playSuccess, {stop: stopPlaingSuccess}] = useSound(AudioSuccess);
 
@@ -60,7 +62,9 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerC
   const [currentClass, setCurrentClass] = useState("");
   const [classScores, setClassScores] = useState({});
   const [totalClassScores, setTotalClassScores] = useState(0);
+  const [animateImgCard, setAnimateImgCard] = useState(false);
   const classImage = useSelector(selectClassImage(currentClass));
+
 
   const [isWon, setIsWon] = React.useState(false);
   const [isLost, setIsLost] = React.useState(false);
@@ -122,8 +126,10 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerC
   };
 
   const handleSetResult = (result) => {
+    setAnimateImgCard(true);
     handleSetCurrentClass(result.Classification);
     if (isNotUnknow(result.Classification)) {
+      playPunch();
       setClassScores(val => {
         const updatedVal = { ...val };
         if (!updatedVal[result.Classification]) {
@@ -142,6 +148,7 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerC
     stopPlainingFail();
     setCountdownTime(countdownTimeDefault);
     setClassScores({});
+    setCurrentClass("");
     setTotalClassScores(0);
   };
 
@@ -204,6 +211,14 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerC
     }
   }, [totalClassScores]);
 
+  useEffect(() => {
+    if (animateImgCard) {
+      setTimeout(() => {
+        setAnimateImgCard(false);
+      }, 500)
+    }
+  }, [animateImgCard]);
+
   return (
     <Box className={classes.gameWrapper}>
       <IconButton color="primary" onClick={handleClose} className={classes.gameWrapperCloseIcon} size="medium">
@@ -245,7 +260,10 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerC
         <Grid item xs={12} md={6} className={classes.resultGridWrap}>
         <Zoom in={isStreaming}>
           <Paper elevation={0} className={classes.resultWrapper}>
-            <Box className={classes.classImageWrapper} style={{ backgroundImage: `url(${classImage})` }}/>
+            <Box
+              className={`${classes.classImageWrapper} ${animateImgCard ? classes.clsassImageAnimated : ""}`}
+              style={{ backgroundImage: `url(${classImage})` }}
+            />
             <Typography variant="h1">{currentClass}</Typography>
           </Paper>
         </Zoom>
@@ -263,7 +281,14 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=60, winnerC
               <Paper variant="outlined" className={classes.scoreItem} >
                 <Box alt="" className={classes.scoreItemImgBox} style={{ backgroundImage: `url(${APP_API_URL}${imgPath})` }}/>
                 <Typography variant="h5">{name}</Typography>
-                <Typography variant="h1">{classScores[name] || 0}</Typography>
+                <Typography
+                  variant="h1"
+                  className={
+                    `${name === currentClass ? classes.scoreItemNumberAnimated : "" } ${_.toNumber(classScores[name]) > 0 ? classes.scoreItemNumber : "" }`
+                  }
+                >
+                  {classScores[name] || 0}
+                </Typography>
               </Paper>
             ))}
           </Box>
