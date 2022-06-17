@@ -1,5 +1,5 @@
-import { makeStyles, useTheme } from "@material-ui/core/styles";import { colorbar } from "plotly.js/lib/bar";
-;
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { colorbar } from "plotly.js/lib/bar";
 
 const GameModeStyle = makeStyles((theme) => ({
   gameWrapper: {
@@ -10,6 +10,7 @@ const GameModeStyle = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "space-between"
   },
+
   topContainerWrapper: {
     padding: "2rem",
     minHeight: "60vh"

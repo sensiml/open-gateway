@@ -24,7 +24,7 @@ import { useInterval } from "hooks";
 
 import useGameModeStyle from "./GameModeStyle";
 
-const UNKNOW_CLASSES = ["0", 0, "Unknow"];
+const UNKNOW_CLASSES = ["0", 0, "Unknow", "Bad Punch"];
 
 
 const bin2String = (array) => {
