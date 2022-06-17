@@ -253,7 +253,6 @@ def config():
     return Response(dumps(ret), mimetype="application/json")
 
 
-@app.route("/results")
 @app.route("/stream")
 def stream():
 
@@ -266,6 +265,20 @@ def stream():
         stream_with_context(app.config["DEVICE_SOURCE"].read_data()),
         mimetype="application/octet-stream",
     )
+
+@app.route("/results")
+def stream_model_results():
+
+    if app.config.get("DEVICE_SOURCE", None) is None:
+        return make_response(
+            jsonify(detail="Must Connect to device before starting stream"), 400
+        )
+
+    return Response(
+        stream_with_context(app.config["DEVICE_SOURCE"].read_result_data()),
+        mimetype="application/octet-stream",
+    )
+
 
 
 @app.route("/scan-video", methods=["GET"])

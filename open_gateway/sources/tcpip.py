@@ -72,7 +72,9 @@ class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
                     self.buffer.update_buffer(data)
 
                     if self.run_sml_model:
-                        self.execute_run_sml_model(sml, data)
+                        model_result = self.execute_run_sml_model(sml, data)
+                        if model_result:
+                            self.rbuffer.update_buffer([model_result])
 
                     time.sleep(0.0001)
 
@@ -119,6 +121,8 @@ class TCPIPResultReader(TCPIPReader, BaseResultReaderMixin):
                     content += data
 
 
+
+            
 if __name__ == "__main__":
     device_id = "192.168.86.27:80"
     config = {
