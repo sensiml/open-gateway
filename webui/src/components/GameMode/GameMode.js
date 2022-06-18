@@ -7,15 +7,15 @@ import Confetti from 'react-confetti'
 
 import { Backdrop, Box, IconButton, Button, Grid, Paper, Typography, Zoom } from "@material-ui/core";
 import { useSelector } from "react-redux";
-
-import AudioSuccess from "assets/AudioSuccess.mp3"
-import AudioBoxingBell from "assets/AudioBoxingBell.mp3"
-import AudioFail from "assets/AudioFail.wav"
-import AudioPunch from "assets/AudioPunch.wav"
+import AudioSuccess from "assets/AudioSuccess.mp3";
+import AudioBoxingBell from "assets/AudioBoxingBell.mp3";
+import AudioFail from "assets/AudioFail.wav";
+import AudioPunch from "assets/AudioPunch.wav";
 
 import logoImg from "assets/logo.png";
 import bellImg from "assets/bell.png";
-import winnerImg from "assets/rocky-balboa.png";
+import defaultWinnerImg from "assets/rocky-balboa.png";
+import defaultLoserImg from "assets/rocky-balboa.png";
 
 
 import { APP_API_URL } from "configs";
@@ -45,7 +45,19 @@ export const filterFormatDate = (dateString) => {
   return date.toISOString().substr(14, 5).replace("0", "");
 };
 
-const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=100, winnerCountThreshold=40 }) => {
+const GameMode = ({
+  onClose,
+  classMapImages={},
+  audioAction=AudioPunch,
+  audioSuccess=AudioSuccess,
+  audioFail=AudioFail,
+  winnerImg=defaultWinnerImg,
+  loserImg=defaultLoserImg,
+  countdownTimeDefault=100,
+  winnerCountThreshold=40,
+  winnerText="Great job! Champ!",
+  loserText="loser_text",
+}) => {
   const classes = useGameModeStyle();
   const [isStreaming, setIsStreaming] = useState(false);
   const [reader, setReader] = useState();
@@ -53,9 +65,9 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=100, winner
     onplay: () => setPlayingBell(true),
     onend: () => setPlayingBell(false),
   });
-  const [playPunch] = useSound(AudioPunch);
-  const [playFail, {stop: stopPlainingFail}] = useSound(AudioFail);
-  const [playSuccess, {stop: stopPlaingSuccess}] = useSound(AudioSuccess);
+  const [playAction] = useSound(audioAction);
+  const [playFail, {stop: stopPlainingFail}] = useSound(audioFail);
+  const [playSuccess, {stop: stopPlaingSuccess}] = useSound(audioSuccess);
 
   const [playingBell, setPlayingBell] = useState(false);
   const [countdownTime, setCountdownTime] = useState(countdownTimeDefault);
@@ -129,7 +141,7 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=100, winner
     setAnimateImgCard(true);
     handleSetCurrentClass(result.Classification);
     if (isNotUnknow(result.Classification)) {
-      playPunch();
+      playAction();
       setClassScores(val => {
         const updatedVal = { ...val };
         if (!updatedVal[result.Classification]) {
@@ -304,7 +316,7 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=100, winner
         <Confetti/>
         <Box className={classes.winnerBox}>
           <img src={winnerImg} alt=""/>
-          <Typography className={classes.winnerTypography} variant="h2">Great job! Champ!</Typography>
+          <Typography className={classes.winnerTypography} variant="h2">{loserText}</Typography>
           <Button variant="outlined" color="primary" size="large" onClick={handleCloseWinnerWindow}>
             Play Again
           </Button>
@@ -312,8 +324,8 @@ const GameMode = ({ onClose, classMapImages={}, countdownTimeDefault=100, winner
       </Backdrop>
       <Backdrop open={isLost} className={classes.backdrop}>
         <Box className={classes.winnerBox}>
-          <img src={winnerImg} alt=""/>
-          <Typography className={classes.loserTypography} variant="h2">Almost! Try Again!</Typography>
+          <img src={loserImg} alt=""/>
+          <Typography className={classes.loserTypography} variant="h2">{winnerText}</Typography>
           <Button variant="outlined" color="primary" size="large" onClick={handleCloseLoserWindow}>
             Play Again
           </Button>
