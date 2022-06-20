@@ -165,7 +165,7 @@ const GameMode = ({
   };
 
   const handleStartStreamRequest = (
-    url=`${process.env.REACT_APP_API_URL}results`,
+    url=`${process.env.REACT_APP_API_URL}game-results`,
   ) => {
     handleReset();
     setIsStreaming(true);
