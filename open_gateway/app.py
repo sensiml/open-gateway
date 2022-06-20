@@ -44,6 +44,7 @@ C_CLR_ERROR = "\033[91m"
 C_CLR_OKBLUE = "\033[94m"
 C_CLR_OKGREEN = "\033[92m"
 
+
 app = Flask(
     __name__,
     static_folder=os.path.join(os.path.dirname(__file__), "..", "webui", "build"),
@@ -66,6 +67,7 @@ app.config["MODE"] = ""
 app.config["VIDEO_SOURCE"] = None
 app.config["LOOP"] = loop
 app.config["CLASS_MAP_IMAGES"] = []
+app.config["AUTO_CONNECT"] = False   
 
 app.config["GAME_MODE_ASSETS"] = {}
 
@@ -86,6 +88,10 @@ def cache_config(config):
     }
     json.dump(tmp, open(os.path.join(basedir, ".config.cache"), "w"))
 
+@app.before_first_request
+def before_first_request():
+    if app.config['AUTO_CONNECT']:        
+        connect()
 
 @app.route("/")
 def main():
@@ -740,32 +746,35 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
 -s --sml_library_path (str): set a path a knowledgepack libsensiml.so in order to run the model against the live streaming gateway data
 -m --model_json_path (str): set to the path of them model.json from the knowledgepack and this will use the class_map described in the model json file
 -i --class_map_images_json_path (str): set a path of json file with images for the class_map, the recognition mode will use them to represent events result
--c --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
+-c --connect (bool): Connect automatically to the last used connection on launch
 -f --scaling_factor (int): number to multiple incoming data by prior to converting to int16 from float
 -z --hide_ui (int): do not luanch the UI interface when starting the application
 -b --baud (int): set the serial baud rate
 -g --game_json (int): set the serial baud rate
+-v --convert_to_int16 (bool): set to True to convert incoming data from float to int16 values
 
 """
     HOST = os.environ.get("SERVER_HOST", "localhost")
     PORT = 5555
+
 
     ensure_folder_exists(basedir)
 
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hu:p:s:c:f:m:i:b:z:g:",
+            "hu:p:s:c:f:m:i:b:z:g:v",
             [
                 "help",
                 "host",
                 "port",
                 "sml_library_path",
-                "convert_to_in16",
+                "connect",
                 "scaling_factor",
                 "class_map_images_json_path",
                 "hide_ui",
                 "game_json"
+                "convert_to_in16"
             ],
         )
     except getopt.GetoptError:
@@ -898,7 +907,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 print(f"{C_CLR_ERROR} Classmap images json file was not found!")
                 exit_with_delay()
 
-        elif opt in ("-c", "--convert_to_int16"):
+        elif opt in ("-v", "--convert_to_int16"):
             app.config["CONVERT_TO_INT16"] = arg
         elif opt in ("-f", "--scaling_factor"):
             print("setting scaling factor", arg)
@@ -906,12 +915,16 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
         elif opt in ("-b", "--baud"):
             print("setting baud rate", arg)
             app.config["BAUD_RATE"] = int(arg)
+        elif opt in ("-c", "--connect"):
+            print('setting connect to True')
+            app.config["AUTO_CONNECT"] = True   
 
 
     try:
         if not HIDE_UI:
             Timer(2, webbrowser.open_new("http://" + HOST + ":" + str(PORT)))
         print("Starting application at {host}:{port}.".format(host=HOST, port=PORT))
+        print(app.before_first_request_funcs)
         app.run(HOST, PORT)
     except OSError as e:
         print("Starting application at {host}:{port}.".format(host=HOST, port=PORT))
