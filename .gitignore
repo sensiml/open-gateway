@@ -146,4 +146,5 @@ dmypy.json
 data/*
 video/*
 **/cache/*
-
+*.Identifier*
+*.Identifier
