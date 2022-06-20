@@ -1,7 +1,6 @@
 {
-  "Uppercuts": "./game_demo_assets/img/uppercut.jpg",
-  "Hooks": "./game_demo_assets/img/hook.jpg",
-  "Jabs": "./game_demo_assets/img/jab.jpg",
-  "Overhands": "./game_demo_assets/img/overhand.jpg",
-  "Bad Punch": "./game_demo_assets/img/unknow.png"
+  "Uppercut": "./game_demo_assets/img/uppercut.jpg",
+  "Hook": "./game_demo_assets/img/hook.jpg",
+  "Jab": "./game_demo_assets/img/jab.jpg",
+  "Bad Punch": "./game_demo_assets/img/unknown.png"
 }
