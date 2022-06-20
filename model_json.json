@@ -1,3 +1,12 @@
 {
-  "ModelDescriptions": { "0": { "ClassMaps": {"0": "Bad Punch", "1": "Uppercuts", "2": "Hooks", "3": "Jabs", "4": "Overhands" } } }
+  "ModelDescriptions": {
+    "0": {
+      "ClassMaps": {
+        "0": "Bad Punch",
+        "1": "Uppercut",
+        "2": "Hook",
+        "3": "Jab"
+      }
+    }
+  }
 }
