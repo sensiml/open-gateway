@@ -469,6 +469,10 @@ class BaseResultReaderMixin(object):
 
         print("ResultReader: Result stream ended")
 
+    def read_result_data(self):
+        return self.read_data()
+
+
     def _record_data(self, filename):
 
         with open(filename + ".csv", "w", newline="") as out:
