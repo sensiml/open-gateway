@@ -133,27 +133,29 @@ class SerialResultReader(SerialReader, BaseResultReaderMixin):
         self._flush_buffer()
 
         self.streaming = True
-        while self.streaming:
-
-            with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
-
+        with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
+            while self.streaming:
+            
                 try:
-                    value = ser.readline()
+                    value = ser.readline()                    
                     data = [value.decode("ascii")]
+                    
                 except Exception as e:
                     print(e,)
-                    print("read value", value)
+                    print("value", value)
                     continue
 
-                self.rbuffer.update_buffer(data)
+                
+                if "ModelNumber" in data[0]:
+                    self.rbuffer.update_buffer(data)
+                elif data[0]:
+                    print(data[0].rstrip())
 
 
 if __name__ == "__main__":
     port = "/dev/ttyACM0"
     buffer_size = 6 * 10
-    _get_serial_data(port, buffer_size)
-    connect(port)
-    for i in range(1000):
-        start = time.time()
-        print(struct.unpack("h" * buffer_size, _get_serial_data(port, buffer_size)))
-        print(time.time() - start)
+    config={'DATA_SOURCE':'RESULTS', "DEVICE_ID":"COM4"}
+    sr = SerialResultReader(config, "COM4")
+    sr.connect()
+    sr._read_source()
