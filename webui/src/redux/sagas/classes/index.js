@@ -10,15 +10,14 @@ import {
 
 function* classesMapImagesSagas() {
   const reponse = yield ApiService.get("class-map-images");
-  yield console.log("classesMapImagesSagas");
+
   if (!_.isEmpty(reponse.data)) {
-    const payload = yield _.reduce(
-      reponse.data,
+    const payload = yield  reponse.data.reduce(
       (acc, el) => {
         acc[el.name] = el.img;
         return acc;
       },
-      [{}]
+      {}
     );
     yield put({ type: SET_CLASS_MAP_IMAGES, payload });
   }

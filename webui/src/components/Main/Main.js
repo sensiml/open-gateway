@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useLayoutEffect } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import _ from "lodash";
+import { GameMode } from "components/GameMode";
 
 import { Header, NavBar } from "../Layout";
 import useStyles from "./MainStyles";
@@ -27,9 +29,11 @@ const Main = (props) => {
   const [config, setConfig] = React.useState({});
   const [firstLoad, setFirstLoad] = React.useState(null);
   const [dataType, setDataType] = React.useState('int16');
+  const [gameModeAssets, setGameModeAssets] = useState({});
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { isStreamingSensor } = useSelector((state) => state.stream);
+  const { classMapImages } = useSelector((state) => state.classes);
   const { errorDataMsg } = useSelector((state) => state.errors);
 
   function handleChange(newValue) {
@@ -106,6 +110,13 @@ const Main = (props) => {
 
 
   useEffect(() => {
+    if (activeView === 2) {
+      axios.get(`${process.env.REACT_APP_API_URL}game-demo-asset`, {}).then((response) => {
+        setGameModeAssets(response.data);
+        console.log("setGameModeAssets", response.data);
+      });
+    }
+    
     axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
       mapdata(response.data);
       console.log(response.data)
@@ -124,48 +135,64 @@ const Main = (props) => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Grid container direction="column" justify="center" alignItems="center">
-        <Header />
-        <NavBar
-          onChange={handleChange}
-          isConnected={isConnected}
-          isCameraConnected={isCameraConnected}
-
+      {activeView === 2 && !_.isEmpty(gameModeAssets) ?
+        <GameMode
+          classMapImages={classMapImages}
+          audioAction={gameModeAssets.action_audio && `${process.env.REACT_APP_API_URL}${gameModeAssets.action_audio}`}
+          audioSuccess={gameModeAssets.winner_audio && `${process.env.REACT_APP_API_URL}${gameModeAssets.winner_audio}`}
+          audioFail={gameModeAssets.loser_audio && `${process.env.REACT_APP_API_URL}${gameModeAssets.loser_audio}`}
+          winnerImg={gameModeAssets.winner_img && `${process.env.REACT_APP_API_URL}${gameModeAssets.winner_img}`}
+          loserImg={gameModeAssets.loser_img && `${process.env.REACT_APP_API_URL}${gameModeAssets.loser_img}`}
+          countdownTimeDefault={gameModeAssets.countdown_timer}
+          winnerCountThreshold={gameModeAssets.winner_classification_count_threshold}
+          winnerText={gameModeAssets.loser_text}
+          loserText={gameModeAssets.winner_text}
+          onClose={() => handleChange(1)}
         />
-        <main className={classes.content}>
-          {activeView === 0 ? (
-            <Configure
-              streamingMode={streamingMode}
-              deviceID={deviceID}
-              setStreamingMode={setStreamingMode}
-              setColumns={setColumns}
-              setStreamingSource={setStreamingSource}
-              setDeviceID={setDeviceID}
-              setIsConnected={setIsConnected}
-              isConnected={isConnected}
-              setIsCameraConnected={setIsCameraConnected}
-              isCameraConnected={isCameraConnected}
-              config={config}
-              setConfig={setConfig}
-              streamingSource={streamingSource}
-              baudRate={baudRate}
-              setBaudRate={setBaudRate}
-            />
-          ) : null}
-          {activeView === 1 ? (
-            <TestMode
-              columns={columns}
-              streamingMode={streamingMode}
-              isConnected={isConnected}
-              isRecording={isRecording}
-              isCameraConnected={isCameraConnected}
-              setIsCameraConnected={setIsCameraConnected}
-              samplerate={config.samplerate}
-              dataType={dataType}
-            />
-          ) : null}
-        </main>
-      </Grid>
+      :
+        <Grid container direction="column" justify="center" alignItems="center">
+          <Header />
+          <NavBar
+            onChange={handleChange}
+            isConnected={isConnected}
+            isCameraConnected={isCameraConnected}
+
+          />
+          <main className={classes.content}>
+            {activeView === 0 ? (
+              <Configure
+                streamingMode={streamingMode}
+                deviceID={deviceID}
+                setStreamingMode={setStreamingMode}
+                setColumns={setColumns}
+                setStreamingSource={setStreamingSource}
+                setDeviceID={setDeviceID}
+                setIsConnected={setIsConnected}
+                isConnected={isConnected}
+                setIsCameraConnected={setIsCameraConnected}
+                isCameraConnected={isCameraConnected}
+                config={config}
+                setConfig={setConfig}
+                streamingSource={streamingSource}
+                baudRate={baudRate}
+                setBaudRate={setBaudRate}
+              />
+            ) : null}
+            {activeView === 1 ? (
+              <TestMode
+                columns={columns}
+                streamingMode={streamingMode}
+                isConnected={isConnected}
+                isRecording={isRecording}
+                isCameraConnected={isCameraConnected}
+                setIsCameraConnected={setIsCameraConnected}
+                samplerate={config.samplerate}
+                dataType={dataType}
+              />
+            ) : null}
+          </main>
+        </Grid>
+      }
     </div>
   );
 };

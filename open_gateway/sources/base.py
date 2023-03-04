@@ -286,6 +286,8 @@ class BaseReader(object):
                     self._map_classification({"ModelNumber": 0, "Classification": ret})
                 )
                 sml.reset_model(0)
+                return  self._map_classification({"ModelNumber": 0, "Classification": ret})
+            
 
     def _map_classification(self, results):
         if self.model_json:
@@ -302,6 +304,44 @@ class BaseReader(object):
 
 
 class BaseStreamReaderMixin(object):
+
+    def read_result_data(self):
+        print("StreamReader: New stream reader connected")
+        # name = random.randint(0, 100)
+
+        if self._thread:
+            pass
+        else:
+            print("StreamReader: establishing a connection to the device.")
+            self.connect()
+            self.streaming = True
+
+        index = self.rbuffer.get_latest_buffer()
+
+        rand = random.randint(0, 100)
+
+        while self.streaming:
+
+            if index is None:
+                index = self.rbuffer.get_latest_buffer()
+                time.sleep(0.1)
+                continue
+
+            if self.rbuffer.is_buffer_full(index):
+                data = self.rbuffer.read_buffer(index)
+                index = self.rbuffer.get_next_index(index)
+
+                for result in data:
+                    if result:                      
+                        result["timestamp"] = time.time()
+                        print('reader', index, result)
+                        yield json.dumps(result) + "\n"
+
+            else:
+                time.sleep(0.1)
+
+        print("ResultReader: Result stream ended")
+
     def read_data(self):
         """ Generator to read the data stream out of the buffer """
 
@@ -423,12 +463,15 @@ class BaseResultReaderMixin(object):
                         result["timestamp"] = time.time()
                         print(index, result)
                         yield json.dumps(result) + "\n"
-                        #$import pdb; pdb.set_trace()
 
             else:
                 time.sleep(0.1)
 
         print("ResultReader: Result stream ended")
+
+    def read_result_data(self):
+        return self.read_data()
+
 
     def _record_data(self, filename):
 

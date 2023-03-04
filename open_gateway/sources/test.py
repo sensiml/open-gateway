@@ -143,13 +143,13 @@ class TestResultReader(TestReader, BaseResultReaderMixin):
             import random
 
             result = json.dumps(
-                {"ModelNumber": 0, "Classification": random.randint(0, 10)}
+                {"ModelNumber": "0", "Classification": random.randint(0, 4)}
             )
             # Randomly removes a character to simulate dropped packets
             # index = random.randint(0, len(result) - 1)
             # result = result[:index] + result[index + 1 :]
             self.rbuffer.update_buffer([result, result])
-            time.sleep(random.randint(0, 5))
+            time.sleep(random.randint(1, 5))
 
 
 def get_test_device_configs(device_id):

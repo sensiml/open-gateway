@@ -11,3 +11,4 @@ ReactDOM.render(
   <App versionCheck={versionCheck}/>,
   document.getElementById('root'),
 );
+

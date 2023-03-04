@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .vscode/
+.Identifier
 
 # C extensions
 *.so
@@ -145,4 +146,5 @@ dmypy.json
 data/*
 video/*
 **/cache/*
-
+*.Identifier*
+*.Identifier

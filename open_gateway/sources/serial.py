@@ -110,7 +110,9 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
                     self.buffer.update_buffer(data)
 
                     if self.run_sml_model:
-                        self.execute_run_sml_model(sml, data)
+                        model_result = self.execute_run_sml_model(sml, data)
+                        if model_result:
+                            self.rbuffer.update_buffer([model_result])                        
 
                     time.sleep(0.00001)
 

@@ -1,0 +1,9 @@
+{
+  "action_audio": "./game_demo_assets/audio/AudioPunch.wav",
+  "winner_audio": "./game_demo_assets/audio/AudioSuccess.mp3",
+  "winner_text": "Great job! Champ!",
+  "loser_audio": "./game_demo_assets/audio/AudioFail.wav",
+  "loser_text": "Almost!",
+  "countdown_timer": 10,
+  "winner_classification_count_threshold": 20
+}
