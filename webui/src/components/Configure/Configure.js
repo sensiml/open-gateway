@@ -258,6 +258,11 @@ const Configure = (props) => {
                           control={<Radio />}
                           label="Test"
                         />
+                        <FormControlLabel
+                          value="MODEL"
+                          control={<Radio />}
+                          label="Model"
+                        />
                       </RadioGroup>
                     </div>
 

@@ -11,6 +11,9 @@ try:
     mp_drawing = mp.solutions.drawing_utils
     mp_drawing_styles = mp.solutions.drawing_styles
     mp_hands = mp.solutions.hands
+    mp_drawing = mp.solutions.drawing_utils
+    mp_drawing_styles = mp.solutions.drawing_styles
+    mp_pose = mp.solutions.pose
 except:
     print("Mediapipe not installed")
     pass
@@ -95,15 +98,6 @@ class MediapipeHandWebCam(WebCam):
     
     def set_data_buffer(self, data_buffer):
         self.data_buffer=data_buffer
-        
-    
-    @property
-    def target_sample_per_frame(self):
-        return SAMPLES_PER_FRAME
-
-    @property
-    def target_sample_rate(self):
-        return 1.0 / self.target_sample_per_frame
 
     def _start_webcam(self):
 
@@ -180,21 +174,89 @@ class MediapipeHandWebCam(WebCam):
 
                 time.sleep(0.0001)
 
-    def start(self):
 
-        if self.vs is not None:
-            return
 
-        print("Starting Camera: ", self.camera_index)
-        self.vs = cv2.VideoCapture(self.camera_index)
+class MediapipePoseWebCam(WebCam):
+    
+    data_byte_size = 2
+    data_type_str = 'h'
+    data_type_cast = int
+    
+    def set_data_buffer(self, data_buffer):
+        self.data_buffer=data_buffer
 
-        self.width = int(self.vs.get(cv2.CAP_PROP_FRAME_WIDTH) + 0.5)
-        self.height = int(self.vs.get(cv2.CAP_PROP_FRAME_HEIGHT) + 0.5)
+    def _start_webcam(self):
 
-        # start a thread that will perform motion detection
-        thread = threading.Thread(target=self._start_webcam)
-        thread.daemon = True
-        thread.start()
+        start = time.time()
+        capture_time = 0
+        frame_time = start
+        frame_counter = 0
+
+        with mp_pose.Pose(
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5) as pose:
+            while self.vs.isOpened():
+                with self.lock:
+                    if self.vs is None:
+                        return
+
+                    if (time.time() - start) < self.target_sample_rate - capture_time * 1.2:
+                        pass
+                    else:
+                        start_grab = time.time()
+
+                        self.new_frame, frame = self.vs.read()
+                                             
+
+                        if self.new_frame:
+                
+                            frame.flags.writeable = False
+                            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                            results = pose.process(frame)
+                            frame.flags.writeable = True
+                            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+                            keypoints = bytearray(33  * 3 * self.data_byte_size)
+                            
+                                                
+                            for landmark_index, data_point in enumerate(results.pose_landmarks.landmark):                                    
+                                struct.pack_into(
+                                    "<" + self.data_type_str,
+                                    keypoints,
+                                    (0 +(landmark_index*3)) * self.data_byte_size,
+                                        self.data_type_cast((float(data_point.x)*10000)),
+                                )
+                                struct.pack_into(
+                                        "<" + self.data_type_str,
+                                        keypoints,
+                                        (1 +(landmark_index*3)) * self.data_byte_size,
+                                            self.data_type_cast((float(data_point.y)*10000)),
+                                    )
+                                struct.pack_into(
+                                        "<" + self.data_type_str,
+                                        keypoints,
+                                        (2 + (landmark_index*3)) * self.data_byte_size,
+                                            self.data_type_cast((float(data_point.z)*10000)),
+                                    )
+
+                                
+                            mp_drawing.draw_landmarks(
+                                    frame,
+                                    results.pose_landmarks,
+                                    mp_pose.POSE_CONNECTIONS,
+                                    landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+                            if self.video_writer:
+                                self.video_writer.write(cv2.flip(frame, 1))
+                            
+                            
+                            self.data_buffer.update_buffer(keypoints)
+
+                            self.output_frame = frame.copy()
+
+                        start = time.time()
+                        capture_time = start - start_grab
+
+                time.sleep(0.0001)
 
 
 if __name__ == "__main__":
@@ -206,3 +268,5 @@ if __name__ == "__main__":
 
     wc.record_stop()
     wc.off()
+
+
