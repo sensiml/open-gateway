@@ -194,7 +194,7 @@ class BaseReader(object):
             self._thread = threading.Thread(target=self._read_source)
             self._thread.start()
 
-            time.sleep(1)
+            time.sleep(5)
 
         else:
             print("Base: Thread Already Started!")

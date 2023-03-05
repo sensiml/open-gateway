@@ -123,7 +123,7 @@ const NavBar = (props) => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List>
-          {["Home", "Test Mode", "Game Mode"].map((text, index) => (
+          {["Home", "Test Mode"].map((text, index) => (
             <ListItem button key={text} onClick={handleMenu(index)}>
               <ListItemIcon>
                 <InconSelector index={index}> </InconSelector>

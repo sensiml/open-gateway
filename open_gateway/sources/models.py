@@ -21,6 +21,8 @@ class ModelReader(BaseReader):
 
 
 class MediapipeStreamReader(ModelReader, BaseStreamReaderMixin):
+
+    video_source = None
     
     def has_video_source(self):
         return True

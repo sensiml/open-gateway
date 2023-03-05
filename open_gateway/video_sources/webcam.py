@@ -217,27 +217,28 @@ class MediapipePoseWebCam(WebCam):
                             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
                             keypoints = bytearray(33  * 3 * self.data_byte_size)
-                            
-                                                
-                            for landmark_index, data_point in enumerate(results.pose_landmarks.landmark):                                    
-                                struct.pack_into(
-                                    "<" + self.data_type_str,
-                                    keypoints,
-                                    (0 +(landmark_index*3)) * self.data_byte_size,
-                                        self.data_type_cast((float(data_point.x)*10000)),
-                                )
-                                struct.pack_into(
+
+
+                            if results.pose_landmarks:                   
+                                for landmark_index, data_point in enumerate(results.pose_landmarks.landmark):                                    
+                                    struct.pack_into(
                                         "<" + self.data_type_str,
                                         keypoints,
-                                        (1 +(landmark_index*3)) * self.data_byte_size,
-                                            self.data_type_cast((float(data_point.y)*10000)),
+                                        (0 +(landmark_index*3)) * self.data_byte_size,
+                                            self.data_type_cast((float(data_point.x)*1000)),
                                     )
-                                struct.pack_into(
-                                        "<" + self.data_type_str,
-                                        keypoints,
-                                        (2 + (landmark_index*3)) * self.data_byte_size,
-                                            self.data_type_cast((float(data_point.z)*10000)),
-                                    )
+                                    struct.pack_into(
+                                            "<" + self.data_type_str,
+                                            keypoints,
+                                            (1 +(landmark_index*3)) * self.data_byte_size,
+                                                self.data_type_cast((float(data_point.y)*1000)),
+                                        )
+                                    struct.pack_into(
+                                            "<" + self.data_type_str,
+                                            keypoints,
+                                            (2 + (landmark_index*3)) * self.data_byte_size,
+                                                self.data_type_cast((float(data_point.z)*1000)),
+                                        )
 
                                 
                             mp_drawing.draw_landmarks(

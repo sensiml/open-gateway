@@ -203,6 +203,7 @@ def connect():
         app.config["DEVICE_SOURCE"].connect()
         
         if app.config['DEVICE_SOURCE'].has_video_source():
+            print('setting video source')
             app.config['VIDEO_SOURCE'] = app.config['DEVICE_SOURCE'].get_video_source()
 
     return get_config()
