@@ -71,7 +71,7 @@ class BaseReader(object):
         elif self.data_type == "float":
             return "f"
 
-        return INT16_BYTE_SIZE
+        return "h"
 
     @property
     def data_type_cast(self):
@@ -198,6 +198,9 @@ class BaseReader(object):
 
         else:
             print("Base: Thread Already Started!")
+            
+    def has_video_source(self):
+        return False
 
     def disconnect(self):
         self.streaming = False

@@ -201,9 +201,11 @@ def connect():
         app.config["DEVICE_SOURCE"].update_config(app.config)
 
         app.config["DEVICE_SOURCE"].connect()
+        
+        if app.config['DEVICE_SOURCE'].has_video_source():
+            app.config['VIDEO_SOURCE'] = app.config['DEVICE_SOURCE'].get_video_source()
 
     return get_config()
-
 
 @app.route("/disconnect")
 def disconnect():
@@ -227,6 +229,7 @@ def version():
 @app.route("/config", methods=["GET", "POST"])
 def config():
     form = DeviceConfigureForm()
+    print(form.data)
 
     if request.method == "POST":
         disconnect()
@@ -257,6 +260,9 @@ def config():
         cache_config(app.config)
 
         app.config["DEVICE_SOURCE"] = source
+
+        if source.has_video_source():
+            app.config['VIDEO_SOURCE'] = app.config['DEVICE_SOURCE'].get_video_source()
 
     ret = parse_current_config()
 

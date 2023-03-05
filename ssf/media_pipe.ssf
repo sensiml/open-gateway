@@ -1,0 +1,447 @@
+{
+    "uuid": "2b137579-3723-41f1-b13d-9afc7b847eb1",
+    "device_name": "Media Pipe Hand Model",
+    "device_manufacturer": "Google",
+    "plugin_developer": "SensiML",
+    "firmware_download_links": [],
+    "documentation_links": [],
+    "capture_sources": [
+        {
+            "name": "Motion",
+            "part": "Default",
+            "sample_rates": [
+                24
+            ],
+            "sensors": [
+                {
+                    "type": "L_WRIST_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_THUMB_CMC_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_THUMB_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_THUMB_IP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_THUMB_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_INDEX_FINGER_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_INDEX_FINGER_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_INDEX_FINGER_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_INDEX_FINGER_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_MIDDLE_FINGER_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_MIDDLE_FINGER_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_MIDDLE_FINGER_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_MIDDLE_FINGER_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_RING_FINGER_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_RING_FINGER_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_RING_FINGER_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_RING_FINGER_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_PINKY_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_PINKY_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_PINKY_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "L_PINKY_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_WRIST_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_THUMB_CMC_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_THUMB_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_THUMB_IP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_THUMB_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_INDEX_FINGER_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_INDEX_FINGER_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_INDEX_FINGER_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_INDEX_FINGER_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_MIDDLE_FINGER_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_MIDDLE_FINGER_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_MIDDLE_FINGER_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_MIDDLE_FINGER_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_RING_FINGER_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_RING_FINGER_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_RING_FINGER_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_RING_FINGER_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_PINKY_MCP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_PINKY_PIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_PINKY_DIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "R_PINKY_TIP_",
+                    "is_default": true,
+                    "column_count": 3,
+                    "column_suffixes": [
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                }
+            ]
+        }
+    ],
+    "device_connections": [
+        {
+            "display_name": "Wi-Fi",
+            "value": 2,
+            "is_default": true
+        }
+    ],
+    "is_little_endian": true
+}
