@@ -53,11 +53,12 @@ class MediapipeStreamReader(ModelReader, BaseStreamReaderMixin):
     def _read_source(self):
 
         self.streaming = True
-        if self.device_id == "Mediapipe Hand Tracking":
+        if self.device_id== "Mediapipe Hand Tracking":
             self.video_source = MediapipeHandWebCam(0)
         elif self.device_id == "Mediapipe Pose Tracking":
             self.video_source = MediapipePoseWebCam(0)
         else:
+            print(self.device_id)
             raise Exception("Invalid device id")
         self.video_source.set_data_buffer(self.buffer)
         self.video_source.start()
@@ -206,7 +207,7 @@ def get_test_device_configs(device_id):
         config["samples_per_packet"] = 4
         config["data_type"] = "int"
 
-    if device_id=="Mediapipe Pose Tracking":
+    elif device_id=="Mediapipe Pose Tracking":
         config['column_location']=   {"NOSE" : 0,
         "LEFT_EYE_INNER" : 1,
         "LEFT_EYE" : 2,
@@ -246,6 +247,7 @@ def get_test_device_configs(device_id):
         config["data_type"] = "int"
 
     else:
+        
         raise Exception("Invalid Device ID")
 
     return config
