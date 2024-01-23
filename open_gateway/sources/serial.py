@@ -24,6 +24,7 @@ class SerialReader(BaseReader):
         super(SerialReader, self).__init__(config, device_id, **kwargs)
         self._port = device_id
         self._baud_rate = config.get("BAUD_RATE", BAUD_RATE)
+        self._streaming_version = 1
         print("BAUD rate set to", self._baud_rate)
 
     @property
@@ -33,6 +34,10 @@ class SerialReader(BaseReader):
     @property
     def baud_rate(self):
         return self._baud_rate
+    
+    @property
+    def streaming_version(self):
+        return self._streaming_version
 
     def _write(self, command):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
@@ -78,6 +83,12 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
 
         try:
             config = json.loads(self._read_line(flush_buffer=True))
+            self._streaming_version = config.get("version", 1)
+            
+            print("Serial Streaming Version: ", self.streaming_version)
+            
+            if not self.streaming_version in [1,2]:
+                raise Exception(f"Invalid Streaming Version: {self.streaming_version}")
         except:
             self._write("disconnect")
             time.sleep(1.0)
@@ -87,6 +98,49 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
             return config
 
         raise Exception("Invalid Configuration File")
+    
+    def _find_head_version_2(self, ser):
+        
+        data_block_byte_length = self.packet_buffer_size + 6
+        data_block_size_code = data_block_byte_length.to_bytes(2, 'little')
+        reserved_byte_code = b'\x00'
+        sync_byte_code = b'\xff'
+        
+        # maximum number of iterations to locate the start of the data packet
+        max_try = 10000
+        
+        sync_byte = ser.read()
+        for i in range(max_try):
+            while (sync_byte != sync_byte_code):
+                sync_byte = ser.read()
+            
+            # read in 3 bytes: LL + R
+            lenght_reserved_bytes = ser.read(3)
+            if lenght_reserved_bytes != data_block_size_code + reserved_byte_code:
+                sync_byte = ser.read()
+                continue
+            else:
+                break
+        
+        if i == max_try - 1:
+            raise Exception(f"Could not find data packet header, streaming version: {self.streaming_version}") 
+        
+        # read the packet data until it ends
+        ser.read(data_block_byte_length)
+        
+        
+    def _read_serial_data(self, ser):
+        
+        if self.streaming_version == 1:
+            sensor_data = ser.read(self.source_buffer_size)
+        elif self.streaming_version == 2:
+            overhead_size = 10
+            packet_data = ser.read(self.packet_buffer_size + overhead_size)
+            sensor_data = packet_data[9:-1]
+            
+        return sensor_data
+    
+        
 
     def _read_source(self):
 
@@ -102,11 +156,16 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
                     sml = self.get_sml_model_obj()
                 else:
                     sml = None
+                
+                if self.streaming_version == 1:
+                    pass  
+                elif self.streaming_version == 2:
+                    self._find_head_version_2(ser)
+                
 
                 while self.streaming:
-
-                    data = ser.read(self.source_buffer_size)
-
+                    
+                    data = self._read_serial_data(ser) 
                     self.buffer.update_buffer(data)
 
                     if self.run_sml_model:

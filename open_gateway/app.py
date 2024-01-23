@@ -85,6 +85,7 @@ def cache_config(config):
         "SOURCE_SAMPLES_PER_PACKET": config["SOURCE_SAMPLES_PER_PACKET"],
         "DATA_TYPE": config["DATA_TYPE"],
         "BAUD_RATE": config["BAUD_RATE"],
+        "SAMPLE_RATE": config["SAMPLE_RATE"],
     }
     json.dump(tmp, open(os.path.join(basedir, ".config.cache"), "w"))
 
@@ -163,6 +164,9 @@ def parse_current_config():
 def get_config():
 
     ret = parse_current_config()
+    
+    if ret.get("sample_rate", None) is not None:
+        ret["sample_rate"] = str(ret["sample_rate"])
 
     return Response(dumps(ret), mimetype="application/json")
 
@@ -236,7 +240,15 @@ def config():
             and form.data["source"].upper() == "SERIAL"
         ):
             app.config["BAUD_RATE"] = form.data["baud_rate"]
-
+                      
+        if ( form.data.get("sample_rate", None) is not None and form.data["source"].upper() == "MICROPHONE"):
+            app.config["SAMPLE_RATE"] = form.data["sample_rate"]
+            app.config["CONFIG_SAMPLE_RATE"] = form.data["sample_rate"]
+            
+        if form.data["source"].upper() != "MICROPHONE":
+            app.config["SAMPLE_RATE"] = None
+            app.config["CONFIG_SAMPLE_RATE"] = None
+            
         source = get_source(
             app.config,
             data_source=form.data["source"].upper(),

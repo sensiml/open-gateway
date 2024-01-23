@@ -3,7 +3,7 @@ from open_gateway.sources.test import TestStreamReader, TestResultReader
 from open_gateway.sources.serial import SerialStreamReader, SerialResultReader
 from open_gateway.sources.tcpip import TCPIPStreamReader, TCPIPResultReader
 from open_gateway.sources.fusion import FusionStreamReader, FusionResultReader
-
+from open_gateway.sources.microphone import MICStreamReader, MICResultReader
 
 try:
     # use bleak ble drivers
@@ -53,6 +53,9 @@ def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwa
 
         if data_source == "TCPIP":
             return TCPIPStreamReader(config, device_id, **kwargs)
+               
+        if data_source == "MICROPHONE":
+            return MICStreamReader(config, device_id, **kwargs)
 
     if source_type == "RECOGNITION":
         if data_source == "BLE":

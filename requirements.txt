@@ -11,3 +11,4 @@ nest_asyncio
 requests
 appdirs
 #bluepy
+pyaudio>=0.2.14

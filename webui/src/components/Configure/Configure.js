@@ -46,6 +46,9 @@ const Configure = (props) => {
   const [mode, setMode] = React.useState(
     props.streamingMode === "recognition" ? "RECOGNITION" : "DATA_CAPTURE"
   );
+
+  const [sample_rate, setSampleRate] = React.useState(props.streamingSampleRate);
+
   const [deviceID, setDeviceID] = React.useState(props.deviceID);
   const [error, setError] = React.useState(false);
 
@@ -53,7 +56,7 @@ const Configure = (props) => {
 
   const [configuring, setIsConfiguring] = React.useState(false);
 
-  const handleRadioChange = (event) => {
+  const handleSourceChange = (event) => {
     console.log("handle radio");
     setSource(event.target.value);
   };
@@ -66,6 +69,11 @@ const Configure = (props) => {
   const handleModeChange = (event) => {
     console.log("handle mode");
     setMode(event.target.value);
+  };
+
+  const handleSampleRate = (event) => {
+    console.log("handle sample rate");
+    setSampleRate(event.target.value);
   };
 
   const handleDeviceIDChange = (event) => {
@@ -97,6 +105,9 @@ const Configure = (props) => {
     };
     if (source === "SERIAL") {
       data.baud_rate = props.baudRate;
+    }
+    if (source === "MICROPHONE") {
+      data.sample_rate = sample_rate;
     }
     axios
       .post(`${process.env.REACT_APP_API_URL}config`, data)
@@ -133,12 +144,21 @@ const Configure = (props) => {
     axios.get(`${process.env.REACT_APP_API_URL}disconnect`).then((res) => {
       console.log(res.data);
       mapdata(res.data);
+      if (res.data.streaming === false) {
+        setHelperText("");
+      }
     });
   };
 
   function mapdata(data) {
     if (data.mode) {
       props.setStreamingMode(data.mode);
+    }
+    if (data.protocol) {
+      props.setStreamingProtocol(data.protocol);
+    }
+    if (data.sample_rate) {
+      props.setStreamingSampleRate(data.sample_rate);
     }
     props.setIsConnected(data.streaming);
     props.setColumns(Object.keys(data.column_location).sort());
@@ -158,7 +178,8 @@ const Configure = (props) => {
     setDeviceID(props.deviceID);
     setSource(props.streamingSource);
     setMode(props.streamingMode.toUpperCase());
-  }, [props.deviceID, props.streamingMode]);
+    setSampleRate(props.streamingSampleRate);
+  }, [props.deviceID, props.streamingSource, props.streamingMode, props.streamingProtocol, props.streamingSampleRate]);
 
   return (
     <Grid container columns>
@@ -178,6 +199,7 @@ const Configure = (props) => {
               <React.Fragment>
                 <Status
                   setStreamingMode={props.setStreamingMode}
+                  setStreamingSampleRate={props.setStreamingSampleRate}
                   setColumns={props.setColumns}
                   setStreamingSource={props.setStreamingSource}
                   setDeviceID={props.setDeviceID}
@@ -235,7 +257,7 @@ const Configure = (props) => {
                       <RadioGroup
                         aria-label="source"
                         value={source}
-                        onChange={handleRadioChange}
+                        onChange={handleSourceChange}
                         row
                       >
                         <FormControlLabel
@@ -258,8 +280,14 @@ const Configure = (props) => {
                           control={<Radio />}
                           label="Test"
                         />
+                        <FormControlLabel
+                          value="MICROPHONE"
+                          control={<Radio />}
+                          label="Microphone"
+                        />
                       </RadioGroup>
                     </div>
+
 
                     <Scan
                       source={source}
@@ -292,6 +320,52 @@ const Configure = (props) => {
                           onChange={handleDeviceBaudRate}
                           fullWidth={true}
                         />
+                      </div>
+                    ) : (
+                      <div />
+                    )}
+
+                    {(source === "MICROPHONE" && mode === "DATA_CAPTURE" ) ? (
+                      <div>
+                        <FormLabel>Microphone Sample Rate (Hz)</FormLabel>
+                        <RadioGroup
+                          aria-label="sample_rate"
+                          value={sample_rate}
+                          defaultValue="16000"
+                          onChange={handleSampleRate}
+                          row
+                        >
+                          <FormControlLabel
+                            value="8000"
+                            control={<Radio />}
+                            label="8000"
+                          />
+                          <FormControlLabel
+                            value="11025"
+                            control={<Radio />}
+                            label="11025"
+                          />
+                          <FormControlLabel
+                            value="16000"
+                            control={<Radio />}
+                            label="16000"
+                          />
+                          <FormControlLabel
+                            value="22050"
+                            control={<Radio />}
+                            label="22050"
+                          />
+                          <FormControlLabel
+                            value="44100"
+                            control={<Radio />}
+                            label="44100"
+                          />
+                          <FormControlLabel
+                            value="48000"
+                            control={<Radio />}
+                            label="48000"
+                          />
+                        </RadioGroup>
                       </div>
                     ) : (
                       <div />
