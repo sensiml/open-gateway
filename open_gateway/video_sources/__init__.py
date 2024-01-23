@@ -5,7 +5,6 @@ import re
 
 
 def get_video_source(camera_index):
-
     if camera_index == -1:
         from open_gateway.video_sources.screen_capture import ScreenCatpure
 
@@ -37,7 +36,6 @@ def list_cameras_darwin():
 
 
 def list_cameras_linux():
-
     # cmd = """v4l2-ctl --list-devices | awk '{split($0,a,"-"); gsub(/[):]/,"",a[3]); getline; name=substr($0,2); print a[3] "-" name; getline}'"""
     # cmd = "v4l2-ctl --list-devices > cameras.txt"
     cmd = "ls /dev/video* > cameras.txt"
@@ -55,7 +53,6 @@ def list_cameras_linux():
 
 
 def list_cameras_windows():
-
     """Get-PnpDevice -Status OK -FriendlyName *webcam* -Class camera,image > cameras.txt"""
 
     p = subprocess.Popen(
@@ -86,7 +83,6 @@ def list_cameras_windows():
 
 
 def get_video_source_list():
-
     if sys.platform == "darwin":
         camera_list = list_cameras_darwin()
 
@@ -113,7 +109,6 @@ def get_video_source_name(camera_index):
 
 
 if __name__ == "__main__":
-
     print(get_video_source_list())
 
     """

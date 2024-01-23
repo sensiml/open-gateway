@@ -13,13 +13,11 @@ def start_webcam():
     global cap, ret, lock, output_frame
 
     while cap.isOpened():
-
         start = time.time()
         with lock:
             start_in_lock = time.time()
             ret, frame = cap.read()
             if ret:
-
                 output_frame = frame.copy()
                 print("lock", time.time() - start_in_lock)
 

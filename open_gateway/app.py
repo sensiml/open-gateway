@@ -67,7 +67,7 @@ app.config["MODE"] = ""
 app.config["VIDEO_SOURCE"] = None
 app.config["LOOP"] = loop
 app.config["CLASS_MAP_IMAGES"] = []
-app.config["AUTO_CONNECT"] = False   
+app.config["AUTO_CONNECT"] = False
 
 app.config["GAME_MODE_ASSETS"] = {}
 
@@ -89,10 +89,12 @@ def cache_config(config):
     }
     json.dump(tmp, open(os.path.join(basedir, ".config.cache"), "w"))
 
+
 @app.before_first_request
 def before_first_request():
-    if app.config['AUTO_CONNECT']:        
+    if app.config["AUTO_CONNECT"]:
         connect()
+
 
 @app.route("/")
 def main():
@@ -125,7 +127,6 @@ def get_recording():
 
 
 def parse_current_config():
-
     ret = {}
     ret["sample_rate"] = app.config["CONFIG_SAMPLE_RATE"]
     ret["column_location"] = dict()
@@ -162,9 +163,8 @@ def parse_current_config():
 
 
 def get_config():
-
     ret = parse_current_config()
-    
+
     if ret.get("sample_rate", None) is not None:
         ret["sample_rate"] = str(ret["sample_rate"])
 
@@ -192,9 +192,7 @@ def scan():
 
 @app.route("/connect", methods=["GET"])
 def connect():
-
     if app.config.get("DEVICE_SOURCE", None) is None:
-
         app.config["DEVICE_SOURCE"] = get_source(
             app.config,
             device_id=get_device_id(),
@@ -211,9 +209,7 @@ def connect():
 
 @app.route("/disconnect")
 def disconnect():
-
     if app.config.get("DEVICE_SOURCE", None) is not None:
-
         app.config["DEVICE_SOURCE"].disconnect()
         app.config["DEVICE_SOURCE"] = None
 
@@ -240,15 +236,18 @@ def config():
             and form.data["source"].upper() == "SERIAL"
         ):
             app.config["BAUD_RATE"] = form.data["baud_rate"]
-                      
-        if ( form.data.get("sample_rate", None) is not None and form.data["source"].upper() == "MICROPHONE"):
+
+        if (
+            form.data.get("sample_rate", None) is not None
+            and form.data["source"].upper() == "MICROPHONE"
+        ):
             app.config["SAMPLE_RATE"] = form.data["sample_rate"]
             app.config["CONFIG_SAMPLE_RATE"] = form.data["sample_rate"]
-            
+
         if form.data["source"].upper() != "MICROPHONE":
             app.config["SAMPLE_RATE"] = None
             app.config["CONFIG_SAMPLE_RATE"] = None
-            
+
         source = get_source(
             app.config,
             data_source=form.data["source"].upper(),
@@ -278,7 +277,6 @@ def config():
 @app.route("/stream")
 @app.route("/results")
 def stream():
-
     if app.config.get("DEVICE_SOURCE", None) is None:
         return make_response(
             jsonify(detail="Must Connect to device before starting stream"), 400
@@ -289,9 +287,9 @@ def stream():
         mimetype="application/octet-stream",
     )
 
+
 @app.route("/game-results")
 def stream_model_results():
-
     if app.config.get("DEVICE_SOURCE", None) is None:
         return make_response(
             jsonify(detail="Must Connect to device before starting stream"), 400
@@ -301,7 +299,6 @@ def stream_model_results():
         stream_with_context(app.config["DEVICE_SOURCE"].read_result_data()),
         mimetype="application/octet-stream",
     )
-
 
 
 @app.route("/scan-video", methods=["GET"])
@@ -328,8 +325,7 @@ def config_model_json():
     if app.config["DEVICE_SOURCE"]:
         app.config["DEVICE_SOURCE"].model_json = app.config["MODEL_JSON"]
 
-    return Response(dumps( app.config["MODEL_JSON"]), mimetype="application/json")
-
+    return Response(dumps(app.config["MODEL_JSON"]), mimetype="application/json")
 
 
 @app.route("/config-class-map-images-json", methods=["POST"])
@@ -368,11 +364,9 @@ def config_class_map_images():
         else:
             print(f"{C_CLR_OKBLUE} Saved image for class {class_name}")
 
-        app.config["CLASS_MAP_IMAGES"].append(
-            {"name": class_name, "img": new_img_name}
-        )
+        app.config["CLASS_MAP_IMAGES"].append({"name": class_name, "img": new_img_name})
 
-    return Response(dumps( app.config["CLASS_MAP_IMAGES"]), mimetype="application/json")
+    return Response(dumps(app.config["CLASS_MAP_IMAGES"]), mimetype="application/json")
 
 
 @app.route("/config-video", methods=["GET", "POST"])
@@ -392,9 +386,7 @@ def config_video():
     camera_index = form.data["camera_index"]
 
     if request.method == "POST":
-
         if event_type == "camera-on":
-
             if app.config["VIDEO_SOURCE"]:
                 return make_response(jsonify(detail="Camera already on"), 200)
 
@@ -404,7 +396,6 @@ def config_video():
             return jsonify(detail="Camera Started")
 
         if event_type == "camera-off":
-
             if app.config["VIDEO_SOURCE"] is None:
                 return make_response(jsonify(detail="Camera is already off"), 200)
 
@@ -421,7 +412,6 @@ def config_video():
             )
 
     if request.method == "GET":
-
         resp = {
             "camera_on": False,
             "camera_record": False,
@@ -477,7 +467,6 @@ def record_video():
         )
 
     if event_type == "record-stop":
-
         if app.config["VIDEO_SOURCE"].is_recording():
             app.config["VIDEO_SOURCE"].record_stop()
 
@@ -486,7 +475,6 @@ def record_video():
         return make_response(jsonify(detail="Video is not recording"), 400)
 
     if event_type == "record-start":
-
         if filename is None:
             return make_response(
                 jsonify(detail="Must pass filename to start recording"), 400
@@ -534,7 +522,6 @@ def record_device():
         )
 
     if event_type == "record-start":
-
         if filename is None:
             return make_response(
                 jsonify(detail="Must pass filename to start recording!"), 400
@@ -548,7 +535,6 @@ def record_device():
         return jsonify(detail="Recording Started!")
 
     if event_type == "record-stop":
-
         if app.config["DEVICE_SOURCE"].is_recording():
             app.config["DEVICE_SOURCE"].record_stop(filename)
 
@@ -578,7 +564,6 @@ def record():
     event_type = form.data["event_type"]
 
     if event_type == "record-start":
-
         if app.config["VIDEO_SOURCE"] is None:
             return make_response(
                 jsonify(detail="Must start webcam before starting to record!"), 400
@@ -609,7 +594,6 @@ def record():
         return jsonify(detail="Recording Started!")
 
     if event_type == "record-stop":
-
         was_recording = False
 
         if app.config["VIDEO_SOURCE"] and app.config["VIDEO_SOURCE"].is_recording():
@@ -631,7 +615,6 @@ def record():
 
 
 def get_file_dcli(filename):
-
     video_path = filename[:-4] + ".mp4"
     file_path = filename
     return {
@@ -685,7 +668,6 @@ def download():
     dcli = []
 
     with zipfile.ZipFile(os.path.join(basedir, "cache", "data.zip"), "w") as zfile:
-
         for filename in os.listdir(os.path.join(basedir, "data")):
             datafile_path = os.path.join(basedir, "data", filename)
             zfile.write(datafile_path, filename)
@@ -737,10 +719,11 @@ def class_map_images():
         ]
     )
 
+
 @app.route("/game-demo-asset", methods=["GET"])
 def get_game_demo_asset():
+    return Response(dumps(app.config["GAME_MODE_ASSETS"]), mimetype="application/json")
 
-    return Response(dumps( app.config["GAME_MODE_ASSETS"]), mimetype="application/json")
 
 def exit_with_delay(delay=3, status_code=1):
     """controled exit from the app"""
@@ -749,7 +732,6 @@ def exit_with_delay(delay=3, status_code=1):
 
 
 def main():
-
     options_string = """
 python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-model-json-file> -c <True/False> -f <scaling-factor> -i <classmap-images-json-file>
 
@@ -769,7 +751,6 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
     HOST = os.environ.get("SERVER_HOST", "localhost")
     PORT = 5555
 
-
     ensure_folder_exists(basedir)
 
     try:
@@ -785,8 +766,7 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                 "scaling_factor",
                 "class_map_images_json_path",
                 "hide_ui",
-                "game_json"
-                "convert_to_in16"
+                "game_json" "convert_to_in16",
             ],
         )
     except getopt.GetoptError:
@@ -872,7 +852,12 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
         elif opt in ("-g", "--game_json"):
             AUDIO_ASSETS = ["action_audio", "winner_audio", "loser_audio"]
             IMG_ASSETS = ["winner_img", "loser_img"]
-            VALUES_ASSESTS = ["winner_text", "loser_text", "countdown_timer", "winner_classification_count_threshold"]
+            VALUES_ASSESTS = [
+                "winner_text",
+                "loser_text",
+                "countdown_timer",
+                "winner_classification_count_threshold",
+            ]
 
             if os.path.exists(arg):
                 dir_to_save = os.path.join(app.static_folder, GAME_MODE_ASSETS_FLD_NAME)
@@ -896,7 +881,9 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                         dest_file = open(os.path.join(dir_to_save, file_name), "wb+")
                         dest_file.write(main_file)
                         dest_file.close()
-                        app.config["GAME_MODE_ASSETS"][audio_file_name] = os.path.join(GAME_MODE_ASSETS_FLD_NAME, file_name)
+                        app.config["GAME_MODE_ASSETS"][audio_file_name] = os.path.join(
+                            GAME_MODE_ASSETS_FLD_NAME, file_name
+                        )
 
                 for img_file_name in IMG_ASSETS:
                     img_path = uploaded_json_file.get(img_file_name)
@@ -908,7 +895,9 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
                             img_path=get_abs_file_path(img_path),
                             img_name="_".join(file_name.lower().split()),
                         )
-                        app.config["GAME_MODE_ASSETS"][img_file_name] = os.path.join(GAME_MODE_ASSETS_FLD_NAME, new_img_name)
+                        app.config["GAME_MODE_ASSETS"][img_file_name] = os.path.join(
+                            GAME_MODE_ASSETS_FLD_NAME, new_img_name
+                        )
 
                 for value_key in VALUES_ASSESTS:
                     value = uploaded_json_file.get(value_key)
@@ -928,9 +917,8 @@ python app.py -u <host> -p <port> -s <path-to-libsensiml.so-folder> -m <path-to-
             print("setting baud rate", arg)
             app.config["BAUD_RATE"] = int(arg)
         elif opt in ("-c", "--connect"):
-            print('setting connect to True')
-            app.config["AUTO_CONNECT"] = True   
-
+            print("setting connect to True")
+            app.config["AUTO_CONNECT"] = True
 
     try:
         if not HIDE_UI:

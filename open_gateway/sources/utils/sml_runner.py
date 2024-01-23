@@ -2,6 +2,7 @@ import os
 import json
 import ctypes
 from ctypes import Array, CDLL
+
 if os.name == "nt":
     from ctypes import WinDLL
 
@@ -301,7 +302,6 @@ class SMLRunner(object):
             self._classification_result_info = empty_function
 
     def _initialized(self):
-
         if not self._model_initialized:
             print("Initialize the model before running this function")
             return None
@@ -574,7 +574,6 @@ class SMLRunner(object):
         self._flush_model(model_index_ctype)
 
     def get_model_header(self, model_index):
-
         if not self._initialized():
             return
 
@@ -586,7 +585,6 @@ class SMLRunner(object):
         return pme_model_header
 
     def get_model_pattern(self, model_index, pattern_index):
-
         if not self._initialized():
             return
 
@@ -599,7 +597,6 @@ class SMLRunner(object):
         return pme_pattern
 
     def get_feature_vector(self, model_index, feature_vector_buffer_size=256):
-
         if not self._initialized():
             return
 

@@ -20,12 +20,11 @@ class CircularBufferQueue(object):
             print(i, "len:", len(self._data[i]))
 
     def _increment(self):
-        """ Increment and clear next buffer """
+        """Increment and clear next buffer"""
         self._index = (self._index + 1) % self._num_buffers
         self._data[self._index] = self.get_empty()
 
     def update_buffer(self, data):
-
         with self._lock:
             size = len(self._data[self._index]) + len(data)
 
@@ -36,7 +35,6 @@ class CircularBufferQueue(object):
                 self._data[self._index] += data
 
             elif size >= self._maxsize:
-
                 # top off current index
                 taken = self._maxsize - len(self._data[self._index])
                 self._data[self._index] += data[:taken]
@@ -74,7 +72,6 @@ class CircularBufferQueue(object):
         return buffer_iterator(copy.deepcopy(self._data[index]), data_width)
 
     def read_buffer(self, buffer_index):
-
         with self._lock:
             return copy.deepcopy(self._data[buffer_index])
 

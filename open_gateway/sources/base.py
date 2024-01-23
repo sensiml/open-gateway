@@ -19,7 +19,7 @@ except:
 
 
 class BaseReader(object):
-    """ Base Reader Object, describes the methods that must be implemented for each data source"""
+    """Base Reader Object, describes the methods that must be implemented for each data source"""
 
     def __init__(self, config, device_id=None, name=None, **kwargs):
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
@@ -53,7 +53,6 @@ class BaseReader(object):
 
     @property
     def data_byte_size(self):
-
         INT16_BYTE_SIZE = 2
         FLOAT32_BYTE_SIZE = 4
 
@@ -84,7 +83,6 @@ class BaseReader(object):
 
     @property
     def data_width_bytes(self):
-
         return self.data_width * self.data_byte_size
 
     @property
@@ -99,7 +97,6 @@ class BaseReader(object):
 
     @staticmethod
     def _validate_config(config):
-
         if not isinstance(config, dict):
             raise Exception("Invalid Configuration")
 
@@ -142,7 +139,7 @@ class BaseReader(object):
         pass
 
     def read_config(self):
-        """ read the config from the device and set the properties of the object """
+        """read the config from the device and set the properties of the object"""
 
         print("Reader: reading device config")
         config = self.read_device_config()
@@ -163,7 +160,7 @@ class BaseReader(object):
         config["DATA_TYPE"] = self.data_type
 
     def update_config(self, config):
-        """ update the objects local config values from the app cache """
+        """update the objects local config values from the app cache"""
 
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.source_samples_per_packet = config["SOURCE_SAMPLES_PER_PACKET"]
@@ -173,7 +170,6 @@ class BaseReader(object):
         self.data_type = config.get("DATA_TYPE", "int16")
 
     def connect(self):
-
         if self._thread is None:
             "Assume if there is a thread, we are already connected"
 
@@ -209,7 +205,6 @@ class BaseReader(object):
         self.rbuffer.reset_buffer()
 
     def record_start(self, filename):
-
         if not self.streaming:
             raise Exception("Must start streaming before beginning to record!")
 
@@ -243,7 +238,6 @@ class BaseReader(object):
         return True
 
     def convert_data_to_list(self, data):
-
         num_samples = len(data) // self.data_byte_size
 
         tmp = struct.unpack(self.data_type_str * num_samples, data)
@@ -254,7 +248,6 @@ class BaseReader(object):
             yield tmp[index * self.data_width : (index + 1) * self.data_width]
 
     def convert_data_to_int16(self, data):
-
         num_samples = len(data) // self.data_byte_size
 
         tmp = struct.unpack(self.data_type_str * num_samples, data)
@@ -271,7 +264,6 @@ class BaseReader(object):
         return bytes(sample_data)
 
     def get_sml_model_obj(self):
-
         sml = SMLRunner(os.path.join(self.sml_library_path))
         sml.init_model()
         print("Model initialized")
@@ -286,8 +278,9 @@ class BaseReader(object):
                     self._map_classification({"ModelNumber": 0, "Classification": ret})
                 )
                 sml.reset_model(0)
-                return  self._map_classification({"ModelNumber": 0, "Classification": ret})
-            
+                return self._map_classification(
+                    {"ModelNumber": 0, "Classification": ret}
+                )
 
     def _map_classification(self, results):
         if self.model_json:
@@ -304,7 +297,6 @@ class BaseReader(object):
 
 
 class BaseStreamReaderMixin(object):
-
     def read_result_data(self):
         print("StreamReader: New stream reader connected")
         # name = random.randint(0, 100)
@@ -321,7 +313,6 @@ class BaseStreamReaderMixin(object):
         rand = random.randint(0, 100)
 
         while self.streaming:
-
             if index is None:
                 index = self.rbuffer.get_latest_buffer()
                 time.sleep(0.1)
@@ -332,9 +323,9 @@ class BaseStreamReaderMixin(object):
                 index = self.rbuffer.get_next_index(index)
 
                 for result in data:
-                    if result:                      
+                    if result:
                         result["timestamp"] = time.time()
-                        print('reader', index, result)
+                        print("reader", index, result)
                         yield json.dumps(result) + "\n"
 
             else:
@@ -343,7 +334,7 @@ class BaseStreamReaderMixin(object):
         print("ResultReader: Result stream ended")
 
     def read_data(self):
-        """ Generator to read the data stream out of the buffer """
+        """Generator to read the data stream out of the buffer"""
 
         print("StreamReader: New stream reader connected")
         # name = random.randint(0, 100)
@@ -358,7 +349,6 @@ class BaseStreamReaderMixin(object):
         index = self.buffer.get_latest_buffer()
 
         while self.streaming:
-
             if index is None:
                 index = self.buffer.get_latest_buffer()
                 time.sleep(0.1)
@@ -379,7 +369,6 @@ class BaseStreamReaderMixin(object):
         print("StreamReader: Stream Ended")
 
     def _record_data(self, filename):
-
         with open(filename + ".csv", "w", newline="") as csvfile:
             datawriter = csv.writer(csvfile, delimiter=",")
             print("StreamReader: Recording stream to ", filename + ".csv")
@@ -397,7 +386,6 @@ class BaseStreamReaderMixin(object):
             data_reader = self.read_data()
 
             while self.recording:
-
                 data = next(data_reader)
 
                 if data:
@@ -419,7 +407,7 @@ class BaseResultReaderMixin(object):
         return {"samples_per_packet": 1}
 
     def read_data(self):
-        """ Generator to read the result stream out of the buffer """
+        """Generator to read the result stream out of the buffer"""
 
         print("ResultReader: result read starting")
 
@@ -434,7 +422,6 @@ class BaseResultReaderMixin(object):
         rand = random.randint(0, 100)
 
         while self.streaming:
-
             if index is None:
                 index = self.rbuffer.get_latest_buffer()
                 time.sleep(0.1)
@@ -472,15 +459,12 @@ class BaseResultReaderMixin(object):
     def read_result_data(self):
         return self.read_data()
 
-
     def _record_data(self, filename):
-
         with open(filename + ".csv", "w", newline="") as out:
             print("ResultReader: Recording results to ", filename + ".csv")
             data_reader = self.read_data()
 
             while self.recording:
-
                 data = next(data_reader)
 
                 if data:

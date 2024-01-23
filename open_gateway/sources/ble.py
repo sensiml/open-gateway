@@ -43,9 +43,7 @@ class StreamingDelegate(btle.DefaultDelegate):
         self._lock = lock
 
     def handleNotification(self, cHandle, value):
-
         with self._lock:
-
             if self.data:
                 self.data += value
             else:
@@ -59,12 +57,11 @@ class ResultDelegate(StreamingDelegate):
 
 
 class BLEReader(BaseReader):
-    """ Base Reader Object, describes the methods that must be implemented for each data source"""
+    """Base Reader Object, describes the methods that must be implemented for each data source"""
 
     name = "BLE"
 
     def __init__(self, config, device_id, connect=True, **kwargs):
-
         super(BLEReader, self).__init__(config, device_id, **kwargs)
 
         self.delegate = StreamingDelegate(self._lock)
@@ -81,7 +78,6 @@ class BLEReader(BaseReader):
             self.peripheral.setDelegate(self.delegate)
 
     def disconnect(self):
-
         self.streaming = False
         self.subscribed = False
 
@@ -97,7 +93,6 @@ class BLEReader(BaseReader):
         self.rbuffer.reset_buffer()
 
     def list_available_devices(self):
-
         scanner = Scanner().withDelegate(ScanDelegate())
         devices = scanner.scan(5.0)
 
@@ -105,7 +100,7 @@ class BLEReader(BaseReader):
 
         for index, dev in enumerate(devices):
             tmp = {"id": index, "device_id": dev.addr, "name": ""}
-            for (adtype, desc, value) in dev.getScanData():
+            for adtype, desc, value in dev.getScanData():
                 if desc == "Complete Local Name":
                     tmp["name"] = value
 
@@ -114,7 +109,6 @@ class BLEReader(BaseReader):
         return device_list
 
     def read_device_config(self):
-
         print("BLE: Reading device config")
         if self.peripheral is None:
             raise Exception("BLE Device ID Not Configured.")
@@ -130,7 +124,6 @@ class BLEReader(BaseReader):
 
 class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
     def _send_subscribe(self):
-
         if not self.subscribed:
             print("BLE: Subscrbing to stream reader")
             setup_data = b"\x01\x00"
@@ -144,7 +137,6 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
             self.subscribed = True
 
     def _read_source(self):
-
         self.streaming = True
 
         # clear ble buffer
@@ -153,7 +145,6 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
 
         try:
             while self.streaming:
-
                 if self.peripheral.waitForNotifications(0.01):
                     continue
 
@@ -175,10 +166,9 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
 
 
 class BLEResultReader(BLEReader, BaseResultReaderMixin):
-    """ Base Reader Object, describes the methods that must be implemented for each data source"""
+    """Base Reader Object, describes the methods that must be implemented for each data source"""
 
     def __init__(self, config, device_id, connect=True, **kwargs):
-
         super(BLEReader, self).__init__(config, device_id, **kwargs)
 
         self.delegate = ResultDelegate(self._lock)
@@ -193,7 +183,6 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
             self.peripheral.setDelegate(self.delegate)
 
     def read_device_config(self):
-
         return {"samples_per_packet": 1}
 
     def set_app_config(self, config):
@@ -201,7 +190,6 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
         config["DEVICE_ID"] = self.device_id
 
     def _send_subscribe(self):
-
         print("sending connect")
         if not self.subscribed:
             print("subscring")
@@ -219,7 +207,6 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
             print("subscribed")
 
     def _read_source(self):
-
         self.streaming = True
 
         while self.streaming:
@@ -243,7 +230,6 @@ class BLEResultReader(BLEReader, BaseResultReaderMixin):
 
 
 if __name__ == "__main__":
-
     config = {
         "DATA_SOURCE": "BLE",
         "CONFIG_SAMPLE_RATE": 119,

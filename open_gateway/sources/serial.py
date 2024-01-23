@@ -16,11 +16,28 @@ from open_gateway.sources.base import (
 BAUD_RATE = 460800
 
 
+def bxor(b1, b2):
+    result = bytearray()
+    for b1, b2 in zip(b1, b2):
+        result.append(b1 ^ b2)
+    return bytes(result)
+
+
+def validate_checksum(XOR, data_load, checksum):
+    for i in range(len(data_load)):
+        XOR = bxor(XOR, data_load[i : i + 1])
+
+    XOR = bytes(XOR)
+    if checksum != XOR:
+        raise Exception(
+            f"Checksum mismatch! The serial connection may be faulty, or the device might be streaming data in an incorrect format !"
+        )
+
+
 class SerialReader(BaseReader):
     name = "SERIAL"
 
     def __init__(self, config, device_id, **kwargs):
-
         super(SerialReader, self).__init__(config, device_id, **kwargs)
         self._port = device_id
         self._baud_rate = config.get("BAUD_RATE", BAUD_RATE)
@@ -34,7 +51,7 @@ class SerialReader(BaseReader):
     @property
     def baud_rate(self):
         return self._baud_rate
-    
+
     @property
     def streaming_version(self):
         return self._streaming_version
@@ -45,7 +62,6 @@ class SerialReader(BaseReader):
 
     def _read_line(self, flush_buffer=False):
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
-
             value = ser.readline()
             if flush_buffer:
                 value = ser.readline()
@@ -80,14 +96,13 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
         self._write("connect")
 
     def read_device_config(self):
-
         try:
             config = json.loads(self._read_line(flush_buffer=True))
             self._streaming_version = config.get("version", 1)
-            
+
             print("Serial Streaming Version: ", self.streaming_version)
-            
-            if not self.streaming_version in [1,2]:
+
+            if not self.streaming_version in [1, 2]:
                 raise Exception(f"Invalid Streaming Version: {self.streaming_version}")
         except:
             self._write("disconnect")
@@ -98,22 +113,21 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
             return config
 
         raise Exception("Invalid Configuration File")
-    
+
     def _find_head_version_2(self, ser):
-        
         data_block_byte_length = self.packet_buffer_size + 6
-        data_block_size_code = data_block_byte_length.to_bytes(2, 'little')
-        reserved_byte_code = b'\x00'
-        sync_byte_code = b'\xff'
-        
+        data_block_size_code = data_block_byte_length.to_bytes(2, "little")
+        reserved_byte_code = b"\x00"
+        sync_byte_code = b"\xff"
+
         # maximum number of iterations to locate the start of the data packet
         max_try = 10000
-        
+
         sync_byte = ser.read()
         for i in range(max_try):
-            while (sync_byte != sync_byte_code):
+            while sync_byte != sync_byte_code:
                 sync_byte = ser.read()
-            
+
             # read in 3 bytes: LL + R
             lenght_reserved_bytes = ser.read(3)
             if lenght_reserved_bytes != data_block_size_code + reserved_byte_code:
@@ -121,33 +135,36 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
                 continue
             else:
                 break
-        
+
         if i == max_try - 1:
-            raise Exception(f"Could not find data packet header, streaming version: {self.streaming_version}") 
-        
-        # read the packet data until it ends
-        ser.read(data_block_byte_length)
-        
-        
+            raise Exception(
+                f"Could not find data packet header, streaming version: {self.streaming_version}"
+            )
+
+        # read the packet data except for the checksum byte
+        data_load = ser.read(data_block_byte_length - 1)
+        chekcsum = ser.read()
+        validate_checksum(reserved_byte_code, data_load, chekcsum)
+
     def _read_serial_data(self, ser):
-        
         if self.streaming_version == 1:
             sensor_data = ser.read(self.source_buffer_size)
         elif self.streaming_version == 2:
             overhead_size = 10
             packet_data = ser.read(self.packet_buffer_size + overhead_size)
             sensor_data = packet_data[9:-1]
-            
+
+            XOR = packet_data[3:4]
+            data_load = packet_data[4:-1]
+            chekcsum = packet_data[-1:]
+            validate_checksum(XOR, data_load, chekcsum)
+
         return sensor_data
-    
-        
 
     def _read_source(self):
-
         try:
             print("Serial: Reading source stream")
             with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
-
                 self.streaming = True
                 ser.reset_input_buffer()
                 ser.read(self.source_buffer_size)
@@ -156,22 +173,20 @@ class SerialStreamReader(SerialReader, BaseStreamReaderMixin):
                     sml = self.get_sml_model_obj()
                 else:
                     sml = None
-                
+
                 if self.streaming_version == 1:
-                    pass  
+                    pass
                 elif self.streaming_version == 2:
                     self._find_head_version_2(ser)
-                
 
                 while self.streaming:
-                    
-                    data = self._read_serial_data(ser) 
+                    data = self._read_serial_data(ser)
                     self.buffer.update_buffer(data)
 
                     if self.run_sml_model:
                         model_result = self.execute_run_sml_model(sml, data)
                         if model_result:
-                            self.rbuffer.update_buffer([model_result])                        
+                            self.rbuffer.update_buffer([model_result])
 
                     time.sleep(0.00001)
 
@@ -190,23 +205,22 @@ class SerialResultReader(SerialReader, BaseResultReaderMixin):
         config["DEVICE_ID"] = self.port
 
     def _read_source(self):
-
         self._flush_buffer()
 
         self.streaming = True
         with serial.Serial(self.port, self.baud_rate, timeout=1) as ser:
             while self.streaming:
-            
                 try:
-                    value = ser.readline()                    
+                    value = ser.readline()
                     data = [value.decode("ascii")]
-                    
+
                 except Exception as e:
-                    print(e,)
+                    print(
+                        e,
+                    )
                     print("value", value)
                     continue
 
-                
                 if "ModelNumber" in data[0]:
                     self.rbuffer.update_buffer(data)
                 elif data[0]:
@@ -216,7 +230,7 @@ class SerialResultReader(SerialReader, BaseResultReaderMixin):
 if __name__ == "__main__":
     port = "/dev/ttyACM0"
     buffer_size = 6 * 10
-    config={'DATA_SOURCE':'RESULTS', "DEVICE_ID":"COM4"}
+    config = {"DATA_SOURCE": "RESULTS", "DEVICE_ID": "COM4"}
     sr = SerialResultReader(config, "COM4")
     sr.connect()
     sr._read_source()

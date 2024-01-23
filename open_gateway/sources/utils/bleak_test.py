@@ -38,7 +38,6 @@ async def read_gatt(address, charUUID):
 
 
 if __name__ == "__main__":
-
     loop = asyncio.get_event_loop()
     devices = loop.run_until_complete(scan())
 
