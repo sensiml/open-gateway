@@ -24,7 +24,6 @@ class VideoBase(object):
         self.streaming = {}
 
     def info(self):
-
         status = {
             "camera_on": False,
             "camera_record": False,
@@ -42,7 +41,7 @@ class VideoBase(object):
         return status
 
     def is_recording(self):
-        """ Return True if recording, else False """
+        """Return True if recording, else False"""
         with self.lock:
             if self.video_writer:
                 return True
@@ -50,7 +49,7 @@ class VideoBase(object):
         return False
 
     def is_on(self):
-        """ Return True if camera is on"""
+        """Return True if camera is on"""
 
         with self.lock:
             if self.vs:
@@ -59,7 +58,6 @@ class VideoBase(object):
         return False
 
     def _get_new_streaming_index(self):
-
         with self.lock:
             if len(self.streaming) >= MAX_VIDEO_STREAMS:
                 if MAX_VIDEO_STREAMS == 1:
@@ -74,7 +72,7 @@ class VideoBase(object):
             return self.streaming_index - 1
 
     def generate(self):
-        """ Generate an octet stream response consumable by a response stream """
+        """Generate an octet stream response consumable by a response stream"""
 
         key = self._get_new_streaming_index()
         self.streaming[key] = True
@@ -114,9 +112,7 @@ class VideoBase(object):
         del self.streaming[key]
 
     def record_start(self, filename):
-
         with self.lock:
-
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # Be sure to use the lower case
 
             # Define the codec and create VideoWriter object
@@ -136,7 +132,6 @@ class VideoBase(object):
             )
 
     def record_stop(self):
-
         with self.lock:
             if self.video_writer:
                 self.video_writer.release()
@@ -144,7 +139,6 @@ class VideoBase(object):
 
     def off(self):
         with self.lock:
-
             for key in self.streaming.keys():
                 self.streaming[key] = False
             self.streaming_index = 0
@@ -154,7 +148,6 @@ class VideoBase(object):
                 self.video_writer = None
 
             if self.vs:
-
                 try:
                     self.vs.release()
                 except Exception as e:

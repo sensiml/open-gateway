@@ -65,7 +65,6 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
         return bytes(sample_data), len(x)
 
     def _pack_data(self, data, data_len, num_columns, samples_per_packet, start_index):
-
         start = start_index * self.data_byte_size * num_columns
 
         if samples_per_packet + start_index > data_len:
@@ -80,7 +79,6 @@ class TestStreamReader(TestReader, BaseStreamReaderMixin):
             return data[start:end], end_index
 
     def read_device_config(self):
-
         config = get_test_device_configs(self.device_id)
 
         self._validate_config(config)
@@ -135,11 +133,9 @@ class TestResultReader(TestReader, BaseResultReaderMixin):
         config["DEVICE_ID"] = self.device_id
 
     def _read_source(self):
-
         self.streaming = True
 
         while self.streaming:
-
             import random
 
             result = json.dumps(
@@ -153,7 +149,6 @@ class TestResultReader(TestReader, BaseResultReaderMixin):
 
 
 def get_test_device_configs(device_id):
-
     config = {}
 
     if device_id == "Test IMU 6-axis Float":

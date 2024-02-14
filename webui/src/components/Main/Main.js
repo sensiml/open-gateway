@@ -19,6 +19,7 @@ const Main = (props) => {
   const dispatch = useDispatch();
   const [activeView, setActiveView] = React.useState(0);
   const [streamingMode, setStreamingMode] = React.useState('DATA_CAPTURE');
+  const [streamingSampleRate, setStreamingSampleRate] = React.useState("16000");
   const [streamingSource, setStreamingSource] = React.useState(null);
   const [columns, setColumns] = React.useState([]);
   const [deviceID, setDeviceID] = React.useState([]);
@@ -45,6 +46,9 @@ const Main = (props) => {
   function mapdata(data) {
     if (data.mode) {
       setStreamingMode(data.mode);
+    }
+    if (data.sample_rate) {
+      setStreamingSampleRate(data.sample_rate);
     }
     setIsConnected(data.streaming);
     setColumns(Object.keys(data.column_location).sort());
@@ -116,7 +120,7 @@ const Main = (props) => {
         console.log("setGameModeAssets", response.data);
       });
     }
-    
+
     axios.get(`${process.env.REACT_APP_API_URL}config`, {}).then((response) => {
       mapdata(response.data);
       console.log(response.data)
@@ -149,7 +153,7 @@ const Main = (props) => {
           loserText={gameModeAssets.winner_text}
           onClose={() => handleChange(1)}
         />
-      :
+        :
         <Grid container direction="column" justify="center" alignItems="center">
           <Header />
           <NavBar
@@ -162,8 +166,10 @@ const Main = (props) => {
             {activeView === 0 ? (
               <Configure
                 streamingMode={streamingMode}
+                streamingSampleRate={streamingSampleRate}
                 deviceID={deviceID}
                 setStreamingMode={setStreamingMode}
+                setStreamingSampleRate={setStreamingSampleRate}
                 setColumns={setColumns}
                 setStreamingSource={setStreamingSource}
                 setDeviceID={setDeviceID}
@@ -182,6 +188,7 @@ const Main = (props) => {
               <TestMode
                 columns={columns}
                 streamingMode={streamingMode}
+                streamingSampleRate={streamingSampleRate}
                 isConnected={isConnected}
                 isRecording={isRecording}
                 isCameraConnected={isCameraConnected}

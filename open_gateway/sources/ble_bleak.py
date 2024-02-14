@@ -26,12 +26,11 @@ RecognitionClassUUID = "42421101-5A22-46DD-90F7-7AF26F723159"
 
 
 class BLEReader(BaseReader):
-    """ Base Reader Object, describes the methods that must be implemented for each data source"""
+    """Base Reader Object, describes the methods that must be implemented for each data source"""
 
     name = "BLE"
 
     def __init__(self, config, device_id, connect=True, **kwargs):
-
         super(BLEReader, self).__init__(config, device_id, **kwargs)
 
         self.subscribed = False
@@ -74,7 +73,6 @@ class BLEReader(BaseReader):
         print("BlE: Disconnected from:", address)
 
     def disconnect(self):
-
         self.streaming = False
         self.subscribed = False
 
@@ -86,7 +84,6 @@ class BLEReader(BaseReader):
         self.rbuffer.reset_buffer()
 
     def list_available_devices(self):
-
         devices = self.loop.run_until_complete(self.runScanner())
         print(devices)
 
@@ -100,7 +97,6 @@ class BLEReader(BaseReader):
         return device_list
 
     def read_device_config(self):
-
         print("BLE: Read device config")
 
         if self.device_id is None:
@@ -115,7 +111,6 @@ class BLEReader(BaseReader):
         )
 
     def _read_source(self):
-
         self.streaming = True
 
         try:
@@ -130,7 +125,6 @@ class BLEReader(BaseReader):
 
 
 class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
-
     charUUID = uuidOfDataChar
 
     def handleNotification(self, cHandle: int, value: bytearray):
@@ -138,12 +132,11 @@ class BLEStreamReader(BLEReader, BaseStreamReaderMixin):
 
 
 class BLEResultReader(BLEReader, BaseResultReaderMixin):
-    """ Base Reader Object, describes the methods that must be implemented for each data source"""
+    """Base Reader Object, describes the methods that must be implemented for each data source"""
 
     charUUID = RecognitionClassUUID
 
     def read_device_config(self):
-
         return {"samples_per_packet": 1}
 
     def set_app_config(self, config):

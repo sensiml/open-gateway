@@ -19,10 +19,9 @@ from open_gateway.sources.buffers import (
 
 
 class BaseFusionReader(BaseReader):
-    """ Base Reader Object, describes the methods that must be implemented for each data source"""
+    """Base Reader Object, describes the methods that must be implemented for each data source"""
 
     def __init__(self, config, sources, device_id, data_source):
-
         self.class_map = config["CLASS_MAP"]
         self.samples_per_packet = config["CONFIG_SAMPLES_PER_PACKET"]
         self.name = data_source
@@ -87,7 +86,6 @@ class BaseFusionReader(BaseReader):
 
 class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
     def read_config(self):
-
         for source in self.sources:
             source.read_config()
 
@@ -134,14 +132,12 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
 
     def read_data(self):
         def inerleave_buffers(data_buffers):
-
             packet_buffer = b""
 
             getting_packets = True
 
             while getting_packets:
                 for index, packet in enumerate(data_buffers):
-
                     tmp = next(packet)
 
                     if tmp:
@@ -161,7 +157,6 @@ class FusionStreamReader(BaseFusionReader, BaseStreamReaderMixin):
             time.sleep(0.01)
 
         while self.is_streaming():
-
             for index, source in enumerate(self.sources):
                 if not data_ready[index] and source.buffer.is_buffer_full(
                     bindex[index]
@@ -188,22 +183,18 @@ class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
         config["DEVICE_ID"] = self.device_id
 
     def read_data(self):
-
         bindex = [False for _ in range(len(self.sources))]
         data = [[] for _ in range(self.num_sources)]
         data_ready = [False] * self.num_sources
 
         while self.is_streaming():
-
             if self._check_is_result_source_ready(bindex):
                 break
             time.sleep(0.01)
 
         while self.is_streaming():
-
             for index, source in enumerate(self.sources):
                 if source.rbuffer.is_buffer_full(bindex[index]):
-
                     data[index] = source.rbuffer.read_buffer(bindex[index])
                     bindex[index] = source.rbuffer.get_next_index(bindex[index])
                     data_ready[index] = True
@@ -228,7 +219,6 @@ class FusionResultReader(BaseFusionReader, BaseResultReaderMixin):
 
 
 if __name__ == "__main__":
-
     from test import TestStreamReader
 
     config = {"CONFIG_SAMPLES_PER_PACKET": 1}

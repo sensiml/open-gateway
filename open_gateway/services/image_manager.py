@@ -3,22 +3,30 @@ import os
 import cv2
 import typing as t
 
+
 class ImageDoesNotExist(ValueError):
-    """ Raised when cant open image """
+    """Raised when cant open image"""
+
     pass
+
 
 class ImageReadError(Exception):
-    """ Raised when  """
+    """Raised when"""
+
     pass
+
 
 class ImageSaveError(Exception):
-    """ Raised when  """
+    """Raised when"""
+
     pass
 
-class ImageManager():
+
+class ImageManager:
     """
-        Manager for images
+    Manager for images
     """
+
     errors = (ImageDoesNotExist, ImageReadError, ImageSaveError)
 
     def __init__(self, dir_to_save: str) -> None:
@@ -40,7 +48,9 @@ class ImageManager():
         try:
             read_img = cv2.imread(img_path)
         except cv2.error:
-            raise ImageReadError(f"Failed to read {img_path}, please, make sure if this file has image format")
+            raise ImageReadError(
+                f"Failed to read {img_path}, please, make sure if this file has image format"
+            )
         else:
             return read_img
 
@@ -50,18 +60,22 @@ class ImageManager():
         try:
             saved = cv2.imwrite(image_path, read_img)
         except cv2.error:
-            raise ImageSaveError(f"Failed to save {img_name}, please, make sure if this file has image format")
+            raise ImageSaveError(
+                f"Failed to save {img_name}, please, make sure if this file has image format"
+            )
         else:
             if saved:
                 return image_name
             else:
                 raise ImageSaveError("Error ImageSaveError")
-    
+
     def resave_img(self, img_path: str, img_name: str) -> str:
         read_img = self.read_img(img_path)
         try:
             new_img_name = self.save_img(read_img=read_img, img_name=img_name)
         except ImageSaveError:
-            raise ImageSaveError(f"Failed to save {img_path}, please, make sure if this file has image format")
+            raise ImageSaveError(
+                f"Failed to save {img_path}, please, make sure if this file has image format"
+            )
         else:
             return new_img_name

@@ -47,7 +47,6 @@ class RecordSensor(object):
         self.data = {}
 
     def write_buffer(self, channel: int):
-
         num_cols = self.data[channel]["num_columns"]
         data = self.data[channel]["data_buffer"]
         print(
@@ -59,7 +58,6 @@ class RecordSensor(object):
             self.data[channel]["filename"],
         )
         with open(self.data[channel]["filename"], "a") as fid:
-
             for i in range(len(data) // num_cols):
                 fid.write(
                     ",".join(
@@ -81,7 +79,6 @@ class RecordSensor(object):
 
     @staticmethod
     def get_packet_header(ser):
-
         # Get size
         byte_array = ser.read() + ser.read()
 
@@ -102,7 +99,6 @@ class RecordSensor(object):
         return Header(data_size, rsvd, channel, sequence_number)
 
     def get_packet_data(self, ser: serial, header: Header):
-
         for i in range((header.data_size - 6) // 2):
             byte_array = ser.read() + ser.read()
             data_point = int.from_bytes(byte_array, "little", signed="True")
@@ -181,7 +177,6 @@ def summarize_recording(data_sizes, recorder):
 
 
 if __name__ == "__main__":
-
     COM_PORT = "COM4"
     RECORD_TIME = 10
     BAUD_RATE = 921600

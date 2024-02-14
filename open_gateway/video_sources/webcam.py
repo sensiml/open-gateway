@@ -21,7 +21,6 @@ class WebCam(VideoBase):
         return 1.0 / self.target_sample_per_frame
 
     def _start_webcam(self):
-
         start = time.time()
         capture_time = 0
         frame_time = start
@@ -60,7 +59,6 @@ class WebCam(VideoBase):
             time.sleep(0.0001)
 
     def start(self):
-
         if self.vs is not None:
             return
 

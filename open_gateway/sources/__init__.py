@@ -3,7 +3,7 @@ from open_gateway.sources.test import TestStreamReader, TestResultReader
 from open_gateway.sources.serial import SerialStreamReader, SerialResultReader
 from open_gateway.sources.tcpip import TCPIPStreamReader, TCPIPResultReader
 from open_gateway.sources.fusion import FusionStreamReader, FusionResultReader
-
+from open_gateway.sources.microphone import MICStreamReader, MICResultReader
 
 try:
     # use bleak ble drivers
@@ -16,10 +16,9 @@ except:
 def get_fusion_source(
     config, data_source, device_ids, source_type="DATA_CAPUTRE", **kwargs
 ):
-    """ Allows you to combine multiple sources into a single synced stream for Data Capture"""
+    """Allows you to combine multiple sources into a single synced stream for Data Capture"""
     sources = []
     for index, device_id in enumerate(device_ids.split(",")):
-
         sources.append(
             get_source(
                 config, data_source, device_id, source_type=source_type, **kwargs
@@ -33,7 +32,6 @@ def get_fusion_source(
 
 
 def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwargs):
-
     if device_id and len(device_id.split(",")) > 1:
         return get_fusion_source(
             config, data_source, device_id, source_type=source_type, **kwargs
@@ -53,6 +51,9 @@ def get_source(config, data_source, device_id, source_type="DATA_CAPTURE", **kwa
 
         if data_source == "TCPIP":
             return TCPIPStreamReader(config, device_id, **kwargs)
+
+        if data_source == "MICROPHONE":
+            return MICStreamReader(config, device_id, **kwargs)
 
     if source_type == "RECOGNITION":
         if data_source == "BLE":

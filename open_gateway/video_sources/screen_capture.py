@@ -20,9 +20,7 @@ class ScreenCatpure(VideoBase):
         return 1.0 / self.target_sample_per_frame
 
     def _start_screen_capture(self):
-
         with mss.mss() as sct:
-
             # Part of the screen to capture
             monitor = {"top": 0, "left": 0, "width": self.width, "height": self.height}
 
@@ -33,9 +31,7 @@ class ScreenCatpure(VideoBase):
             capture_time = 0
 
             while self.vs:
-
                 with self.lock:
-
                     if (time.time() - start) < self.target_sample_rate - capture_time:
                         pass
                     else:
@@ -67,7 +63,6 @@ class ScreenCatpure(VideoBase):
                 time.sleep(0.0001)
 
     def start(self):
-
         if self.vs is not None:
             return
 
@@ -82,7 +77,6 @@ class ScreenCatpure(VideoBase):
 
 
 def set_screen_resolution():
-
     from tkinter import Tk
 
     if os.environ.get("DISPLAY", "") == "":

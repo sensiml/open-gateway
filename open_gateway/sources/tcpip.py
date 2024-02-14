@@ -19,11 +19,9 @@ class TCPIPReader(BaseReader):
     name = "TCPIP"
 
     def __init__(self, config, device_id, **kwargs):
-
         self.device_id = device_id
 
         if kwargs.get("connect", True) is True:
-
             self._address = device_id.split(":")[0]
 
             if len(device_id.split(":")) == 2:
@@ -44,13 +42,11 @@ class TCPIPReader(BaseReader):
 
 class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
     def read_device_config(self):
-
         r = requests.get("{}/config".format(self.address))
 
         return self._validate_config(r.json())
 
     def _read_source(self):
-
         try:
             url = "{}/{}".format(self.address, "stream")
 
@@ -65,7 +61,6 @@ class TCPIPStreamReader(TCPIPReader, BaseStreamReaderMixin):
 
             with s.get(url, headers=None, stream=True) as resp:
                 for data in resp.iter_content(chunk_size=self.source_buffer_size):
-
                     if not self.streaming:
                         return
 
@@ -90,7 +85,6 @@ class TCPIPResultReader(TCPIPReader, BaseResultReaderMixin):
         config["DEVICE_ID"] = self.device_id
 
     def _read_source(self):
-
         url = "{}/{}".format(self.address, "results")
 
         s = requests.Session()
@@ -101,7 +95,6 @@ class TCPIPResultReader(TCPIPReader, BaseResultReaderMixin):
             content = ""
 
             for cont in resp.iter_content():
-
                 if not self.streaming:
                     return
 
@@ -121,8 +114,6 @@ class TCPIPResultReader(TCPIPReader, BaseResultReaderMixin):
                     content += data
 
 
-
-            
 if __name__ == "__main__":
     device_id = "192.168.86.27:80"
     config = {

@@ -29,7 +29,6 @@ print("Screen Capture Dimensions", monitor)
 
 for i in range(10000):
     with mss.mss() as sct:
-
         frame_counter = 0
         start = time.time()
         frame_time = start
